@@ -1,0 +1,5 @@
+title,description,property_type,listing_type,status,price,area_sqft,bedrooms,bathrooms,address,city,state,postal_code,amenities
+"Modern 2BHK Apartment","Spacious 2 bedroom apartment with modern amenities",apartment,sale,new,5500000,1200,2,2,"123 Main Street, Downtown",Mumbai,Maharashtra,400001,"parking,gym,swimming_pool,security"
+"Luxury Villa","Beautiful 4 bedroom villa with garden",house,sale,new,12000000,2500,4,3,"456 Garden Lane, Suburb",Pune,Maharashtra,411001,"garden,parking,security,club_house"
+"Commercial Office Space","Prime location office space for rent",commercial,rent,new,150000,800,0,2,"789 Business District",Bangalore,Karnataka,560001,"parking,elevator,ac,security"
+"Residential Plot","Ready to build residential plot",land,sale,new,3000000,2000,0,0,"Plot 101, Green Valley",Chennai,Tamil Nadu,600001,"water_connection,electricity"

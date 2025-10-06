@@ -4,6 +4,10 @@ import sequelize from '../config/database';
 interface SeoSettingsAttributes {
   id: number;
   page: string;
+  entityType?: string;        // Add this
+  entityId?: number;          // Add this  
+  pageType?: string;          // Add this
+  isActive?: boolean;         // Add this
   title?: string;
   description?: string;
   keywords?: string;
@@ -22,6 +26,10 @@ interface SeoSettingsCreationAttributes extends Optional<SeoSettingsAttributes, 
 class SeoSettings extends Model<SeoSettingsAttributes, SeoSettingsCreationAttributes> implements SeoSettingsAttributes {
   public id!: number;
   public page!: string;
+  public entityType?: string;        // Add this
+  public entityId?: number;          // Add this  
+  public pageType?: string;          // Add this
+  public isActive?: boolean;         // Add this
   public title?: string;
   public description?: string;
   public keywords?: string;
@@ -50,6 +58,22 @@ export const initializeSeoSettings = () => {
         type: DataTypes.STRING(255),
         allowNull: false,
         unique: true,
+      },
+      entityType: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
+      entityId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      pageType: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
+      isActive: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
       },
       title: {
         type: DataTypes.STRING(255),

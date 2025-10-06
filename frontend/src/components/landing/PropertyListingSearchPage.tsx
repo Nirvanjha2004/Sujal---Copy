@@ -298,7 +298,7 @@ export function PropertyListingSearchPage() {
         </div>
       </header>
       
-      <div className="max-w-[1400px] mx-auto pl-3 pr-8 py-4">
+      <div className="max-w-[1400px] mx-auto pl-2 pr-9 py-4">
         <div className="text-sm text-muted-foreground mb-6">
           Home › Property in {searchQuery || 'All Locations'} {listingType === 'rent' ? 'for Rent' : 'for Sale'}
         </div>

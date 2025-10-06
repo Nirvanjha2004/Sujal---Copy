@@ -15,7 +15,7 @@ class AdminController {
   getDashboardAnalytics = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const analytics = await this.adminService.getDashboardAnalytics();
-
+      console.log('Dashboard analytics:', analytics);
       res.json({
         success: true,
         data: analytics,
@@ -35,23 +35,31 @@ class AdminController {
   };
 
   /**
-   * Get users for moderation
+   * Get users for moderation - FIXED with correct parameter mapping
    */
   getUsersForModeration = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
       const role = req.query.role as UserRole;
+      
+      // Map camelCase query params to snake_case for database
       const isVerified = req.query.isVerified ? req.query.isVerified === 'true' : undefined;
       const isActive = req.query.isActive ? req.query.isActive === 'true' : undefined;
       const search = req.query.search as string;
+      
+      console.log('Fetching users for moderation with params:', { 
+        page, limit, role, isVerified, isActive, search 
+      });
 
       const result = await this.adminService.getUsersForModeration(page, limit, {
         role,
-        isVerified,
-        isActive,
+        is_verified: isVerified,    // Convert camelCase to snake_case
+        is_active: isActive,        // Convert camelCase to snake_case
         search,
       });
+
+      console.log('Fetched users for moderation:', result);
 
       res.json({
         success: true,
@@ -72,23 +80,31 @@ class AdminController {
   };
 
   /**
-   * Get properties for moderation
+   * Get properties for moderation - FIXED with correct parameter mapping
    */
   getPropertiesForModeration = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
-      const propertyType = req.query.propertyType as string;
+      
+      // Map camelCase query params to snake_case for database
+      const propertyType = req.query.propertyType as string;      // Frontend sends propertyType
       const isActive = req.query.isActive ? req.query.isActive === 'true' : undefined;
       const isFeatured = req.query.isFeatured ? req.query.isFeatured === 'true' : undefined;
       const search = req.query.search as string;
 
+      console.log('Fetching properties for moderation with params:', { 
+        page, limit, propertyType, isActive, isFeatured, search 
+      });
+
       const result = await this.adminService.getPropertiesForModeration(page, limit, {
-        propertyType,
-        isActive,
-        isFeatured,
+        property_type: propertyType,    // Convert camelCase to snake_case
+        is_active: isActive,            // Convert camelCase to snake_case
+        is_featured: isFeatured,        // Convert camelCase to snake_case
         search,
       });
+
+      console.log('Fetched properties for moderation:', result);
 
       res.json({
         success: true,
@@ -109,12 +125,12 @@ class AdminController {
   };
 
   /**
-   * Update user status
+   * Update user status - FIXED with correct field mapping
    */
   updateUserStatus = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const { userId } = req.params;
-      const { isActive, isVerified, role } = req.body;
+      const { isActive, isVerified, role } = req.body;  // Frontend sends camelCase
 
       if (!userId || isNaN(parseInt(userId))) {
         res.status(400).json({
@@ -128,9 +144,10 @@ class AdminController {
         return;
       }
 
+      // Map camelCase to snake_case for database
       const updates: any = {};
-      if (isActive !== undefined) updates.isActive = isActive;
-      if (isVerified !== undefined) updates.isVerified = isVerified;
+      if (isActive !== undefined) updates.is_active = isActive;      // Convert to snake_case
+      if (isVerified !== undefined) updates.is_verified = isVerified; // Convert to snake_case
       if (role !== undefined) updates.role = role;
 
       if (Object.keys(updates).length === 0) {
@@ -145,6 +162,7 @@ class AdminController {
         return;
       }
 
+      console.log('Updating user status:', { userId, updates });
       const user = await this.adminService.updateUserStatus(parseInt(userId), updates);
 
       res.json({
@@ -179,12 +197,12 @@ class AdminController {
   };
 
   /**
-   * Update property status
+   * Update property status - FIXED with correct field mapping
    */
   updatePropertyStatus = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const { propertyId } = req.params;
-      const { isActive, isFeatured } = req.body;
+      const { isActive, isFeatured } = req.body;  // Frontend sends camelCase
 
       if (!propertyId || isNaN(parseInt(propertyId))) {
         res.status(400).json({
@@ -198,9 +216,10 @@ class AdminController {
         return;
       }
 
+      // Map camelCase to snake_case for database
       const updates: any = {};
-      if (isActive !== undefined) updates.isActive = isActive;
-      if (isFeatured !== undefined) updates.isFeatured = isFeatured;
+      if (isActive !== undefined) updates.is_active = isActive;      // Convert to snake_case
+      if (isFeatured !== undefined) updates.is_featured = isFeatured; // Convert to snake_case
 
       if (Object.keys(updates).length === 0) {
         res.status(400).json({
@@ -214,6 +233,7 @@ class AdminController {
         return;
       }
 
+      console.log('Updating property status:', { propertyId, updates });
       const property = await this.adminService.updatePropertyStatus(parseInt(propertyId), updates);
 
       res.json({
@@ -266,6 +286,7 @@ class AdminController {
         return;
       }
 
+      console.log('Deleting user:', userId);
       await this.adminService.deleteUser(parseInt(userId));
 
       res.json({
@@ -318,6 +339,7 @@ class AdminController {
         return;
       }
 
+      console.log('Deleting property:', propertyId);
       await this.adminService.deleteProperty(parseInt(propertyId));
 
       res.json({

@@ -14,8 +14,39 @@ class SeoController {
    */
   getSeoSettings = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { entityType, entityId, pageType } = req.query;
+      const { entityType, entityId, pageType, page, limit } = req.query;
 
+      // Check if this is a request for ALL settings (admin list view)
+      if (page || limit) {
+        // This is for the admin list - get all settings with pagination
+        const pageNum = parseInt(page as string) || 1;
+        const limitNum = parseInt(limit as string) || 20;
+
+        // Get all settings with optional filters
+        const filters: any = {};
+        if (entityType) filters.entityType = entityType;
+        if (entityId) filters.entityId = entityId;
+        if (pageType) filters.pageType = pageType;
+
+        const result = await this.seoService.getAllSeoSettings(
+          pageNum,
+          limitNum,
+          filters
+        );
+
+        res.json({
+          success: true,
+          data: {
+            settings: result.settings,
+            total: result.total,
+            totalPages: result.totalPages,
+          },
+          timestamp: new Date().toISOString(),
+        } as ApiResponse);
+        return;
+      }
+
+      // Original logic for getting specific entity settings
       if (!entityType || typeof entityType !== 'string') {
         res.status(400).json({
           success: false,
@@ -161,7 +192,7 @@ class SeoController {
       } as ApiResponse);
     } catch (error) {
       console.error('Error getting property SEO metadata:', error);
-      
+
       if (error instanceof Error && error.message === 'Property not found') {
         res.status(404).json({
           success: false,

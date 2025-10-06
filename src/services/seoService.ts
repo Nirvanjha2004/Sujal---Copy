@@ -363,6 +363,198 @@ class SeoService {
 
     return { title, description, keywords };
   }
+
+  /**
+   * Get all SEO settings with pagination and filters
+   */
+  async getAllSeoSettings(
+    page: number = 1,
+    limit: number = 20,
+    filters: {
+      entityType?: string;
+      entityId?: number;
+      pageType?: string;
+      isActive?: boolean;
+      search?: string;
+    } = {}
+  ): Promise<{
+    settings: any[];
+    total: number;
+    totalPages: number;
+  }> {
+    const { Op } = require('sequelize');
+    const whereClause: any = {};
+
+    // Apply filters
+    if (filters.entityType) {
+      whereClause.entityType = filters.entityType;
+    }
+
+    if (filters.entityId) {
+      whereClause.entityId = filters.entityId;
+    }
+
+    if (filters.pageType) {
+      whereClause.pageType = filters.pageType;
+    }
+
+    if (filters.isActive !== undefined) {
+      whereClause.isActive = filters.isActive;
+    }
+
+    if (filters.search) {
+      whereClause[Op.or] = [
+        { title: { [Op.iLike]: `%${filters.search}%` } },
+        { description: { [Op.iLike]: `%${filters.search}%` } },
+        { keywords: { [Op.iLike]: `%${filters.search}%` } }
+      ];
+    }
+
+    const offset = (page - 1) * limit;
+
+    const { count, rows } = await SeoSettings.findAndCountAll({
+      where: whereClause,
+      limit,
+      offset,
+      order: [['updatedAt', 'DESC']],
+    });
+
+    return {
+      settings: rows,
+      total: count,
+      totalPages: Math.ceil(count / limit),
+    };
+  }
+
+  /**
+   * Update SEO settings by ID
+   */
+  async updateSeoSettings(
+    id: number,
+    data: {
+      entityType?: string;
+      entityId?: number;
+      pageType?: string;
+      title?: string;
+      description?: string;
+      keywords?: string;
+      ogTitle?: string;
+      ogDescription?: string;
+      ogImage?: string;
+      canonicalUrl?: string;
+      metaRobots?: string;
+      schemaMarkup?: object;
+      isActive?: boolean;
+    }
+  ): Promise<SeoSettings> {
+    const seoSetting = await SeoSettings.findByPk(id);
+    
+    if (!seoSetting) {
+      throw new Error('SEO setting not found');
+    }
+
+    // Create page identifier based on entityType and other params
+    let pageIdentifier = data.entityType || seoSetting.page;
+    if (data.entityId) {
+      pageIdentifier = `${data.entityType}-${data.entityId}`;
+    } else if (data.pageType) {
+      pageIdentifier = data.pageType;
+    }
+
+    await seoSetting.update({
+      page: pageIdentifier,
+      title: data.title,
+      description: data.description,
+      keywords: data.keywords,
+      ogTitle: data.ogTitle,
+      ogDescription: data.ogDescription,
+      ogImage: data.ogImage,
+      canonicalUrl: data.canonicalUrl,
+      metaRobots: data.metaRobots,
+      structuredData: data.schemaMarkup,
+      // Note: Add these fields to your model if they don't exist
+      entityType: data.entityType,
+      entityId: data.entityId,
+      pageType: data.pageType,
+      isActive: data.isActive,
+    });
+
+    return seoSetting.reload();
+  }
+
+  /**
+   * Delete SEO settings by ID
+   */
+  async deleteSeoSettings(id: number): Promise<void> {
+    const seoSetting = await SeoSettings.findByPk(id);
+    
+    if (!seoSetting) {
+      throw new Error('SEO setting not found');
+    }
+
+    await seoSetting.destroy();
+  }
+
+  /**
+   * Update SEO setting status by ID
+   */
+  async updateSeoStatus(id: number, isActive: boolean): Promise<SeoSettings> {
+    const seoSetting = await SeoSettings.findByPk(id);
+    
+    if (!seoSetting) {
+      throw new Error('SEO setting not found');
+    }
+
+    await seoSetting.update({ isActive });
+    return seoSetting.reload();
+  }
+
+  /**
+   * Create new SEO settings
+   */
+  async createSeoSettings(data: {
+    entityType: string;
+    entityId?: number;
+    pageType?: string;
+    title: string;
+    description: string;
+    keywords?: string;
+    ogTitle?: string;
+    ogDescription?: string;
+    ogImage?: string;
+    canonicalUrl?: string;
+    metaRobots?: string;
+    schemaMarkup?: object;
+    isActive?: boolean;
+  }): Promise<SeoSettings> {
+    // Create page identifier based on entityType and other params
+    let pageIdentifier = data.entityType;
+    if (data.entityId) {
+      pageIdentifier = `${data.entityType}-${data.entityId}`;
+    } else if (data.pageType) {
+      pageIdentifier = data.pageType;
+    }
+
+    const seoSetting = await SeoSettings.create({
+      page: pageIdentifier,
+      title: data.title,
+      description: data.description,
+      keywords: data.keywords,
+      ogTitle: data.ogTitle,
+      ogDescription: data.ogDescription,
+      ogImage: data.ogImage,
+      canonicalUrl: data.canonicalUrl,
+      metaRobots: data.metaRobots,
+      structuredData: data.schemaMarkup,
+      // Note: Add these fields to your model if they don't exist
+      entityType: data.entityType,
+      entityId: data.entityId,
+      pageType: data.pageType,
+      isActive: data.isActive !== undefined ? data.isActive : true,
+    });
+
+    return seoSetting;
+  }
 }
 
 export default SeoService;

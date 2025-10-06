@@ -4,7 +4,15 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Icon } from '@iconify/react';
 import { httpClient } from '@/lib/httpClient';
-import { Layout } from '@/components/layout/Layout';
+import { AdminLayout } from '../layout/AdminLayout';
+
+// Tooltip imports - add these to your project if they don't exist
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface PropertyModerationData {
   id: number;
@@ -119,240 +127,263 @@ export function PropertyModeration() {
 
   if (loading && properties.length === 0) {
     return (
-      <Layout>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <AdminLayout>
+        <div className="flex items-center justify-center min-h-64">
           <div className="text-center">
             <Icon icon="solar:refresh-bold" className="size-8 animate-spin text-primary mb-4" />
             <p className="text-muted-foreground">Loading properties...</p>
           </div>
         </div>
-      </Layout>
+      </AdminLayout>
     );
   }
 
   return (
-    <Layout>
-      <div className="min-h-screen bg-gray-50">
-        <div className="container mx-auto px-4 py-8">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Property Moderation</h1>
-            <p className="text-gray-600">Review and manage property listings</p>
+    <AdminLayout>
+      <div className="max-w-[1200px] mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Property Moderation</h1>
+          <p className="text-gray-600">Review and manage property listings</p>
+        </div>
+
+        {/* Filters */}
+        <Card className="p-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+              <div className="flex">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search by title or city..."
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <Button onClick={handleSearch} className="rounded-l-none">
+                  <Icon icon="solar:magnifer-bold" className="size-4" />
+                </Button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Property Type</label>
+              <select
+                value={filters.propertyType || ''}
+                onChange={(e) => handleFilterChange('propertyType', e.target.value || undefined)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">All Types</option>
+                <option value="apartment">Apartment</option>
+                <option value="house">House</option>
+                <option value="commercial">Commercial</option>
+                <option value="land">Land</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+              <select
+                value={filters.isActive !== undefined ? filters.isActive.toString() : ''}
+                onChange={(e) => handleFilterChange('isActive', e.target.value ? e.target.value === 'true' : undefined)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">All Status</option>
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Featured</label>
+              <select
+                value={filters.isFeatured !== undefined ? filters.isFeatured.toString() : ''}
+                onChange={(e) => handleFilterChange('isFeatured', e.target.value ? e.target.value === 'true' : undefined)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">All Featured</option>
+                <option value="true">Featured</option>
+                <option value="false">Not Featured</option>
+              </select>
+            </div>
+          </div>
+        </Card>
+
+        {/* Properties Table */}
+        <Card>
+          <div>
+            <table className="w-full table-fixed">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[28%]">
+                    Property
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[12%]">
+                    Type
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[12%]">
+                    Price
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[24%]">
+                    Owner
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[12%]">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[12%]">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {properties.map((property) => (
+                  <tr key={property.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-4">
+                      <div className="truncate">
+                        <div className="text-sm font-medium text-gray-900 truncate">
+                          {property.title}
+                        </div>
+                        <div className="text-sm text-gray-500 truncate">
+                          {property.city} • {property.viewsCount} views • {new Date(property.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <Badge className={`${getPropertyTypeBadgeColor(property.propertyType)} capitalize`}>
+                        {property.propertyType}
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-4 text-sm text-gray-900">
+                      {formatPrice(property.price)}
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="truncate">
+                        <div className="text-sm font-medium text-gray-900 truncate">
+                          {property.user.firstName} {property.user.lastName}
+                        </div>
+                        <div className="text-sm text-gray-500 truncate">{property.user.email}</div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="flex flex-col space-y-1">
+                        <Badge variant={property.isActive ? "default" : "secondary"}>
+                          {property.isActive ? 'Active' : 'Inactive'}
+                        </Badge>
+                        {property.isFeatured && (
+                          <Badge className="bg-yellow-100 text-yellow-800">
+                            Featured
+                          </Badge>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <TooltipProvider>
+                        <div className="flex items-center space-x-2">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={() => updatePropertyStatus(property.id, { isActive: !property.isActive })}
+                                className="h-8 w-8"
+                              >
+                                <Icon 
+                                  icon={property.isActive ? "solar:eye-closed-bold" : "solar:eye-bold"} 
+                                  className="size-4" 
+                                />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{property.isActive ? 'Deactivate' : 'Activate'}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                          
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={() => updatePropertyStatus(property.id, { isFeatured: !property.isFeatured })}
+                                className="h-8 w-8"
+                              >
+                                <Icon 
+                                  icon={property.isFeatured ? "solar:star-bold" : "solar:star-outline-bold"} 
+                                  className="size-4" 
+                                />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{property.isFeatured ? 'Unfeature' : 'Feature'}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                          
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={() => deleteProperty(property.id)}
+                                className="h-8 w-8 text-red-600 hover:text-red-800 hover:bg-red-50"
+                              >
+                                <Icon icon="solar:trash-bin-trash-bold" className="size-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Delete</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                      </TooltipProvider>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
 
-          {/* Filters */}
-          <Card className="p-6 mb-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
-                <div className="flex">
-                  <input
-                    type="text"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search by title or city..."
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <Button onClick={handleSearch} className="rounded-l-none">
-                    <Icon icon="solar:magnifer-bold" className="size-4" />
+          {/* Pagination - unchanged */}
+          {totalPages > 1 && (
+            <div className="px-6 py-3 bg-gray-50 border-t border-gray-200">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-700">
+                  Page {currentPage} of {totalPages}
+                </div>
+                <div className="flex space-x-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
                   </Button>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Property Type</label>
-                <select
-                  value={filters.propertyType || ''}
-                  onChange={(e) => handleFilterChange('propertyType', e.target.value || undefined)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">All Types</option>
-                  <option value="apartment">Apartment</option>
-                  <option value="house">House</option>
-                  <option value="commercial">Commercial</option>
-                  <option value="land">Land</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                <select
-                  value={filters.isActive !== undefined ? filters.isActive.toString() : ''}
-                  onChange={(e) => handleFilterChange('isActive', e.target.value ? e.target.value === 'true' : undefined)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">All Status</option>
-                  <option value="true">Active</option>
-                  <option value="false">Inactive</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Featured</label>
-                <select
-                  value={filters.isFeatured !== undefined ? filters.isFeatured.toString() : ''}
-                  onChange={(e) => handleFilterChange('isFeatured', e.target.value ? e.target.value === 'true' : undefined)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">All Featured</option>
-                  <option value="true">Featured</option>
-                  <option value="false">Not Featured</option>
-                </select>
-              </div>
-            </div>
-          </Card>
-
-          {/* Properties Table */}
-          <Card className="overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Property
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Type
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Price
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Owner
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Views
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Created
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {properties.map((property) => (
-                    <tr key={property.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900 max-w-xs truncate">
-                            {property.title}
-                          </div>
-                          <div className="text-sm text-gray-500">{property.city}</div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Badge className={`${getPropertyTypeBadgeColor(property.propertyType)} capitalize`}>
-                          {property.propertyType}
-                        </Badge>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {formatPrice(property.price)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">
-                            {property.user.firstName} {property.user.lastName}
-                          </div>
-                          <div className="text-sm text-gray-500">{property.user.email}</div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex flex-col space-y-1">
-                          <Badge variant={property.isActive ? "default" : "secondary"}>
-                            {property.isActive ? 'Active' : 'Inactive'}
-                          </Badge>
-                          {property.isFeatured && (
-                            <Badge className="bg-yellow-100 text-yellow-800">
-                              Featured
-                            </Badge>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {property.viewsCount}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(property.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex justify-end space-x-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => updatePropertyStatus(property.id, { isActive: !property.isActive })}
-                          >
-                            {property.isActive ? 'Deactivate' : 'Activate'}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => updatePropertyStatus(property.id, { isFeatured: !property.isFeatured })}
-                          >
-                            {property.isFeatured ? 'Unfeature' : 'Feature'}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => deleteProperty(property.id)}
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="px-6 py-3 bg-gray-50 border-t border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm text-gray-700">
-                    Page {currentPage} of {totalPages}
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                      disabled={currentPage === 1}
-                    >
-                      Previous
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                      disabled={currentPage === totalPages}
-                    >
-                      Next
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </Card>
-
-          {error && (
-            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-md">
-              <div className="flex">
-                <Icon icon="solar:danger-triangle-bold" className="size-5 text-red-400" />
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800">Error</h3>
-                  <div className="mt-2 text-sm text-red-700">{error}</div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </Button>
                 </div>
               </div>
             </div>
           )}
-        </div>
+        </Card>
+
+        {/* Error display - unchanged */}
+        {error && (
+          <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-md">
+            <div className="flex">
+              <Icon icon="solar:danger-triangle-bold" className="size-5 text-red-400" />
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">Error</h3>
+                <div className="mt-2 text-sm text-red-700">{error}</div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-    </Layout>
+    </AdminLayout>
   );
 }

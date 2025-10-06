@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Icon } from '@iconify/react';
 import { httpClient } from '@/lib/httpClient';
 import { Layout } from '@/components/layout/Layout';
+import { AdminLayout } from '../layout/AdminLayout';
 
 interface User {
   id: number;
@@ -104,19 +105,19 @@ export function RoleAssignment() {
 
   if (loading && users.length === 0) {
     return (
-      <Layout>
+      <AdminLayout>
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
             <Icon icon="solar:refresh-bold" className="size-8 animate-spin text-primary mb-4" />
             <p className="text-muted-foreground">Loading users...</p>
           </div>
         </div>
-      </Layout>
+      </AdminLayout>
     );
   }
 
   return (
-    <Layout>
+    <AdminLayout>
       <div className="min-h-screen bg-gray-50">
         <div className="container mx-auto px-4 py-8">
           {/* Header */}
@@ -375,6 +376,6 @@ export function RoleAssignment() {
           </div>
         </div>
       )}
-    </Layout>
+    </AdminLayout>
   );
 }

@@ -14,6 +14,7 @@ import searchHistoryRoutes from './searchHistoryRoutes';
 import publicRoutes from './publicRoutes';
 import adminRoutes from './adminRoutes';
 import seoRoutes from './seoRoutes';
+import cmsRoutes from './cmsRoutes';
 
 const router = Router();
 
@@ -37,6 +38,8 @@ router.use('/v1/search-history', searchHistoryRoutes);
 router.use('/v1/public', publicRoutes);
 router.use('/v1/admin', adminRoutes);
 router.use('/v1/seo', seoRoutes);
+router.use('/v1/cms', cmsRoutes);  // MAKE SURE THIS IS REGISTERED
+
 
 // Legacy routes (redirect to v1 for backward compatibility)
 router.use('/auth', (req, res) => res.redirect(301, `/api/v1/auth${req.url}`));

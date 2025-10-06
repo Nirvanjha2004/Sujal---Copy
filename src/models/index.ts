@@ -5,6 +5,7 @@ export { PropertyImage } from './PropertyImage';
 export { Inquiry, InquiryStatus } from './Inquiry';
 export { UserFavorite } from './UserFavorite';
 export { SavedSearch, SearchCriteria } from './SavedSearch';
+export { default as CmsContent } from './CmsContent';
 
 // Export database connection
 export { default as sequelize, connectDatabase } from '../config/database';

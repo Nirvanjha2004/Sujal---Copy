@@ -3,9 +3,7 @@ import { ErrorBoundary } from './components/layout/ErrorBoundary'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
 import { RealEstateLandingPage } from './components/landing/RealEstateLandingPage2'
 import { PropertyListingPage } from './components/landing/PropertyListingPage'
-import { PropertyDetailsPageSimple } from './components/property/PropertyDetailsPageSimple'
 import { PropertyListingGrid } from './components/landing/PropertyListingGrid2'
-import { SearchPage } from './components/search/SearchPage'
 import { LoginPage } from './components/auth/LoginPage'
 import { RegisterPage } from './components/auth/RegisterPage'
 import { OTPVerificationPage } from './components/auth/OTPVerificationPage'
@@ -24,6 +22,7 @@ import { CommunicationPageWrapper } from './components/communication/Communicati
 import { CommunicationDemo } from './components/communication/CommunicationDemo'
 import AgentDashboard from './components/properties/AgentDashboard'
 import { PropertyListingSearchPage } from './components/landing/PropertyListingSearchPage'
+import { PropertySearchDashboard } from './components/landing/SearchViewedDashboard'
 
 function App() {
     return (
@@ -36,6 +35,9 @@ function App() {
                             <Route path="/search" element={<PropertyListingSearchPage />} />
                             <Route path="/property/:id" element={<PropertyListingPage />} />
                             <Route path="/calculators" element={<CalculatorsPage />} />
+                            
+                            {/* Search & Activity Dashboard - Can be accessed by both authenticated and unauthenticated users */}
+                            <Route path="/search-dashboard" element={<PropertySearchDashboard />} />
 
                             {/* Authentication routes */}
                             <Route path="/login" element={<LoginPage />} />

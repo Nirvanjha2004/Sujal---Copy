@@ -1,6 +1,5 @@
 import { Op } from 'sequelize';
 import CmsContent from '../models/CmsContent';
-import { User } from '../models/User';
 
 interface CmsContentData {
   id: number;
@@ -13,12 +12,6 @@ interface CmsContentData {
   displayOrder: number;
   createdAt: Date;
   updatedAt: Date;
-  creator?: {
-    id: number;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
 }
 
 interface CreateCmsContentData {
@@ -41,7 +34,7 @@ interface UpdateCmsContentData {
 
 class CmsService {
   /**
-   * Get all CMS content with optional filtering
+   * Get all CMS content with optional filtering - FIXED
    */
   async getAllContent(
     page: number = 1,
@@ -71,24 +64,32 @@ class CmsService {
       }
     }
 
-    const { count, rows } = await CmsContent.findAndCountAll({
-      where: whereClause,
-      offset,
-      limit,
-      order: [['displayOrder', 'DESC'], ['createdAt', 'DESC']],
-    });
+    console.log('CMS Service - Getting content with filters:', whereClause);
 
-    const content = rows.map(item => item.toJSON()) as CmsContentData[];
+    try {
+      const { count, rows } = await CmsContent.findAndCountAll({
+        where: whereClause,
+        offset,
+        limit,
+        order: [['displayOrder', 'DESC'], ['createdAt', 'DESC']],
+      });
 
-    return {
-      content,
-      total: count,
-      totalPages: Math.ceil(count / limit),
-    };
+      const content = rows.map(item => item.toJSON()) as CmsContentData[];
+      console.log('CMS Service - Found content:', content.length);
+
+      return {
+        content,
+        total: count,
+        totalPages: Math.ceil(count / limit),
+      };
+    } catch (error) {
+      console.error('CMS Service - Error getting content:', error);
+      throw error;
+    }
   }
 
   /**
-   * Get active content for public display
+   * Get active content for public display - FIXED
    */
   async getActiveContent(
     type?: 'banner' | 'announcement' | 'page' | 'widget'
@@ -101,198 +102,198 @@ class CmsService {
       whereClause.type = type;
     }
 
-    const content = await CmsContent.findAll({
-      where: whereClause,
-      order: [['displayOrder', 'DESC'], ['createdAt', 'DESC']],
-    });
+    try {
+      const content = await CmsContent.findAll({
+        where: whereClause,
+        order: [['displayOrder', 'DESC'], ['createdAt', 'DESC']],
+      });
 
-    return content.map(item => item.toJSON()) as CmsContentData[];
+      return content.map(item => item.toJSON()) as CmsContentData[];
+    } catch (error) {
+      console.error('CMS Service - Error getting active content:', error);
+      throw error;
+    }
   }
 
   /**
-   * Get content by ID
+   * Get content by ID - FIXED
    */
   async getContentById(id: number): Promise<CmsContentData | null> {
-    const content = await CmsContent.findByPk(id);
+    try {
+      const content = await CmsContent.findByPk(id);
 
-    if (!content) {
-      return null;
+      if (!content) {
+        return null;
+      }
+
+      return content.toJSON() as CmsContentData;
+    } catch (error) {
+      console.error('CMS Service - Error getting content by ID:', error);
+      throw error;
     }
-
-    return content.toJSON() as CmsContentData;
   }
 
   /**
-   * Get content by key
+   * Get content by key - FIXED
    */
   async getContentByKey(key: string): Promise<CmsContentData | null> {
-    const content = await CmsContent.findOne({
-      where: { key },
-    });
+    try {
+      const content = await CmsContent.findOne({
+        where: { key },
+      });
 
-    if (!content) {
-      return null;
+      if (!content) {
+        return null;
+      }
+
+      return content.toJSON() as CmsContentData;
+    } catch (error) {
+      console.error('CMS Service - Error getting content by key:', error);
+      throw error;
     }
-
-    return content.toJSON() as CmsContentData;
   }
 
   /**
-   * Create new CMS content
+   * Create new CMS content - FIXED
    */
   async createContent(data: CreateCmsContentData): Promise<CmsContentData> {
-    // Check if key already exists
-    const existingContent = await CmsContent.findOne({ where: { key: data.key } });
-    if (existingContent) {
-      throw new Error('Content with this key already exists');
+    try {
+      // Check if key already exists
+      const existingContent = await CmsContent.findOne({ where: { key: data.key } });
+      if (existingContent) {
+        throw new Error('Content with this key already exists');
+      }
+
+      console.log('CMS Service - Creating content:', data);
+
+      const content = await CmsContent.create({
+        type: data.type,
+        key: data.key,
+        title: data.title,
+        content: data.content,
+        metadata: data.metadata,
+        isActive: data.isActive ?? true,
+        displayOrder: data.displayOrder || 0,
+      });
+
+      console.log('CMS Service - Created content:', content.id);
+
+      return content.toJSON() as CmsContentData;
+    } catch (error) {
+      console.error('CMS Service - Error creating content:', error);
+      throw error;
     }
-
-    const content = await CmsContent.create({
-      type: data.type,
-      key: data.key,
-      title: data.title,
-      content: data.content,
-      metadata: data.metadata,
-      isActive: data.isActive ?? true,
-      displayOrder: data.displayOrder || 0,
-    });
-
-    return this.getContentById(content.id) as Promise<CmsContentData>;
   }
 
   /**
-   * Update CMS content
+   * Update CMS content - FIXED
    */
   async updateContent(id: number, data: UpdateCmsContentData): Promise<CmsContentData> {
-    const content = await CmsContent.findByPk(id);
-    if (!content) {
-      throw new Error('Content not found');
-    }
+    try {
+      const content = await CmsContent.findByPk(id);
+      if (!content) {
+        throw new Error('Content not found');
+      }
 
-    await content.update(data);
-    return this.getContentById(id) as Promise<CmsContentData>;
+      console.log('CMS Service - Updating content:', { id, data });
+
+      await content.update(data);
+      return content.toJSON() as CmsContentData;
+    } catch (error) {
+      console.error('CMS Service - Error updating content:', error);
+      throw error;
+    }
   }
 
   /**
-   * Delete CMS content
+   * Delete CMS content - FIXED
    */
   async deleteContent(id: number): Promise<void> {
-    const content = await CmsContent.findByPk(id);
-    if (!content) {
-      throw new Error('Content not found');
-    }
+    try {
+      const content = await CmsContent.findByPk(id);
+      if (!content) {
+        throw new Error('Content not found');
+      }
 
-    await content.destroy();
+      console.log('CMS Service - Deleting content:', id);
+
+      await content.destroy();
+    } catch (error) {
+      console.error('CMS Service - Error deleting content:', error);
+      throw error;
+    }
   }
 
   /**
-   * Toggle content active status
+   * Toggle content active status - FIXED
    */
   async toggleContentStatus(id: number): Promise<CmsContentData> {
-    const content = await CmsContent.findByPk(id);
-    if (!content) {
-      throw new Error('Content not found');
-    }
+    try {
+      const content = await CmsContent.findByPk(id);
+      if (!content) {
+        throw new Error('Content not found');
+      }
 
-    await content.update({ isActive: !content.isActive });
-    return this.getContentById(id) as Promise<CmsContentData>;
+      await content.update({ isActive: !content.isActive });
+      return content.toJSON() as CmsContentData;
+    } catch (error) {
+      console.error('CMS Service - Error toggling content status:', error);
+      throw error;
+    }
   }
 
   /**
-   * Get banners for display
+   * Get banners for display - FIXED
    */
   async getActiveBanners(): Promise<CmsContentData[]> {
     return this.getActiveContent('banner');
   }
 
   /**
-   * Get announcements for display
+   * Get announcements for display - FIXED
    */
   async getActiveAnnouncements(): Promise<CmsContentData[]> {
     return this.getActiveContent('announcement');
   }
 
   /**
-   * Get page content
-   */
-  async getPageContent(key: string): Promise<CmsContentData | null> {
-    const content = await CmsContent.findOne({
-      where: {
-        key,
-        type: 'page',
-        isActive: true,
-      },
-    });
-
-    return content ? (content.toJSON() as CmsContentData) : null;
-  }
-
-  /**
-   * Get widget content
-   */
-  async getWidgetContent(key: string): Promise<CmsContentData | null> {
-    const content = await CmsContent.findOne({
-      where: {
-        key,
-        type: 'widget',
-        isActive: true,
-      },
-    });
-
-    return content ? (content.toJSON() as CmsContentData) : null;
-  }
-
-  /**
-   * Bulk update content status
-   */
-  async bulkUpdateStatus(ids: number[], isActive: boolean): Promise<number> {
-    const [affectedCount] = await CmsContent.update(
-      { isActive },
-      {
-        where: {
-          id: {
-            [Op.in]: ids,
-          },
-        },
-      }
-    );
-
-    return affectedCount;
-  }
-
-  /**
-   * Get content statistics
+   * Get content statistics - FIXED
    */
   async getContentStats(): Promise<{
     totalContent: number;
     activeContent: number;
     contentByType: Record<string, number>;
   }> {
-    const [
-      totalContent,
-      activeContent,
-      contentByType,
-    ] = await Promise.all([
-      CmsContent.count(),
-      CmsContent.count({ where: { isActive: true } }),
-      CmsContent.findAll({
-        attributes: ['type'],
-        group: ['type'],
-        raw: true,
-      }),
-    ]);
+    try {
+      const [
+        totalContent,
+        activeContent,
+        contentByType,
+      ] = await Promise.all([
+        CmsContent.count(),
+        CmsContent.count({ where: { isActive: true } }),
+        CmsContent.findAll({
+          attributes: ['type'],
+          group: ['type'],
+          raw: true,
+        }),
+      ]);
 
-    const typeStats: Record<string, number> = {};
-    for (const item of contentByType as any[]) {
-      const count = await CmsContent.count({ where: { type: item.type } });
-      typeStats[item.type] = count;
+      const typeStats: Record<string, number> = {};
+      for (const item of contentByType as any[]) {
+        const count = await CmsContent.count({ where: { type: item.type } });
+        typeStats[item.type] = count;
+      }
+
+      return {
+        totalContent,
+        activeContent,
+        contentByType: typeStats,
+      };
+    } catch (error) {
+      console.error('CMS Service - Error getting content stats:', error);
+      throw error;
     }
-
-    return {
-      totalContent,
-      activeContent,
-      contentByType: typeStats,
-    };
   }
 }
 

@@ -30,12 +30,15 @@ interface DashboardAnalytics {
 interface UserModerationData {
   id: number;
   email: string;
-  firstName: string;
-  lastName: string;
+  first_name: string;  // Updated to match DB
+  last_name: string;   // Updated to match DB
   role: UserRole;
-  isVerified: boolean;
-  isActive: boolean;
-  createdAt: Date;
+  phone: string;
+  profile_image: string;
+  is_verified: boolean;  // Updated to match DB
+  is_active: boolean;    // Updated to match DB
+  created_at: Date;      // Updated to match DB
+  updated_at: Date;      // Updated to match DB
   propertiesCount: number;
   inquiriesCount: number;
 }
@@ -43,34 +46,20 @@ interface UserModerationData {
 interface PropertyModerationData {
   id: number;
   title: string;
-  propertyType: string;
-  listingType: string;
+  property_type: string;  // Updated to match DB
+  listing_type: string;   // Updated to match DB
   price: number;
   city: string;
-  isActive: boolean;
-  isFeatured: boolean;
-  viewsCount: number;
-  createdAt: Date;
+  is_active: boolean;     // Updated to match DB
+  is_featured: boolean;   // Updated to match DB
+  views_count: number;    // Updated to match DB
+  created_at: Date;       // Updated to match DB
   user: {
     id: number;
-    firstName: string;
-    lastName: string;
+    first_name: string;   // Updated to match DB
+    last_name: string;    // Updated to match DB
     email: string;
   };
-}
-
-interface BannerAnnouncement {
-  id: number;
-  type: 'banner' | 'announcement';
-  title: string;
-  content: string;
-  targetAudience: 'all' | 'buyers' | 'sellers' | 'agents';
-  isActive: boolean;
-  startDate?: Date;
-  endDate?: Date;
-  priority: number;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 class AdminService {
@@ -97,6 +86,12 @@ class AdminService {
       Property.count({ where: { is_featured: true, is_active: true } }),
     ]);
 
+    console.log('Total users:', totalUsers);
+    console.log('Total properties:', totalProperties);
+    console.log('Total inquiries:', totalInquiries);
+    console.log('Active listings:', activeListings);
+    console.log('Featured listings:', featuredListings);
+
     // Get users by role
     const userRoles = await User.findAll({
       attributes: ['role'],
@@ -104,31 +99,43 @@ class AdminService {
       raw: true,
     }) as any[];
 
+    console.log('User roles found:', userRoles);
+
     const usersByRole: Record<string, number> = {};
     for (const roleData of userRoles) {
       const count = await User.count({ where: { role: roleData.role } });
       usersByRole[roleData.role] = count;
     }
 
+    console.log('Users by role:', usersByRole);
+
     // Get properties by type
     const propertyTypes = await Property.findAll({
-      attributes: ['propertyType'],
-      group: ['propertyType'],
+      attributes: ['property_type'],
+      group: ['property_type'],
       raw: true,
     }) as any[];
 
+    console.log('Property types found:', propertyTypes);
+
     const propertiesByType: Record<string, number> = {};
     for (const typeData of propertyTypes) {
-      const count = await Property.count({ where: { propertyType: typeData.propertyType } });
-      propertiesByType[typeData.propertyType] = count;
+      const count = await Property.count({ where: { property_type: typeData.property_type } });
+      propertiesByType[typeData.property_type] = count;
     }
+
+    console.log('Properties by type:', propertiesByType);
 
     // Get recent activity (last 7 days)
     const [newUsers, newProperties, newInquiries] = await Promise.all([
-      User.count({ where: { createdAt: { [Op.gte]: sevenDaysAgo } } }),
-      Property.count({ where: { createdAt: { [Op.gte]: sevenDaysAgo } } }),
-      Inquiry.count({ where: { createdAt: { [Op.gte]: sevenDaysAgo } } }),
+      User.count({ where: { created_at: { [Op.gte]: sevenDaysAgo } } }),
+      Property.count({ where: { created_at: { [Op.gte]: sevenDaysAgo } } }),
+      Inquiry.count({ where: { created_at: { [Op.gte]: sevenDaysAgo } } }),
     ]);
+
+    console.log("Recent activity - New users:", newUsers);
+    console.log("Recent activity - New properties:", newProperties);
+    console.log("Recent activity - New inquiries:", newInquiries);
 
     // Get monthly stats for the last 6 months
     const monthlyStats = await this.getMonthlyStats(6);
@@ -151,54 +158,70 @@ class AdminService {
   }
 
   /**
-   * Get users for moderation
+   * Get users for moderation - FIXED with correct column names
    */
   async getUsersForModeration(
     page: number = 1,
     limit: number = 20,
     filters?: {
       role?: UserRole;
-      isVerified?: boolean;
-      isActive?: boolean;
+      is_verified?: boolean;    // Fixed: snake_case
+      is_active?: boolean;      // Fixed: snake_case
       search?: string;
     }
   ): Promise<{ users: UserModerationData[]; total: number; totalPages: number }> {
     const offset = (page - 1) * limit;
     const whereClause: any = {};
 
+    console.log('getUsersForModeration called with page:', page, 'limit:', limit, 'filters:', filters);
     if (filters) {
       if (filters.role) {
         whereClause.role = filters.role;
       }
-      if (filters.isVerified !== undefined) {
-        whereClause.isVerified = filters.isVerified;
+      if (filters.is_verified !== undefined) {    // Fixed: snake_case
+        whereClause.is_verified = filters.is_verified;
       }
-      if (filters.isActive !== undefined) {
-        whereClause.isActive = filters.isActive;
+      if (filters.is_active !== undefined) {      // Fixed: snake_case
+        whereClause.is_active = filters.is_active;
       }
       if (filters.search) {
         whereClause[Op.or] = [
-          { firstName: { [Op.like]: `%${filters.search}%` } },
-          { lastName: { [Op.like]: `%${filters.search}%` } },
+          { first_name: { [Op.like]: `%${filters.search}%` } },   // Fixed: snake_case
+          { last_name: { [Op.like]: `%${filters.search}%` } },    // Fixed: snake_case
           { email: { [Op.like]: `%${filters.search}%` } },
         ];
       }
     }
 
+    console.log('reached inside getUsersForModeration with filters:', filters);
     const { count, rows } = await User.findAndCountAll({
       where: whereClause,
-      attributes: ['id', 'email', 'firstName', 'lastName', 'role', 'isVerified', 'isActive', 'createdAt'],
+      attributes: [
+        'id', 
+        'email', 
+        'first_name',     // Fixed: snake_case
+        'last_name',      // Fixed: snake_case
+        'role', 
+        'phone',
+        'profile_image',  // Fixed: snake_case
+        'is_verified',    // Fixed: snake_case
+        'is_active',      // Fixed: snake_case
+        'created_at',     // Fixed: snake_case
+        'updated_at'      // Fixed: snake_case
+      ],
       offset,
       limit,
-      order: [['createdAt', 'DESC']],
+      order: [['created_at', 'DESC']],
     });
 
+    console.log('Fetched users count:', count);
+    console.log('Fetched users rows:', rows);
     // Get additional data for each user
     const usersWithStats = await Promise.all(
       rows.map(async (user: any) => {
         const [propertiesCount, inquiriesCount] = await Promise.all([
-          Property.count({ where: { userId: user.id } }),
-          Inquiry.count({ where: { inquirerId: user.id } }),
+          Property.count({ where: { user_id: user.id } }),        // Fixed: snake_case
+          Inquiry.count({ where: { inquirer_id: user.id } }),     // Fixed: snake_case (assuming this column exists)
         ]);
 
         return {
@@ -209,6 +232,8 @@ class AdminService {
       })
     );
 
+    console.log('Users with stats:', usersWithStats);
+
     return {
       users: usersWithStats,
       total: count,
@@ -217,30 +242,32 @@ class AdminService {
   }
 
   /**
-   * Get properties for moderation
+   * Get properties for moderation - FIXED with correct association alias
    */
   async getPropertiesForModeration(
     page: number = 1,
     limit: number = 20,
     filters?: {
-      propertyType?: string;
-      isActive?: boolean;
-      isFeatured?: boolean;
+      property_type?: string;   // Fixed: snake_case
+      is_active?: boolean;      // Fixed: snake_case
+      is_featured?: boolean;    // Fixed: snake_case
       search?: string;
     }
   ): Promise<{ properties: PropertyModerationData[]; total: number; totalPages: number }> {
     const offset = (page - 1) * limit;
     const whereClause: any = {};
 
+    console.log('getPropertiesForModeration called with filters:', filters);
+
     if (filters) {
-      if (filters.propertyType) {
-        whereClause.propertyType = filters.propertyType;
+      if (filters.property_type) {              // Fixed: snake_case
+        whereClause.property_type = filters.property_type;
       }
-      if (filters.isActive !== undefined) {
-        whereClause.isActive = filters.isActive;
+      if (filters.is_active !== undefined) {    // Fixed: snake_case
+        whereClause.is_active = filters.is_active;
       }
-      if (filters.isFeatured !== undefined) {
-        whereClause.isFeatured = filters.isFeatured;
+      if (filters.is_featured !== undefined) {  // Fixed: snake_case
+        whereClause.is_featured = filters.is_featured;
       }
       if (filters.search) {
         whereClause[Op.or] = [
@@ -251,49 +278,74 @@ class AdminService {
       }
     }
 
-    const { count, rows } = await Property.findAndCountAll({
-      where: whereClause,
-      include: [
-        {
-          model: User,
-          as: 'user',
-          attributes: ['id', 'firstName', 'lastName', 'email'],
-        },
-      ],
-      offset,
-      limit,
-      order: [['createdAt', 'DESC']],
-    });
+    console.log('WHERE clause for properties:', whereClause);
 
-    const properties = rows.map((property: any) => ({
-      id: property.id,
-      title: property.title,
-      propertyType: property.propertyType,
-      listingType: property.listingType,
-      price: property.price,
-      city: property.city,
-      isActive: property.isActive,
-      isFeatured: property.isFeatured,
-      viewsCount: property.viewsCount,
-      createdAt: property.createdAt,
-      user: property.user,
-    })) as PropertyModerationData[];
+    try {
+      const { count, rows } = await Property.findAndCountAll({
+        where: whereClause,
+        include: [
+          {
+            model: User,
+            as: 'owner',  // FIXED: Changed from 'user' to 'owner' to match association
+            attributes: ['id', 'first_name', 'last_name', 'email'],  // Fixed: snake_case
+          },
+        ],
+        attributes: [
+          'id',
+          'title',
+          'property_type',    // Fixed: snake_case
+          'listing_type',     // Fixed: snake_case
+          'price',
+          'city',
+          'is_active',        // Fixed: snake_case
+          'is_featured',      // Fixed: snake_case
+          'views_count',      // Fixed: snake_case
+          'created_at',       // Fixed: snake_case
+          'user_id'           // Fixed: snake_case
+        ],
+        offset,
+        limit,
+        order: [['created_at', 'DESC']],
+      });
 
-    return {
-      properties,
-      total: count,
-      totalPages: Math.ceil(count / limit),
-    };
+      console.log('Fetched properties count:', count);
+      console.log('Fetched properties rows:', rows.length);
+
+      const properties = rows.map((property: any) => ({
+        id: property.id,
+        title: property.title,
+        property_type: property.property_type,      // Fixed: snake_case
+        listing_type: property.listing_type,        // Fixed: snake_case
+        price: property.price,
+        city: property.city,
+        is_active: property.is_active,              // Fixed: snake_case
+        is_featured: property.is_featured,          // Fixed: snake_case
+        views_count: property.views_count || 0,     // Fixed: snake_case
+        created_at: property.created_at,            // Fixed: snake_case
+        user: property.owner,  // FIXED: Map 'owner' association to 'user' for frontend compatibility
+      })) as PropertyModerationData[];
+
+      console.log('Processed properties:', properties.length);
+
+      return {
+        properties,
+        total: count,
+        totalPages: Math.ceil(count / limit),
+      };
+    } catch (error) {
+      console.error('Error in getPropertiesForModeration:', error);
+      throw error;
+    }
   }
 
   /**
-   * Update user status
+   * Update user status - FIXED with correct column names
    */
   async updateUserStatus(
     userId: number,
     updates: {
-      isActive?: boolean;
-      isVerified?: boolean;
+      is_active?: boolean;     // Fixed: snake_case
+      is_verified?: boolean;   // Fixed: snake_case
       role?: UserRole;
     }
   ): Promise<User> {
@@ -307,13 +359,13 @@ class AdminService {
   }
 
   /**
-   * Update property status
+   * Update property status - FIXED with correct column names
    */
   async updatePropertyStatus(
     propertyId: number,
     updates: {
-      isActive?: boolean;
-      isFeatured?: boolean;
+      is_active?: boolean;     // Fixed: snake_case
+      is_featured?: boolean;   // Fixed: snake_case
     }
   ): Promise<Property> {
     const property = await Property.findByPk(propertyId);
@@ -326,7 +378,7 @@ class AdminService {
   }
 
   /**
-   * Delete user (soft delete by deactivating)
+   * Delete user (soft delete by deactivating) - FIXED with correct column names
    */
   async deleteUser(userId: number): Promise<void> {
     const user = await User.findByPk(userId);
@@ -335,7 +387,7 @@ class AdminService {
     }
 
     // Deactivate user instead of hard delete
-    await user.update({ isActive: false });
+    await user.update({ is_active: false });  // Fixed: snake_case
   }
 
   /**
@@ -351,7 +403,7 @@ class AdminService {
   }
 
   /**
-   * Get system statistics
+   * Get system statistics - FIXED with correct column names
    */
   async getSystemStats(): Promise<{
     database: {
@@ -387,9 +439,9 @@ class AdminService {
       Inquiry.count(),
       UserFavorite.count(),
       SavedSearch.count(),
-      User.count({ where: { updatedAt: { [Op.gte]: oneDayAgo } } }),
-      User.count({ where: { updatedAt: { [Op.gte]: oneWeekAgo } } }),
-      User.count({ where: { updatedAt: { [Op.gte]: oneMonthAgo } } }),
+      User.count({ where: { updated_at: { [Op.gte]: oneDayAgo } } }),    // Fixed: snake_case
+      User.count({ where: { updated_at: { [Op.gte]: oneWeekAgo } } }),   // Fixed: snake_case
+      User.count({ where: { updated_at: { [Op.gte]: oneMonthAgo } } }),  // Fixed: snake_case
     ]);
 
     return {
@@ -409,7 +461,7 @@ class AdminService {
   }
 
   /**
-   * Get monthly statistics for the last N months
+   * Get monthly statistics for the last N months - FIXED with correct column names
    */
   private async getMonthlyStats(months: number): Promise<{
     month: string;
@@ -427,7 +479,7 @@ class AdminService {
       const [users, properties, inquiries] = await Promise.all([
         User.count({
           where: {
-            createdAt: {
+            created_at: {   // Fixed: snake_case
               [Op.gte]: monthStart,
               [Op.lte]: monthEnd,
             },
@@ -435,7 +487,7 @@ class AdminService {
         }),
         Property.count({
           where: {
-            createdAt: {
+            created_at: {   // Fixed: snake_case
               [Op.gte]: monthStart,
               [Op.lte]: monthEnd,
             },
@@ -443,7 +495,7 @@ class AdminService {
         }),
         Inquiry.count({
           where: {
-            createdAt: {
+            created_at: {   // Fixed: snake_case
               [Op.gte]: monthStart,
               [Op.lte]: monthEnd,
             },
@@ -463,7 +515,7 @@ class AdminService {
   }
 
   /**
-   * Get traffic analytics (mock implementation - would integrate with analytics service)
+   * Get traffic analytics (mock implementation)
    */
   async getTrafficAnalytics(range: string): Promise<any> {
     // Mock data - in production this would integrate with Google Analytics, Mixpanel, etc.
@@ -512,7 +564,7 @@ class AdminService {
   }
 
   /**
-   * Get lead analytics
+   * Get lead analytics - FIXED with correct column names
    */
   async getLeadAnalytics(range: string): Promise<any> {
     const daysBack = range === '7d' ? 7 : range === '30d' ? 30 : range === '90d' ? 90 : 365;
@@ -522,7 +574,7 @@ class AdminService {
     // Get real inquiry data
     const totalLeads = await Inquiry.count({
       where: {
-        createdAt: { [Op.gte]: startDate },
+        created_at: { [Op.gte]: startDate },  // Fixed: snake_case
       },
     });
 
@@ -532,7 +584,7 @@ class AdminService {
         [Inquiry.sequelize!.fn('COUNT', Inquiry.sequelize!.col('id')), 'count'],
       ],
       where: {
-        createdAt: { [Op.gte]: startDate },
+        created_at: { [Op.gte]: startDate },  // Fixed: snake_case
       },
       group: ['status'],
       raw: true,
@@ -555,10 +607,10 @@ class AdminService {
       percentage: (status.count / totalLeads) * 100,
     }));
 
-    // Get top performing properties
+    // Get top performing properties - FIXED with correct column names
     const topProperties = await Inquiry.findAll({
       attributes: [
-        'property_id',
+        'property_id',  // Fixed: snake_case
         [Inquiry.sequelize!.fn('COUNT', Inquiry.sequelize!.col('id')), 'leads'],
       ],
       include: [{
@@ -567,7 +619,7 @@ class AdminService {
         attributes: ['title'],
       }],
       where: {
-        createdAt: { [Op.gte]: startDate },
+        created_at: { [Op.gte]: startDate },  // Fixed: snake_case
       },
       group: ['property_id', 'property.id'],
       order: [[Inquiry.sequelize!.fn('COUNT', Inquiry.sequelize!.col('id')), 'DESC']],
@@ -590,7 +642,7 @@ class AdminService {
   }
 
   /**
-   * Get listing analytics
+   * Get listing analytics - FIXED with correct column names
    */
   async getListingAnalytics(range: string): Promise<any> {
     const daysBack = range === '7d' ? 7 : range === '30d' ? 30 : range === '90d' ? 90 : 365;
@@ -609,7 +661,7 @@ class AdminService {
       Property.count({
         where: {
           is_active: true,
-          createdAt: { [Op.gte]: monthStart },
+          created_at: { [Op.gte]: monthStart },  // Fixed: snake_case
         },
       }),
       Property.count({ where: { is_active: false } }),
@@ -618,7 +670,7 @@ class AdminService {
 
     const propertiesByType = await Property.findAll({
       attributes: [
-        'property_type',
+        'property_type',  // Fixed: snake_case
         [Property.sequelize!.fn('COUNT', Property.sequelize!.col('id')), 'count'],
       ],
       where: { is_active: true },
@@ -648,7 +700,7 @@ class AdminService {
       featuredListings,
       averageListingViews: 150, // Mock data
       listingsByType: propertiesByType.map(type => ({
-        type: type.property_type,
+        type: type.property_type,  // Fixed: snake_case
         count: parseInt(type.count),
         percentage: (parseInt(type.count) / totalListings) * 100,
       })),

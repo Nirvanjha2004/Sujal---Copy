@@ -9,6 +9,7 @@ import { Alert } from '@/components/ui/alert';
 import { Icon } from '@iconify/react';
 import { httpClient } from '@/lib/httpClient';
 import { Layout } from '@/components/layout/Layout';
+import { AdminLayout } from '../layout/AdminLayout';
 
 interface SeoSetting {
   id: number;
@@ -110,8 +111,11 @@ export function SeoManagement() {
         schemaMarkup: formData.schemaMarkup ? JSON.parse(formData.schemaMarkup) : undefined,
       };
 
+      console.log('Submitting SEO data:', submitData);
+
       if (editingSetting) {
-        await httpClient.put(`/admin/seo/settings`, submitData);
+        // Fix: Include the ID in the URL for updates
+        await httpClient.put(`/admin/seo/settings/${editingSetting.id}`, submitData);
         setSuccess('SEO settings updated successfully');
       } else {
         await httpClient.post('/admin/seo/settings', submitData);
@@ -189,16 +193,16 @@ export function SeoManagement() {
 
   if (loading) {
     return (
-      <Layout>
+      <AdminLayout>
         <div className="flex items-center justify-center min-h-screen">
           <Icon icon="solar:refresh-bold" className="size-8 animate-spin text-primary" />
         </div>
-      </Layout>
+      </AdminLayout>
     );
   }
 
   return (
-    <Layout>
+    <AdminLayout>
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -610,6 +614,6 @@ export function SeoManagement() {
           </div>
         )}
       </div>
-    </Layout>
+    </AdminLayout>
   );
 }

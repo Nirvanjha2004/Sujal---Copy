@@ -1,6 +1,7 @@
 import { getValidToken } from '@/utils/tokenUtils';
 
-const API_BASE_URL = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3000/api';
+// Update the API_BASE_URL to match your backend port
+const API_BASE_URL = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3001/api/v1';
 
 export interface Property {
   id: number;
@@ -558,6 +559,12 @@ export const api = {
 
   // Admin APIs
   admin: {
+    // Add the analytics endpoint
+    getAnalytics: async (): Promise<any> => {
+      const response = await apiRequest('/admin/dashboard/analytics') as any;
+      return response;
+    },
+
     getUsers: (filters?: any): Promise<{ data: any[]; total: number }> => {
       const params = new URLSearchParams();
       if (filters) {
@@ -591,6 +598,311 @@ export const api = {
       return apiRequest(`/admin/properties/${propertyId}/moderate`, {
         method: 'POST',
         body: JSON.stringify({ action, reason }),
+      });
+    },
+
+    // Analytics APIs
+    getTrafficAnalytics: (range: string = '30d'): Promise<any> => {
+      return apiRequest(`/admin/analytics/traffic?range=${range}`);
+    },
+
+    getLeadAnalytics: (range: string = '30d'): Promise<any> => {
+      return apiRequest(`/admin/analytics/leads?range=${range}`);
+    },
+
+    getListingAnalytics: (range: string = '30d'): Promise<any> => {
+      return apiRequest(`/admin/analytics/listings?range=${range}`);
+    },
+
+    // Property Moderation
+    getPropertiesForModeration: (filters?: any): Promise<{ data: any[]; total: number }> => {
+      const params = new URLSearchParams();
+      if (filters) {
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            params.append(key, value.toString());
+          }
+        });
+      }
+      return apiRequest(`/admin/properties${params.toString() ? `?${params.toString()}` : ''}`);
+    },
+
+    updatePropertyStatus: (propertyId: number, updates: { isActive?: boolean; isFeatured?: boolean }): Promise<any> => {
+      return apiRequest(`/admin/properties/${propertyId}/status`, {
+        method: 'PUT',
+        body: JSON.stringify(updates),
+      });
+    },
+
+    deleteProperty: (propertyId: number): Promise<void> => {
+      return apiRequest(`/admin/properties/${propertyId}`, {
+        method: 'DELETE',
+      });
+    },
+
+    // User Management
+    getUsersForModeration: (filters?: any): Promise<{ data: any[]; total: number }> => {
+      const params = new URLSearchParams();
+      if (filters) {
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            params.append(key, value.toString());
+          }
+        });
+      }
+      return apiRequest(`/admin/users${params.toString() ? `?${params.toString()}` : ''}`);
+    },
+
+    updateUserStatus: (userId: number, updates: { isActive?: boolean; isVerified?: boolean; role?: string }): Promise<any> => {
+      return apiRequest(`/admin/users/${userId}/status`, {
+        method: 'PUT',
+        body: JSON.stringify(updates),
+      });
+    },
+
+    // System Stats
+    getSystemStats: (): Promise<any> => {
+      return apiRequest('/admin/system/stats');
+    },
+  },
+
+  // CMS Management
+  cms: {
+    // Get all content (admin only)
+    getContent: (filters?: { 
+      type?: string; 
+      isActive?: boolean; 
+      page?: number; 
+      limit?: number; 
+    }): Promise<{ 
+      success: boolean; 
+      data: { 
+        content: any[]; 
+        total: number; 
+        totalPages: number; 
+      } 
+    }> => {
+      const params = new URLSearchParams();
+      if (filters) {
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            params.append(key, value.toString());
+          }
+        });
+      }
+      return apiRequest(`/cms/content`);
+    },
+
+    // Get active content (public)
+    getActiveContent: (type?: string): Promise<{ 
+      success: boolean; 
+      data: any[] 
+    }> => {
+      const params = type ? `?type=${type}` : '';
+      return apiRequest(`/cms/active${params}`, {
+        headers: {} // No auth required for public routes
+      });
+    },
+
+    // Get banners (public)
+    getBanners: (): Promise<{ 
+      success: boolean; 
+      data: any[] 
+    }> => {
+      return apiRequest('/cms/banners', {
+        headers: {} // No auth required for public routes
+      });
+    },
+
+    // Get announcements (public)
+    getAnnouncements: (): Promise<{ 
+      success: boolean; 
+      data: any[] 
+    }> => {
+      return apiRequest('/cms/announcements', {
+        headers: {} // No auth required for public routes
+      });
+    },
+
+    // Get content by key (public)
+    getContentByKey: (key: string): Promise<{ 
+      success: boolean; 
+      data: any 
+    }> => {
+      return apiRequest(`/cms/key/${key}`, {
+        headers: {} // No auth required for public routes
+      });
+    },
+
+    // Get content by ID (admin only)
+    getContentById: (id: number): Promise<{ 
+      success: boolean; 
+      data: any 
+    }> => {
+      return apiRequest(`/cms/content/${id}`);
+    },
+
+    // Create content (admin only)
+    createContent: (contentData: {
+      type: 'banner' | 'announcement' | 'page' | 'widget';
+      key: string;
+      title: string;
+      content: string;
+      metadata?: object;
+      isActive?: boolean;
+      displayOrder?: number;
+    }): Promise<{ 
+      success: boolean; 
+      data: any 
+    }> => {
+      return apiRequest('/cms/content', {
+        method: 'POST',
+        body: JSON.stringify(contentData),
+      });
+    },
+
+    // Update content (admin only)
+    updateContent: (id: number, contentData: {
+      title?: string;
+      content?: string;
+      metadata?: object;
+      isActive?: boolean;
+      displayOrder?: number;
+    }): Promise<{ 
+      success: boolean; 
+      data: any 
+    }> => {
+      return apiRequest(`/cms/content/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(contentData),
+      });
+    },
+
+    // Toggle content status (admin only)
+    toggleContentStatus: (id: number): Promise<{ 
+      success: boolean; 
+      data: any 
+    }> => {
+      return apiRequest(`/cms/content/${id}/toggle`, {
+        method: 'PATCH',
+      });
+    },
+
+    // Delete content (admin only)
+    deleteContent: (id: number): Promise<{ 
+      success: boolean; 
+      message: string 
+    }> => {
+      return apiRequest(`/cms/content/${id}`, {
+        method: 'DELETE',
+      });
+    },
+
+    // Get content stats (admin only)
+    getContentStats: (): Promise<{ 
+      success: boolean; 
+      data: {
+        totalContent: number;
+        activeContent: number;
+        contentByType: Record<string, number>;
+      }
+    }> => {
+      return apiRequest('/cms/stats');
+    },
+  },
+
+  // SEO Management
+  seo: {
+    getSettings: (filters?: { page?: string }): Promise<{ data: any[] }> => {
+      const params = new URLSearchParams();
+      if (filters) {
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            params.append(key, value.toString());
+          }
+        });
+      }
+      return apiRequest(`/seo/settings${params.toString() ? `?${params.toString()}` : ''}`);
+    },
+
+    createSetting: (seoData: any): Promise<{ data: any }> => {
+      return apiRequest('/seo/settings', {
+        method: 'POST',
+        body: JSON.stringify(seoData),
+      });
+    },
+
+    updateSetting: (id: number, seoData: any): Promise<{ data: any }> => {
+      return apiRequest(`/seo/settings/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(seoData),
+      });
+    },
+
+    deleteSetting: (id: number): Promise<void> => {
+      return apiRequest(`/seo/settings/${id}`, {
+        method: 'DELETE',
+      });
+    },
+
+    generateSitemap: (): Promise<{ data: any }> => {
+      return apiRequest('/seo/generate-sitemap', {
+        method: 'POST',
+      });
+    },
+  },
+
+  // URL Redirects
+  redirects: {
+    getRedirects: (): Promise<{ data: any[] }> => {
+      return apiRequest('/redirects');
+    },
+
+    createRedirect: (redirectData: any): Promise<{ data: any }> => {
+      return apiRequest('/redirects', {
+        method: 'POST',
+        body: JSON.stringify(redirectData),
+      });
+    },
+
+    updateRedirect: (id: number, redirectData: any): Promise<{ data: any }> => {
+      return apiRequest(`/redirects/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(redirectData),
+      });
+    },
+
+    deleteRedirect: (id: number): Promise<void> => {
+      return apiRequest(`/redirects/${id}`, {
+        method: 'DELETE',
+      });
+    },
+  },
+
+  // Review Moderation
+  reviews: {
+    getReviews: (filters?: { status?: string; property_id?: number }): Promise<{ data: any[] }> => {
+      const params = new URLSearchParams();
+      if (filters) {
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            params.append(key, value.toString());
+          }
+        });
+      }
+      return apiRequest(`/moderation/reviews${params.toString() ? `?${params.toString()}` : ''}`);
+    },
+
+    moderateReview: (reviewId: number, action: 'approve' | 'reject', reason?: string): Promise<void> => {
+      return apiRequest(`/moderation/reviews/${reviewId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ action, reason }),
+      });
+    },
+
+    deleteReview: (reviewId: number): Promise<void> => {
+      return apiRequest(`/moderation/reviews/${reviewId}`, {
+        method: 'DELETE',
       });
     },
   },

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import { Button } from '@/components/ui/button';
@@ -12,12 +12,28 @@ export function LoginPage() {
   const location = useLocation();
   const { state, login, clearError } = useAuth();
   
-  // Get success message from location state (from email verification)
   const successMessage = location.state?.message;
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
+
+  // --- START: THE FIX ---
+  // This useEffect will run when the authentication state changes.
+  useEffect(() => {
+    // Check if the user is authenticated and the user object is available
+    if (state.isAuthenticated && state.user) {
+      const userRole = state.user.role;
+      console.log('User authenticated. Role:', userRole, 'Redirecting...');
+
+      // Determine the destination based on the user's role
+      const destination = location.state?.from?.pathname || (userRole === 'admin' ? '/admin' : '/dashboard');
+      
+      // Perform the redirection
+      navigate(destination, { replace: true });
+    }
+  }, [state.isAuthenticated, state.user, navigate, location.state]);
+  // --- END: THE FIX ---
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -25,20 +41,22 @@ export function LoginPage() {
       ...prev,
       [name]: value
     }));
-    // Clear error when user starts typing
     if (state.error) clearError();
   };
 
+  // The handleSubmit function now only needs to trigger the login.
+  // The useEffect above will handle the redirection.
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
 
     try {
       await login(formData.email, formData.password);
-      navigate('/dashboard');
+      // The redirect is now handled by the useEffect.
+      // No more navigate('/dashboard') here.
     } catch (err) {
       console.error('Login error:', err);
-      // Error is handled by Redux state
+      // Error is handled by the auth state
     }
   };
 

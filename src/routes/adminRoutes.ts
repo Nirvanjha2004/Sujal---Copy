@@ -46,6 +46,7 @@ router.put('/seo/settings', seoController.upsertSeoSettings);
 router.get('/seo/property/:propertyId/metadata', seoController.getPropertySeoMetadata);
 router.get('/seo/page/:pageType/metadata', seoController.getPageSeoMetadata);
 router.get('/seo/property/:propertyId/url', seoController.generatePropertyUrl);
+router.put('/admin/seo/settings/:id', seoController.upsertSeoSettings);
 
 // CMS Content Management Routes
 router.get('/cms/content', cmsController.getAllContent);

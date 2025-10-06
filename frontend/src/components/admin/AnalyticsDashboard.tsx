@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Icon } from '@iconify/react';
-import { httpClient } from '@/lib/httpClient';
-import { Layout } from '@/components/layout/Layout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { api } from '@/lib/api';
 
-interface TrafficAnalytics {
+interface TrafficData {
   totalPageViews: number;
   uniqueVisitors: number;
   bounceRate: number;
@@ -28,7 +27,7 @@ interface TrafficAnalytics {
   };
 }
 
-interface LeadAnalytics {
+interface LeadData {
   totalLeads: number;
   leadConversionRate: number;
   leadsBySource: Array<{
@@ -49,7 +48,7 @@ interface LeadAnalytics {
   }>;
 }
 
-interface ListingAnalytics {
+interface ListingData {
   totalActiveListings: number;
   newListingsThisMonth: number;
   expiredListings: number;
@@ -67,443 +66,325 @@ interface ListingAnalytics {
   }>;
 }
 
-export function AnalyticsDashboard() {
-  const [trafficData, setTrafficData] = useState<TrafficAnalytics | null>(null);
-  const [leadData, setLeadData] = useState<LeadAnalytics | null>(null);
-  const [listingData, setListingData] = useState<ListingAnalytics | null>(null);
-  const [loading, setLoading] = useState(true);
+export function EnhancedAnalyticsDashboard() {
+  const [trafficData, setTrafficData] = useState<TrafficData | null>(null);
+  const [leadData, setLeadData] = useState<LeadData | null>(null);
+  const [listingData, setListingData] = useState<ListingData | null>(null);
+  const [selectedRange, setSelectedRange] = useState('30d');
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'traffic' | 'leads' | 'listings'>('traffic');
-  const [dateRange, setDateRange] = useState('30d');
 
-  useEffect(() => {
-    fetchAnalytics();
-  }, [dateRange]);
-
-  const fetchAnalytics = async () => {
+  const fetchAnalyticsData = async () => {
+    setIsLoading(true);
+    setError(null);
+    
     try {
-      setLoading(true);
+      console.log('🔄 Fetching analytics for range:', selectedRange);
+      
+      // Fetch all analytics data from backend
       const [trafficResponse, leadResponse, listingResponse] = await Promise.all([
-        httpClient.get<{ success: boolean; data: TrafficAnalytics }>(`/admin/analytics/traffic?range=${dateRange}`),
-        httpClient.get<{ success: boolean; data: LeadAnalytics }>(`/admin/analytics/leads?range=${dateRange}`),
-        httpClient.get<{ success: boolean; data: ListingAnalytics }>(`/admin/analytics/listings?range=${dateRange}`),
+        api.admin.getTrafficAnalytics(selectedRange).catch(err => {
+          console.warn('Traffic analytics not available:', err);
+          return null;
+        }),
+        api.admin.getLeadAnalytics(selectedRange).catch(err => {
+          console.warn('Lead analytics not available:', err);
+          return null;
+        }),
+        api.admin.getListingAnalytics(selectedRange).catch(err => {
+          console.warn('Listing analytics not available:', err);
+          return null;
+        }),
       ]);
 
-      setTrafficData(trafficResponse.data);
-      setLeadData(leadResponse.data);
-      setListingData(listingResponse.data);
-      setError(null);
-    } catch (err: any) {
-      setError(err.response?.data?.error?.message || 'Failed to load analytics');
+      if (trafficResponse?.data) {
+        setTrafficData(trafficResponse.data);
+      }
+      
+      if (leadResponse?.data) {
+        setLeadData(leadResponse.data);
+      }
+      
+      if (listingResponse?.data) {
+        setListingData(listingResponse.data);
+      }
+
+      console.log('✅ Analytics data loaded successfully');
+    } catch (error: any) {
+      console.error('❌ Error fetching analytics:', error);
+      setError(error.message || 'Failed to fetch analytics data');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const formatNumber = (num: number): string => {
-    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-    return num.toString();
-  };
+  useEffect(() => {
+    fetchAnalyticsData();
+  }, [selectedRange]);
 
-  const formatPercentage = (num: number): string => {
-    return `${num.toFixed(1)}%`;
-  };
-
-  const formatDuration = (seconds: number): string => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}m ${remainingSeconds}s`;
-  };
-
-  if (loading) {
+  if (isLoading) {
     return (
-      <Layout>
-        <div className="flex items-center justify-center min-h-screen">
-          <Icon icon="solar:refresh-bold" className="size-8 animate-spin text-primary" />
-        </div>
-      </Layout>
+      <div className="flex items-center justify-center h-64">
+        <Icon icon="solar:loading-bold" className="size-8 animate-spin" />
+        <span className="ml-4">Loading analytics...</span>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Layout>
-        <div className="container mx-auto px-4 py-8">
-          <Card className="p-8 text-center">
-            <Icon icon="solar:danger-circle-bold" className="size-12 mx-auto text-red-500 mb-4" />
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Failed to Load Analytics</h2>
-            <p className="text-gray-600 mb-4">{error}</p>
-            <Button onClick={fetchAnalytics}>Try Again</Button>
-          </Card>
-        </div>
-      </Layout>
+      <div className="text-center py-8">
+        <Icon icon="solar:danger-triangle-bold" className="size-12 text-red-500 mx-auto mb-4" />
+        <h3 className="text-lg font-medium text-gray-900 mb-2">Failed to Load Analytics</h3>
+        <p className="text-gray-500 mb-4">{error}</p>
+        <Button onClick={fetchAnalyticsData}>
+          <Icon icon="solar:refresh-bold" className="mr-2" />
+          Retry
+        </Button>
+      </div>
     );
   }
 
   return (
-    <Layout>
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
-            <p className="text-gray-600">Comprehensive platform analytics and insights</p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <select
-              value={dateRange}
-              onChange={(e) => setDateRange(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg"
-            >
-              <option value="7d">Last 7 days</option>
-              <option value="30d">Last 30 days</option>
-              <option value="90d">Last 90 days</option>
-              <option value="1y">Last year</option>
-            </select>
-            <Button onClick={fetchAnalytics} variant="outline">
-              <Icon icon="solar:refresh-bold" className="size-4 mr-2" />
-              Refresh
-            </Button>
-          </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">Advanced Analytics</h2>
+          <p className="text-muted-foreground">Detailed insights into traffic, leads, and listings</p>
         </div>
-
-        {/* Tab Navigation */}
-        <div className="flex space-x-1 mb-8 bg-gray-100 p-1 rounded-lg">
-          {[
-            { id: 'traffic', label: 'Traffic Analytics', icon: 'solar:chart-2-bold' },
-            { id: 'leads', label: 'Lead Analytics', icon: 'solar:user-plus-bold' },
-            { id: 'listings', label: 'Listing Analytics', icon: 'solar:home-2-bold' },
-          ].map((tab) => (
-            <Button
-              key={tab.id}
-              variant={activeTab === tab.id ? 'default' : 'ghost'}
-              onClick={() => setActiveTab(tab.id as any)}
-              className="flex-1"
-            >
-              <Icon icon={tab.icon} className="size-4 mr-2" />
-              {tab.label}
-            </Button>
-          ))}
+        <div className="flex items-center gap-2">
+          <Select value={selectedRange} onValueChange={setSelectedRange}>
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7d">Last 7 days</SelectItem>
+              <SelectItem value="30d">Last 30 days</SelectItem>
+              <SelectItem value="90d">Last 90 days</SelectItem>
+              <SelectItem value="1y">Last year</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button onClick={fetchAnalyticsData} variant="outline" size="sm">
+            <Icon icon="solar:refresh-bold" className="size-4" />
+          </Button>
         </div>
+      </div>
 
-        {/* Traffic Analytics */}
-        {activeTab === 'traffic' && trafficData && (
-          <div className="space-y-8">
-            {/* Key Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Card className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Total Page Views</p>
-                    <p className="text-3xl font-bold text-gray-900">{formatNumber(trafficData.totalPageViews)}</p>
-                  </div>
-                  <div className="p-3 bg-blue-100 rounded-full">
-                    <Icon icon="solar:eye-bold" className="size-6 text-blue-600" />
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Unique Visitors</p>
-                    <p className="text-3xl font-bold text-gray-900">{formatNumber(trafficData.uniqueVisitors)}</p>
-                  </div>
-                  <div className="p-3 bg-green-100 rounded-full">
-                    <Icon icon="solar:users-group-rounded-bold" className="size-6 text-green-600" />
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Bounce Rate</p>
-                    <p className="text-3xl font-bold text-gray-900">{formatPercentage(trafficData.bounceRate)}</p>
-                  </div>
-                  <div className="p-3 bg-yellow-100 rounded-full">
-                    <Icon icon="solar:logout-bold" className="size-6 text-yellow-600" />
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Avg. Session</p>
-                    <p className="text-3xl font-bold text-gray-900">{formatDuration(trafficData.avgSessionDuration)}</p>
-                  </div>
-                  <div className="p-3 bg-purple-100 rounded-full">
-                    <Icon icon="solar:clock-circle-bold" className="size-6 text-purple-600" />
-                  </div>
-                </div>
-              </Card>
+      {/* Traffic Analytics */}
+      {trafficData ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Icon icon="solar:chart-2-bold" className="mr-2" />
+              Traffic Analytics
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-4 gap-4 mb-6">
+              <div className="text-center">
+                <div className="text-2xl font-bold">{trafficData.totalPageViews.toLocaleString()}</div>
+                <div className="text-sm text-muted-foreground">Page Views</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold">{trafficData.uniqueVisitors.toLocaleString()}</div>
+                <div className="text-sm text-muted-foreground">Unique Visitors</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold">{trafficData.bounceRate}%</div>
+                <div className="text-sm text-muted-foreground">Bounce Rate</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold">{Math.floor(trafficData.avgSessionDuration / 60)}m {trafficData.avgSessionDuration % 60}s</div>
+                <div className="text-sm text-muted-foreground">Avg Session</div>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-2 gap-6">
               {/* Top Pages */}
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Top Pages</h3>
-                <div className="space-y-4">
-                  {trafficData.topPages.map((page, index) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <div>
-                        <div className="font-medium">{page.path}</div>
-                        <div className="text-sm text-gray-500">{formatNumber(page.uniqueViews)} unique views</div>
-                      </div>
-                      <Badge variant="secondary">{formatNumber(page.views)}</Badge>
+              <div>
+                <h4 className="font-semibold mb-3">Top Pages</h4>
+                <div className="space-y-2">
+                  {trafficData.topPages?.map((page, index) => (
+                    <div key={index} className="flex justify-between items-center">
+                      <span className="text-sm">{page.path}</span>
+                      <span className="text-sm font-medium">{page.views.toLocaleString()}</span>
                     </div>
-                  ))}
+                  )) || <p className="text-muted-foreground text-sm">No data available</p>}
                 </div>
-              </Card>
+              </div>
 
               {/* Referral Sources */}
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Traffic Sources</h3>
-                <div className="space-y-4">
-                  {trafficData.referralSources.map((source, index) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <div>
-                        <div className="font-medium">{source.source}</div>
-                        <div className="text-sm text-gray-500">{formatPercentage(source.percentage)}</div>
-                      </div>
-                      <Badge variant="outline">{formatNumber(source.visits)}</Badge>
+              <div>
+                <h4 className="font-semibold mb-3">Referral Sources</h4>
+                <div className="space-y-2">
+                  {trafficData.referralSources?.map((source, index) => (
+                    <div key={index} className="flex justify-between items-center">
+                      <span className="text-sm">{source.source}</span>
+                      <span className="text-sm font-medium">{source.percentage}%</span>
                     </div>
-                  ))}
-                </div>
-              </Card>
-            </div>
-
-            {/* Device Breakdown */}
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Device Breakdown</h3>
-              <div className="grid grid-cols-3 gap-6">
-                <div className="text-center">
-                  <div className="p-4 bg-blue-100 rounded-full w-16 h-16 mx-auto mb-2 flex items-center justify-center">
-                    <Icon icon="solar:monitor-bold" className="size-8 text-blue-600" />
-                  </div>
-                  <div className="font-medium">Desktop</div>
-                  <div className="text-2xl font-bold">{formatPercentage(trafficData.deviceBreakdown.desktop)}</div>
-                </div>
-                <div className="text-center">
-                  <div className="p-4 bg-green-100 rounded-full w-16 h-16 mx-auto mb-2 flex items-center justify-center">
-                    <Icon icon="solar:phone-bold" className="size-8 text-green-600" />
-                  </div>
-                  <div className="font-medium">Mobile</div>
-                  <div className="text-2xl font-bold">{formatPercentage(trafficData.deviceBreakdown.mobile)}</div>
-                </div>
-                <div className="text-center">
-                  <div className="p-4 bg-purple-100 rounded-full w-16 h-16 mx-auto mb-2 flex items-center justify-center">
-                    <Icon icon="solar:tablet-bold" className="size-8 text-purple-600" />
-                  </div>
-                  <div className="font-medium">Tablet</div>
-                  <div className="text-2xl font-bold">{formatPercentage(trafficData.deviceBreakdown.tablet)}</div>
+                  )) || <p className="text-muted-foreground text-sm">No data available</p>}
                 </div>
               </div>
-            </Card>
-          </div>
-        )}
-
-        {/* Lead Analytics */}
-        {activeTab === 'leads' && leadData && (
-          <div className="space-y-8">
-            {/* Key Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Card className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Total Leads</p>
-                    <p className="text-3xl font-bold text-gray-900">{formatNumber(leadData.totalLeads)}</p>
-                  </div>
-                  <div className="p-3 bg-green-100 rounded-full">
-                    <Icon icon="solar:user-plus-bold" className="size-6 text-green-600" />
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Conversion Rate</p>
-                    <p className="text-3xl font-bold text-gray-900">{formatPercentage(leadData.leadConversionRate)}</p>
-                  </div>
-                  <div className="p-3 bg-blue-100 rounded-full">
-                    <Icon icon="solar:target-bold" className="size-6 text-blue-600" />
-                  </div>
-                </div>
-              </Card>
             </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Icon icon="solar:chart-2-bold" className="mr-2" />
+              Traffic Analytics
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-center text-muted-foreground py-8">Traffic analytics not available</p>
+          </CardContent>
+        </Card>
+      )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Leads by Source */}
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Leads by Source</h3>
-                <div className="space-y-4">
-                  {leadData.leadsBySource.map((source, index) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <div>
-                        <div className="font-medium">{source.source}</div>
-                        <div className="text-sm text-gray-500">{formatPercentage(source.percentage)}</div>
-                      </div>
-                      <Badge variant="secondary">{formatNumber(source.count)}</Badge>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-
-              {/* Leads by Status */}
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Leads by Status</h3>
-                <div className="space-y-4">
-                  {leadData.leadsByStatus.map((status, index) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <div>
-                        <div className="font-medium capitalize">{status.status}</div>
-                        <div className="text-sm text-gray-500">{formatPercentage(status.percentage)}</div>
-                      </div>
-                      <Badge variant="outline">{formatNumber(status.count)}</Badge>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            </div>
-
-            {/* Top Performing Properties */}
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Top Performing Properties</h3>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left py-2">Property</th>
-                      <th className="text-right py-2">Leads</th>
-                      <th className="text-right py-2">Conversions</th>
-                      <th className="text-right py-2">Rate</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {leadData.topPerformingProperties.map((property) => (
-                      <tr key={property.id} className="border-b">
-                        <td className="py-2 font-medium">{property.title}</td>
-                        <td className="text-right py-2">{property.leads}</td>
-                        <td className="text-right py-2">{property.conversions}</td>
-                        <td className="text-right py-2">
-                          {formatPercentage((property.conversions / property.leads) * 100)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+      {/* Lead Analytics */}
+      {leadData ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Icon icon="solar:users-group-rounded-bold" className="mr-2" />
+              Lead Analytics
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-3 gap-4 mb-6">
+              <div className="text-center">
+                <div className="text-2xl font-bold">{leadData.totalLeads}</div>
+                <div className="text-sm text-muted-foreground">Total Leads</div>
               </div>
-            </Card>
-          </div>
-        )}
-
-        {/* Listing Analytics */}
-        {activeTab === 'listings' && listingData && (
-          <div className="space-y-8">
-            {/* Key Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-              <Card className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Active Listings</p>
-                    <p className="text-3xl font-bold text-gray-900">{formatNumber(listingData.totalActiveListings)}</p>
-                  </div>
-                  <div className="p-3 bg-green-100 rounded-full">
-                    <Icon icon="solar:home-2-bold" className="size-6 text-green-600" />
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">New This Month</p>
-                    <p className="text-3xl font-bold text-gray-900">{formatNumber(listingData.newListingsThisMonth)}</p>
-                  </div>
-                  <div className="p-3 bg-blue-100 rounded-full">
-                    <Icon icon="solar:add-circle-bold" className="size-6 text-blue-600" />
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Expired</p>
-                    <p className="text-3xl font-bold text-gray-900">{formatNumber(listingData.expiredListings)}</p>
-                  </div>
-                  <div className="p-3 bg-red-100 rounded-full">
-                    <Icon icon="solar:clock-circle-bold" className="size-6 text-red-600" />
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Featured</p>
-                    <p className="text-3xl font-bold text-gray-900">{formatNumber(listingData.featuredListings)}</p>
-                  </div>
-                  <div className="p-3 bg-yellow-100 rounded-full">
-                    <Icon icon="solar:star-bold" className="size-6 text-yellow-600" />
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Avg. Views</p>
-                    <p className="text-3xl font-bold text-gray-900">{formatNumber(listingData.averageListingViews)}</p>
-                  </div>
-                  <div className="p-3 bg-purple-100 rounded-full">
-                    <Icon icon="solar:eye-bold" className="size-6 text-purple-600" />
-                  </div>
-                </div>
-              </Card>
+              <div className="text-center">
+                <div className="text-2xl font-bold">{leadData.leadConversionRate}%</div>
+                <div className="text-sm text-muted-foreground">Conversion Rate</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold">{leadData.leadsByStatus?.find(s => s.status === 'closed')?.count || 0}</div>
+                <div className="text-sm text-muted-foreground">Converted</div>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-2 gap-6">
+              {/* Lead Sources */}
+              <div>
+                <h4 className="font-semibold mb-3">Lead Sources</h4>
+                <div className="space-y-2">
+                  {leadData.leadsBySource?.map((source, index) => (
+                    <div key={index} className="flex justify-between items-center">
+                      <span className="text-sm">{source.source}</span>
+                      <span className="text-sm font-medium">{source.count} ({source.percentage}%)</span>
+                    </div>
+                  )) || <p className="text-muted-foreground text-sm">No data available</p>}
+                </div>
+              </div>
+
+              {/* Top Properties */}
+              <div>
+                <h4 className="font-semibold mb-3">Top Performing Properties</h4>
+                <div className="space-y-2">
+                  {leadData.topPerformingProperties?.map((property, index) => (
+                    <div key={index} className="text-sm">
+                      <div className="font-medium">{property.title}</div>
+                      <div className="text-muted-foreground">{property.leads} leads, {property.conversions} conversions</div>
+                    </div>
+                  )) || <p className="text-muted-foreground text-sm">No data available</p>}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Icon icon="solar:users-group-rounded-bold" className="mr-2" />
+              Lead Analytics
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-center text-muted-foreground py-8">Lead analytics not available</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Listing Analytics */}
+      {listingData ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Icon icon="solar:home-bold" className="mr-2" />
+              Listing Analytics
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-4 gap-4 mb-6">
+              <div className="text-center">
+                <div className="text-2xl font-bold">{listingData.totalActiveListings}</div>
+                <div className="text-sm text-muted-foreground">Active Listings</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold">{listingData.newListingsThisMonth}</div>
+                <div className="text-sm text-muted-foreground">New This Month</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold">{listingData.featuredListings}</div>
+                <div className="text-sm text-muted-foreground">Featured</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold">{listingData.averageListingViews}</div>
+                <div className="text-sm text-muted-foreground">Avg Views</div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
               {/* Listings by Type */}
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Listings by Type</h3>
-                <div className="space-y-4">
-                  {listingData.listingsByType.map((type, index) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <div>
-                        <div className="font-medium capitalize">{type.type}</div>
-                        <div className="text-sm text-gray-500">{formatPercentage(type.percentage)}</div>
-                      </div>
-                      <Badge variant="secondary">{formatNumber(type.count)}</Badge>
+              <div>
+                <h4 className="font-semibold mb-3">By Property Type</h4>
+                <div className="space-y-2">
+                  {listingData.listingsByType?.map((type, index) => (
+                    <div key={index} className="flex justify-between items-center">
+                      <span className="text-sm capitalize">{type.type}</span>
+                      <span className="text-sm font-medium">{type.count} ({type.percentage.toFixed(1)}%)</span>
                     </div>
-                  ))}
+                  )) || <p className="text-muted-foreground text-sm">No data available</p>}
                 </div>
-              </Card>
+              </div>
 
               {/* Listings by City */}
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Top Cities</h3>
-                <div className="space-y-4">
-                  {listingData.listingsByCity.map((city, index) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <div>
-                        <div className="font-medium">{city.city}</div>
-                        <div className="text-sm text-gray-500">
-                          Avg: ₹{city.averagePrice.toLocaleString()}
-                        </div>
+              <div>
+                <h4 className="font-semibold mb-3">By City</h4>
+                <div className="space-y-2">
+                  {listingData.listingsByCity?.map((city, index) => (
+                    <div key={index} className="text-sm">
+                      <div className="flex justify-between">
+                        <span className="font-medium">{city.city}</span>
+                        <span>{city.count} listings</span>
                       </div>
-                      <Badge variant="outline">{formatNumber(city.count)}</Badge>
+                      <div className="text-muted-foreground">Avg: ₹{(city.averagePrice / 100000).toFixed(1)}L</div>
                     </div>
-                  ))}
+                  )) || <p className="text-muted-foreground text-sm">No data available</p>}
                 </div>
-              </Card>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
-    </Layout>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Icon icon="solar:home-bold" className="mr-2" />
+              Listing Analytics
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-center text-muted-foreground py-8">Listing analytics not available</p>
+          </CardContent>
+        </Card>
+      )}
+    </div>
   );
 }

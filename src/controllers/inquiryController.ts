@@ -3,6 +3,7 @@ import { body, param, query, validationResult } from 'express-validator';
 import inquiryService, { CreateInquiryData, InquiryFilters } from '../services/inquiryService';
 import { InquiryStatus } from '../models/Inquiry';
 import { UserRole } from '../models/User';
+import sequelize from '../config/database'; // 1. Import sequelize instance
 
 export interface AuthenticatedRequest extends Request {
   user?: {
@@ -41,9 +42,14 @@ class InquiryController {
   ];
 
   async createInquiry(req: AuthenticatedRequest, res: Response): Promise<void> {
+    // 2. Start a transaction
+    const t = await sequelize.transaction();
+
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+        // If validation fails, no DB changes were made, so we can safely rollback.
+        await t.rollback();
         res.status(400).json({
           success: false,
           error: {
@@ -68,7 +74,11 @@ class InquiryController {
         inquiryData.inquirer_id = req.user.id;
       }
 
-      const inquiry = await inquiryService.createInquiry(inquiryData);
+      // 3. Pass the transaction to the service method
+      const inquiry = await inquiryService.createInquiry(inquiryData, { transaction: t });
+
+      // 4. If everything is successful, commit the transaction
+      await t.commit();
 
       res.status(201).json({
         success: true,
@@ -87,6 +97,9 @@ class InquiryController {
         message: 'Inquiry submitted successfully',
       });
     } catch (error) {
+      // 5. If any error occurs, roll back the transaction
+      await t.rollback();
+
       console.error('Create inquiry error:', error);
       res.status(500).json({
         success: false,

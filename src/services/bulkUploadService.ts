@@ -4,7 +4,8 @@ import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
 import { Property } from '../models';
 import PropertyService from './propertyService';
-import { PropertyType, PropertyStatus } from '../types';
+import { PropertyType } from '../models/Property';
+import { PropertyStatus } from '../types';
 
 // Define the expected CSV headers
 const REQUIRED_HEADERS = [

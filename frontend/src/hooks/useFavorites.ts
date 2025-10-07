@@ -1,71 +1,44 @@
-import { useState, useEffect } from 'react';
-import { api, Property } from '@/lib/api';
+import { useState, useEffect, useCallback } from 'react';
+import { api, Favorite } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 
 export function useFavorites() {
-  const [favorites, setFavorites] = useState<Property[]>([]);
+  const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { state: authState } = useAuth();
 
-  useEffect(() => {
-    const fetchFavorites = async () => {
-      if (!authState.isAuthenticated) {
-        setFavorites([]);
-        setLoading(false);
-        return;
-      }
+  const fetchFavorites = useCallback(async () => {
+    if (!authState.isAuthenticated) {
+      setFavorites([]);
+      setLoading(false);
+      return;
+    }
 
-      try {
-        setLoading(true);
-        const response = await api.getFavorites();
-        console.log("Favorites response:", response);
-        // Handle different possible response structures
-        let favoritesData: Property[] = [];
-        
-        if (response && response.data) {
-          if (Array.isArray(response.data)) {
-            favoritesData = response.data;
-          } else if (response.data.favorites && Array.isArray(response.data.favorites)) {
-            favoritesData = response.data.favorites;
-          } else if (response.data.data && Array.isArray(response.data.data)) {
-            favoritesData = response.data.data;
-          }
-        } else if (Array.isArray(response)) {
-          favoritesData = response;
-        }
-        
-        setFavorites(favoritesData);
-      } catch (err) {
-        console.error('Error fetching favorites:', err);
-        setError(err instanceof Error ? err.message : 'Failed to fetch favorites');
-        setFavorites([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchFavorites();
+    try {
+      setLoading(true);
+      const response = await api.getFavorites();
+      // The API returns { data: { favorites: [...] } }
+      const favoritesData = response?.data?.favorites || [];
+      setFavorites(Array.isArray(favoritesData) ? favoritesData : []);
+    } catch (err) {
+      console.error('Error fetching favorites:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch favorites');
+      setFavorites([]);
+    } finally {
+      setLoading(false);
+    }
   }, [authState.isAuthenticated]);
+
+  useEffect(() => {
+    fetchFavorites();
+  }, [fetchFavorites]);
 
   const addToFavorites = async (propertyId: number) => {
     try {
       await api.addToFavorites(propertyId);
-      // Refresh favorites list
-      const response = await api.getFavorites();
-      
-      let favoritesData: Property[] = [];
-      if (response && response.data) {
-        if (Array.isArray(response.data)) {
-          favoritesData = response.data;
-        } else if (response.data.favorites && Array.isArray(response.data.favorites)) {
-          favoritesData = response.data.favorites;
-        } else if (response.data.data && Array.isArray(response.data.data)) {
-          favoritesData = response.data.data;
-        }
-      }
-      
-      setFavorites(favoritesData);
+      // Re-fetch the list to get the complete Favorite object from the server
+      await fetchFavorites();
     } catch (err) {
       console.error('Error adding to favorites:', err);
       throw new Error(err instanceof Error ? err.message : 'Failed to add to favorites');
@@ -75,28 +48,22 @@ export function useFavorites() {
   const removeFromFavorites = async (propertyId: number) => {
     try {
       await api.removeFromFavorites(propertyId);
-      // Remove from local state
-      setFavorites(prev => {
-        if (!Array.isArray(prev)) return [];
-        return prev.filter(prop => prop && prop.id !== propertyId);
-      });
+      // Optimistically remove from local state for instant UI update
+      setFavorites(prev => prev.filter(fav => fav.property.id !== propertyId));
     } catch (err) {
       console.error('Error removing from favorites:', err);
+      // If the API call fails, we can re-fetch to revert the optimistic update
+      await fetchFavorites();
       throw new Error(err instanceof Error ? err.message : 'Failed to remove from favorites');
     }
   };
 
   const isFavorite = (propertyId: number) => {
-    if (!Array.isArray(favorites)) {
-      console.warn('Favorites is not an array:', typeof favorites, favorites);
+    if (!propertyId || !Array.isArray(favorites)) {
       return false;
     }
-    
-    if (!propertyId) {
-      return false;
-    }
-    
-    return favorites.some(prop => prop && prop.id === propertyId);
+    // Correctly check the nested property ID within each favorite object
+    return favorites.some(fav => fav.property && fav.property.id === propertyId);
   };
 
   return {

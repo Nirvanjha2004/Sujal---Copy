@@ -9,7 +9,7 @@ const router = Router();
 router.use(authenticate);
 
 // Apply rate limiting
-router.use(rateLimitConfig);
+// router.use(rateLimitConfig);
 
 /**
  * @route   POST /api/favorites

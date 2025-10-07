@@ -6,7 +6,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Layout } from '@/components/layout/Layout';
 import { useNavigate } from 'react-router-dom';
-import { api, PropertyFilters, SavedSearch } from '@/lib/api';
+import { getSavedSearches, deleteSavedSearch, PropertyFilters, SavedSearch } from '@/lib/api';
 
 export function SavedSearchesPage() {
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);
@@ -15,36 +15,50 @@ export function SavedSearchesPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchSavedSearches();
+    const fetchSearches = async () => {
+      try {
+        setLoading(true);
+        const response = await getSavedSearches();
+        // Map the API response to the expected frontend structure
+        const mappedSearches = response.data.savedSearches.map((item: any) => ({
+          id: item.id,
+          name: item.search_name, // Use search_name
+          created_at: item.created_at,
+          filters: item.search_criteria, // Use search_criteria
+        }));
+        setSavedSearches(mappedSearches || []);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch saved searches');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSearches();
   }, []);
 
-  const fetchSavedSearches = async () => {
-    try {
-      setLoading(true);
-      const response = await api.getSavedSearches();
-      setSavedSearches(response.data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch saved searches');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleDeleteSearch = async (searchId: number) => {
+    // Optimistic deletion
+    const originalSearches = savedSearches;
+    setSavedSearches(prev => prev.filter(search => search.id !== searchId));
     try {
-      await api.deleteSavedSearch(searchId);
-      setSavedSearches(prev => prev.filter(search => search.id !== searchId));
+      await deleteSavedSearch(searchId);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete saved search');
+      // Revert on failure
+      setSavedSearches(originalSearches);
     }
   };
 
   const handleRunSearch = (filters: PropertyFilters) => {
-    // Navigate to search page with filters
     const params = new URLSearchParams();
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
-        params.append(key, value.toString());
+        // Use 'q' for the location parameter, as expected by the search page
+        if (key === 'location') {
+          params.append('q', value.toString());
+        } else {
+          params.append(key, value.toString());
+        }
       }
     });
     navigate(`/search?${params.toString()}`);
@@ -57,14 +71,10 @@ export function SavedSearchesPage() {
     if (filters.property_type) filterLabels.push(`Type: ${filters.property_type}`);
     if (filters.listing_type) filterLabels.push(`For: ${filters.listing_type}`);
     if (filters.min_price || filters.max_price) {
-      const priceRange = `₹${filters.min_price || 0}L - ₹${filters.max_price || '∞'}L`;
+      const priceRange = `₹${filters.min_price || '0'} - ₹${filters.max_price || 'Any'}`;
       filterLabels.push(`Price: ${priceRange}`);
     }
     if (filters.bedrooms) filterLabels.push(`${filters.bedrooms} BHK`);
-    if (filters.min_area || filters.max_area) {
-      const areaRange = `${filters.min_area || 0} - ${filters.max_area || '∞'} sq ft`;
-      filterLabels.push(`Area: ${areaRange}`);
-    }
     
     return filterLabels;
   };
@@ -140,10 +150,10 @@ export function SavedSearchesPage() {
                       </p>
                     </div>
                     <Button
-                      size="sm"
+                      size="icon"
                       variant="ghost"
                       onClick={() => handleDeleteSearch(search.id)}
-                      className="text-destructive hover:text-destructive"
+                      className="text-destructive hover:bg-destructive/10 hover:text-destructive size-8"
                     >
                       <Icon icon="solar:trash-bin-trash-bold" className="size-4" />
                     </Button>
@@ -161,7 +171,7 @@ export function SavedSearchesPage() {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex gap-2 pt-2">
+                    <div className="flex gap-2 pt-4">
                       <Button
                         size="sm"
                         onClick={() => handleRunSearch(search.filters)}
@@ -169,22 +179,6 @@ export function SavedSearchesPage() {
                       >
                         <Icon icon="solar:magnifer-bold" className="size-4 mr-1" />
                         Run Search
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          // Navigate to search page with filters pre-filled for editing
-                          const params = new URLSearchParams();
-                          Object.entries(search.filters).forEach(([key, value]) => {
-                            if (value !== undefined && value !== null && value !== '') {
-                              params.append(key, value.toString());
-                            }
-                          });
-                          navigate(`/search?${params.toString()}&edit=${search.id}`);
-                        }}
-                      >
-                        <Icon icon="solar:pen-bold" className="size-4" />
                       </Button>
                     </div>
                   </div>
@@ -218,4 +212,3 @@ export function SavedSearchesPage() {
     </Layout>
   );
 }
-  

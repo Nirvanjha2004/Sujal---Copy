@@ -20,6 +20,16 @@ import { PropertyFilters } from "@/lib/api";
 import { PropertyGridSkeleton } from "@/components/ui/loading";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/contexts/AuthContext";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 export function PropertyListingSearchPage() {
   const navigate = useNavigate();
@@ -39,6 +49,8 @@ export function PropertyListingSearchPage() {
   const [maxArea, setMaxArea] = useState<string>("no-max");
   const [postedBy, setPostedBy] = useState<string[]>([]);
   const [constructionStatus, setConstructionStatus] = useState<string[]>([]);
+  const [isSaveSearchModalOpen, setIsSaveSearchModalOpen] = useState(false);
+  const [saveSearchName, setSaveSearchName] = useState("");
 
   // Extract filters from URL params on component mount
   useEffect(() => {
@@ -112,6 +124,37 @@ export function PropertyListingSearchPage() {
     if (newFilters.status) params.set('status', newFilters.status);
     
     setSearchParams(params);
+  };
+
+  const handleSaveSearchClick = () => {
+    if (!authState.isAuthenticated) {
+      toast.error("Please log in to save your search.");
+      navigate("/login");
+      return;
+    }
+    // Ensure there are filters to save
+    if (Object.keys(filters).length === 0) {
+      toast.info("Apply some filters before saving a search.");
+      return;
+    }
+    setIsSaveSearchModalOpen(true);
+  };
+
+  const handleConfirmSaveSearch = async () => {
+    if (!saveSearchName.trim()) {
+      toast.error("Please enter a name for your search.");
+      return;
+    }
+
+    try {
+      await api.createSavedSearch(saveSearchName, filters);
+      toast.success(`Search "${saveSearchName}" saved successfully!`);
+      setIsSaveSearchModalOpen(false);
+      setSaveSearchName("");
+    } catch (error) {
+      console.error("Failed to save search:", error);
+      toast.error("Failed to save search. Please try again.");
+    }
   };
 
   // Handle search input change
@@ -470,48 +513,52 @@ export function PropertyListingSearchPage() {
           </aside>
           
           <main className="flex-1 mr-4">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold mb-4">
-                {loading ? 'Loading...' : `${total || 0} results`} | Property in {searchQuery || 'All Locations'} {listingType === 'rent' ? 'for Rent' : 'for Sale'}
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold">
+                {loading ? 'Loading...' : `${total || 0} results`} | Property in {searchQuery || 'All Locations'}
               </h2>
-              
-              <Card className="mb-6">
-                <CardContent className="flex items-center gap-3 p-4">
-                  <Icon icon="lucide:map-pin" className="size-6 text-primary" />
-                  <span className="font-medium">Get to know more about {searchQuery || 'your area'}</span>
-                  <Button variant="link" className="text-primary p-0">
-                    View Insights <Icon icon="lucide:chevron-right" className="size-4" />
-                  </Button>
-                </CardContent>
-              </Card>
-              
-              <div className="flex items-center gap-4 mb-6 overflow-x-auto pb-2">
-                <div className="flex items-center gap-2 px-4 py-2 bg-orange-50 border border-orange-200 rounded-full whitespace-nowrap">
-                  <Icon icon="solar:star-bold" className="size-5 text-orange-500" />
-                  <span className="text-sm font-medium">NEW LAUNCH</span>
-                  <sup className="text-xs text-orange-500">*</sup>
-                </div>
-                <Button variant="outline" size="sm" className="rounded-full whitespace-nowrap">
-                  Owner
+              <Button variant="outline" onClick={handleSaveSearchClick}>
+                <Icon icon="solar:bookmark-bold" className="mr-2 size-4" />
+                Save Search
+              </Button>
+            </div>
+            
+            <Card className="mb-6">
+              <CardContent className="flex items-center gap-3 p-4">
+                <Icon icon="lucide:map-pin" className="size-6 text-primary" />
+                <span className="font-medium">Get to know more about {searchQuery || 'your area'}</span>
+                <Button variant="link" className="text-primary p-0">
+                  View Insights <Icon icon="lucide:chevron-right" className="size-4" />
                 </Button>
-                <Button variant="outline" size="sm" className="rounded-full whitespace-nowrap">
-                  Verified
-                </Button>
-                <Button variant="outline" size="sm" className="rounded-full whitespace-nowrap">
-                  Under construction
-                </Button>
-                <Button variant="outline" size="sm" className="rounded-full whitespace-nowrap">
-                  Ready To Move
-                </Button>
-                <Button variant="outline" size="sm" className="rounded-full whitespace-nowrap">
-                  With Photos <Icon icon="lucide:chevron-right" className="size-4" />
-                </Button>
-                <Button variant="outline" size="sm" className="rounded-full">
-                  <Icon icon="lucide:sliders-horizontal" className="size-4" />
-                  Sort By
-                  <Icon icon="lucide:chevron-down" className="size-4" />
-                </Button>
+              </CardContent>
+            </Card>
+            
+            <div className="flex items-center gap-4 mb-6 overflow-x-auto pb-2">
+              <div className="flex items-center gap-2 px-4 py-2 bg-orange-50 border border-orange-200 rounded-full whitespace-nowrap">
+                <Icon icon="solar:star-bold" className="size-5 text-orange-500" />
+                <span className="text-sm font-medium">NEW LAUNCH</span>
+                <sup className="text-xs text-orange-500">*</sup>
               </div>
+              <Button variant="outline" size="sm" className="rounded-full whitespace-nowrap">
+                Owner
+              </Button>
+              <Button variant="outline" size="sm" className="rounded-full whitespace-nowrap">
+                Verified
+              </Button>
+              <Button variant="outline" size="sm" className="rounded-full whitespace-nowrap">
+                Under construction
+              </Button>
+              <Button variant="outline" size="sm" className="rounded-full whitespace-nowrap">
+                Ready To Move
+              </Button>
+              <Button variant="outline" size="sm" className="rounded-full whitespace-nowrap">
+                With Photos <Icon icon="lucide:chevron-right" className="size-4" />
+              </Button>
+              <Button variant="outline" size="sm" className="rounded-full">
+                <Icon icon="lucide:sliders-horizontal" className="size-4" />
+                Sort By
+                <Icon icon="lucide:chevron-down" className="size-4" />
+              </Button>
             </div>
             
             {loading ? (
@@ -725,6 +772,30 @@ export function PropertyListingSearchPage() {
         </div>
       </div>
       
+      <Dialog open={isSaveSearchModalOpen} onOpenChange={setIsSaveSearchModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Save Your Search</DialogTitle>
+            <DialogDescription>
+              Give this search a name so you can easily find it later.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Input
+              placeholder="e.g., '2BHK Apartments in Jaipur'"
+              value={saveSearchName}
+              onChange={(e) => setSaveSearchName(e.target.value)}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsSaveSearchModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleConfirmSaveSearch}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Button size="icon" className="fixed bottom-6 right-6 rounded-full size-14 shadow-lg">
         <Icon icon="lucide:message-circle" className="size-6" />
         <Badge className="absolute -top-1 -right-1 size-5 p-0 flex items-center justify-center bg-red-500">

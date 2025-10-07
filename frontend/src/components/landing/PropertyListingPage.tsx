@@ -12,7 +12,10 @@ import { ImageGallery } from "@/components/property/ImageGallery";
 import { PropertyShare } from "@/components/property/PropertyShare";
 import { PropertyOwnerProfile } from "@/components/property/PropertyOwnerProfile";
 import { useAuth } from "@/contexts/AuthContext";
+import { api } from "@/lib/api"; // 1. Import api
+import { toast } from "sonner"; // 2. Import toast for notifications
 import "./PropertyListingPage.css";
+import { useState } from "react";
 
 export function PropertyListingPage() {
     const { id } = useParams<{ id: string }>();
@@ -22,6 +25,10 @@ export function PropertyListingPage() {
     
     const { property, loading, error } = useProperty(propertyId);
     const { isFavorite, addToFavorites, removeFromFavorites } = useFavorites();
+
+    // Remove state related to the contact message as it's no longer needed here
+    // const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+    // const [contactMessage, setContactMessage] = useState("");
 
     const formatPrice = (price: number) => {
         if (price >= 10000000) {
@@ -35,6 +42,11 @@ export function PropertyListingPage() {
 
     const handleFavoriteToggle = async () => {
         if (!property) return;
+
+        if (!authState.isAuthenticated) {
+            navigate('/login');
+            return;
+        }
         
         try {
             if (isFavorite(property.id)) {
@@ -46,6 +58,55 @@ export function PropertyListingPage() {
             console.error('Failed to toggle favorite:', error);
         }
     };
+
+    const handleContactOwnerClick = async () => {
+        // 1. Check for authentication and user details first
+        if (!authState.isAuthenticated || !authState.user?.email) {
+            toast.info("Please log in to contact the owner.");
+            navigate('/login');
+            return;
+        }
+
+        // 2. Ensure property data is loaded
+        if (!property || !property.id) {
+            toast.error("Property details not available. Please refresh the page.");
+            return;
+        }
+
+        try {
+            const defaultMessage = `I'm interested in your property: "${property.title}".`;
+
+            console.log('inquiryResponse:', property.id, authState.user.email , authState.user.first_name);
+
+            // 3. Use guaranteed values from the checks above
+            const inquiryResponse = await api.createInquiry({
+                property_id: property.id,
+                message: defaultMessage,
+                name: authState.user.first_name || "Interested Buyer", // Fallback for name
+                email: authState.user.email,
+            });
+
+
+            const inquiry = inquiryResponse.data.inquiry;
+            const conversationId = inquiry.conversation_id;
+
+            if (!conversationId) {
+                throw new Error("Could not retrieve conversation ID.");
+            }
+
+            toast.success("Opening conversation...");
+
+            // Navigate to the specific conversation page
+            navigate(`/dashboard/messages/${conversationId}`);
+
+        } catch (err) {
+            console.error("Failed to create inquiry:", err);
+            toast.error("Could not start conversation. Please try again.");
+        }
+    };
+
+    // The handleSendInquiry function is now merged into handleContactOwnerClick
+    // and can be removed.
 
     if (loading) {
         return <PropertyGridSkeleton />;
@@ -233,6 +294,7 @@ export function PropertyListingPage() {
                             variant="default"
                             size="lg"
                             className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
+                            onClick={handleContactOwnerClick}
                         >
                             Contact Owner
                         </Button>

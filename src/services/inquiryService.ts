@@ -2,7 +2,7 @@ import { Inquiry, InquiryStatus } from '../models/Inquiry';
 import { User } from '../models/User';
 import { Property } from '../models/Property';
 import emailService, { InquiryEmailData } from './emailService';
-import { Op } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 
 export interface CreateInquiryData {
   property_id: number;
@@ -30,7 +30,7 @@ export interface InquiryListOptions {
 }
 
 class InquiryService {
-  async createInquiry(data: CreateInquiryData): Promise<Inquiry> {
+  async createInquiry(data: CreateInquiryData, options?: { transaction: Transaction }): Promise<Inquiry> {
     // Validate that property exists
     const property = await Property.findByPk(data.property_id, {
       include: [
@@ -40,6 +40,7 @@ class InquiryService {
           attributes: ['id', 'email', 'first_name', 'last_name'],
         },
       ],
+      transaction: options?.transaction, // Pass transaction to findByPk
     });
 
     if (!property) {
@@ -54,7 +55,9 @@ class InquiryService {
       email: data.email,
       phone: data.phone,
       message: data.message,
-    });
+    }, { transaction: options?.transaction }); // Pass transaction to create
+
+    console.log('The Inquiry logs are', inquiry);
 
     // Load the created inquiry with associations
     const createdInquiry = await Inquiry.findByPk(inquiry.id, {
@@ -78,14 +81,17 @@ class InquiryService {
           required: false,
         },
       ],
+      transaction: options?.transaction, // Pass transaction here as well
     });
+
+    console.log('The CreatedInquiry logs are', createdInquiry);
 
     if (!createdInquiry) {
       throw new Error('Failed to create inquiry');
     }
 
     // Send email notifications
-    await this.sendInquiryNotifications(createdInquiry);
+    // await this.sendInquiryNotifications(createdInquiry);
 
     return createdInquiry;
   }

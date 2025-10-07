@@ -65,6 +65,10 @@ export enum PropertyType {
   HOUSE = 'house',
   COMMERCIAL = 'commercial',
   LAND = 'land',
+  VILLA = 'villa',
+  OFFICE = 'office',
+  SHOP = 'shop',
+  WAREHOUSE = 'warehouse',
 }
 
 export enum ListingType {

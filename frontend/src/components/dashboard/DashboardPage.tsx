@@ -90,7 +90,7 @@ export function DashboardPage() {
               title: 'Search Properties',
               description: 'Browse available properties',
               icon: 'solar:magnifer-bold',
-              action: () => navigate('/properties'),
+              action: () => navigate('/'),
               color: 'bg-primary'
             },
             {

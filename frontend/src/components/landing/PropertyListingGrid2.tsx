@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { useProperties } from "@/hooks/useProperties";
 import { PropertyGridSkeleton } from "@/components/ui/loading";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useMemo } from "react";
 import { PropertyFilters } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -14,25 +14,23 @@ export function PropertyListingGrid() {
   const navigate = useNavigate();
   const { state: authState } = useAuth();
   const [searchParams] = useSearchParams();
-  const [filters, setFilters] = useState<PropertyFilters>({});
 
   // Extract filters from URL params
-  useEffect(() => {
+  const filters = useMemo(() => {
     const newFilters: PropertyFilters = {};
-
     const query = searchParams.get("q");
     const propertyType = searchParams.get("property_type");
     const listingType = searchParams.get("listing_type");
     const minPrice = searchParams.get("min_price");
     const maxPrice = searchParams.get("max_price");
 
-    if (query) newFilters.location = query; // Using location field for general search
+    if (query) newFilters.location = query;
     if (propertyType && propertyType !== "all") newFilters.property_type = propertyType;
     if (listingType) newFilters.listing_type = listingType;
     if (minPrice) newFilters.min_price = parseInt(minPrice);
     if (maxPrice) newFilters.max_price = parseInt(maxPrice);
 
-    setFilters(newFilters);
+    return newFilters;
   }, [searchParams]);
 
   const { properties, loading, error, total } = useProperties(filters);
@@ -229,10 +227,10 @@ export function PropertyListingGrid() {
               <div className="text-center py-12">
                 <Icon icon="solar:home-bold" className="size-16 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">No properties found</h3>
-                <p className="text-muted-foreground">Showing sample properties below</p>
+                {/* <p className="text-muted-foreground">Showing sample properties below</p> */}
               </div>
 
-              {/* Original static property cards */}
+              {/* Original static property cards
               <Card className="overflow-hidden">
                 <div className="flex flex-col md:flex-row">
                   <div className="md:w-1/3">
@@ -425,7 +423,7 @@ export function PropertyListingGrid() {
                     </div>
                   </div>
                 </div>
-              </Card>
+              </Card> */}
             </>
           ) : (
             // Dynamic properties from API

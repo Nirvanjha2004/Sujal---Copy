@@ -1,7 +1,7 @@
--- Create URL redirects table for SEO redirect management
+-- Corrected table definition
 CREATE TABLE IF NOT EXISTS url_redirects (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    from_path VARCHAR(500) NOT NULL UNIQUE,
+    from_path VARCHAR(500) NOT NULL UNIQUE,  -- UNIQUE automatically creates an index
     to_path VARCHAR(500) NOT NULL,
     status_code INT NOT NULL DEFAULT 301,
     is_active BOOLEAN DEFAULT TRUE,
@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS url_redirects (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    INDEX idx_from_path (from_path),
+    -- Remove redundant index on from_path
     INDEX idx_is_active (is_active),
     INDEX idx_status_code (status_code),
     INDEX idx_hit_count (hit_count),

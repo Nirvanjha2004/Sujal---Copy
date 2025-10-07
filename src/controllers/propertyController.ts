@@ -278,34 +278,48 @@ class PropertyController {
       }
 
 
-      console.log(`[${requestId}] Reached the search function`, req.query)
+      console.log(`[${requestId}] Reached the search function`, (req.query.property_type as String))
 
       const authReq = req as AuthenticatedRequest;
       const filters: PropertySearchFilters = {
-        propertyType: req.query.propertyType as PropertyType,
-        listingType: req.query.listingType as ListingType,
+        propertyType: req.query.property_type as PropertyType,
+        listingType: req.query.listing_type as ListingType,
         status: req.query.status as PropertyStatus,
-        minPrice: req.query.minPrice ? parseFloat(req.query.minPrice as string) : undefined,
-        maxPrice: req.query.maxPrice ? parseFloat(req.query.maxPrice as string) : undefined,
+
+        minPrice: req.query.min_price ? Number(req.query.min_price) : undefined,
+        maxPrice: req.query.max_price ? Number(req.query.max_price) : undefined,
+
         city: req.query.city as string,
         state: req.query.state as string,
-        location: req.query.keywords as string,
-        bedrooms: req.query.bedrooms ? parseInt(req.query.bedrooms as string) : undefined,
-        bathrooms: req.query.bathrooms ? parseInt(req.query.bathrooms as string) : undefined,
-        minArea: req.query.minArea ? parseInt(req.query.minArea as string) : undefined,
-        maxArea: req.query.maxArea ? parseInt(req.query.maxArea as string) : undefined,
-        latitude: req.query.latitude ? parseFloat(req.query.latitude as string) : undefined,
-        longitude: req.query.longitude ? parseFloat(req.query.longitude as string) : undefined,
-        radius: req.query.radius ? parseFloat(req.query.radius as string) : undefined,
-        amenities: req.query.amenities ? (req.query.amenities as string).split(',') : undefined,
-        sortBy: req.query.sortBy as 'price' | 'date' | 'relevance' | 'views',
-        sortOrder: req.query.sortOrder as 'asc' | 'desc',
-        page: req.query.page ? parseInt(req.query.page as string) : 1,
-        limit: req.query.limit ? parseInt(req.query.limit as string) : 20,
-        isFeatured: req.query.isFeatured ? req.query.isFeatured === 'true' : undefined,
+        location: req.query.location as string,
+
+        bedrooms: req.query.bedrooms ? parseInt(req.query.bedrooms as string, 10) : undefined,
+        bathrooms: req.query.bathrooms ? parseInt(req.query.bathrooms as string, 10) : undefined,
+
+        minArea: req.query.min_area ? parseInt(req.query.min_area as string, 10) : undefined,
+        maxArea: req.query.max_area ? parseInt(req.query.max_area as string, 10) : undefined,
+
+        latitude: req.query.latitude ? Number(req.query.latitude) : undefined,
+        longitude: req.query.longitude ? Number(req.query.longitude) : undefined,
+        radius: req.query.radius ? Number(req.query.radius) : undefined,
+
+        amenities: req.query.amenities
+          ? (req.query.amenities as string).split(',').map(a => a.trim())
+          : undefined,
+
+        sortBy: req.query.sort_by as 'price' | 'date' | 'relevance' | 'views',
+        sortOrder: req.query.sort_order as 'asc' | 'desc',
+
+        page: req.query.page ? parseInt(req.query.page as string, 10) : 1,
+        limit: req.query.limit ? parseInt(req.query.limit as string, 10) : 20,
+
+        isFeatured: req.query.is_featured ? req.query.is_featured === 'true' : undefined,
+
         keywords: req.query.keywords as string,
-        userId: authReq.user?.userId, // Add userId for search history tracking
+
+        // userId: authReq.user?.userId, // REMOVE THIS LINE
       };
+
       const result = await this.propertyService.searchProperties(filters, requestId);
       res.status(200).json({
         success: true,
@@ -384,7 +398,7 @@ class PropertyController {
       const body = req.body as any;
 
       const updateData: PropertyUpdateData = {};
-      
+
       // Only include fields that are provided
       if (body.title !== undefined) updateData.title = body.title;
       if (body.description !== undefined) updateData.description = body.description;
@@ -586,7 +600,7 @@ class PropertyController {
   compareProperties = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const propertyIds = req.query.ids as string;
-      
+
       if (!propertyIds) {
         res.status(400).json({
           success: false,
@@ -600,7 +614,7 @@ class PropertyController {
       }
 
       const ids = propertyIds.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
-      
+
       if (ids.length < 2 || ids.length > 3) {
         res.status(400).json({
           success: false,

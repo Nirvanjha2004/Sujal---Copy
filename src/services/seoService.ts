@@ -230,11 +230,15 @@ class SeoService {
 
   // Private helper methods
   private getPropertyTypeLabel(type: PropertyType): string {
-    const labels = {
+    const labels: Record<PropertyType, string> = {
       [PropertyType.APARTMENT]: 'Apartment',
       [PropertyType.HOUSE]: 'House',
       [PropertyType.COMMERCIAL]: 'Commercial Property',
       [PropertyType.LAND]: 'Land',
+      [PropertyType.VILLA]: 'Villa',
+      [PropertyType.OFFICE]: '',
+      [PropertyType.SHOP]: '',
+      [PropertyType.WAREHOUSE]: ''
     };
     return labels[type] || 'Property';
   }

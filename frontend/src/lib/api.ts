@@ -157,15 +157,13 @@ export const api = {
           // Map frontend parameter names to backend parameter names
           let backendKey = key;
           // Note: 'location' stays as 'location' - backend now supports this for searching city, state, and address
-          if (key === 'property_type') backendKey = 'propertyType';
-          if (key === 'listing_type') backendKey = 'listingType';
-          if (key === 'min_price') backendKey = 'minPrice';
-          if (key === 'max_price') backendKey = 'maxPrice';
-          if (key === 'min_area') backendKey = 'minArea';
-          if (key === 'max_area') backendKey = 'maxArea';
-          if (key === 'sort_by') backendKey = 'sortBy';
-          if (key === 'sort_order') backendKey = 'sortOrder';
-          
+          if (key === 'property_type') backendKey = 'property_type';
+          if (key === 'listing_type') backendKey = 'listing_type';
+          if (key === 'price') backendKey = 'price';
+          if (key === 'area') backendKey = 'area_sqft';
+          if (key === 'sort_by') backendKey = 'sort_by';
+          if (key === 'sort_order') backendKey = 'sort_order';
+
           // Handle amenities array specially
           if (key === 'amenities' && Array.isArray(value)) {
             if (value.length > 0) {
@@ -178,6 +176,8 @@ export const api = {
         }
       });
     }
+
+    console.log("The params are", params.toString())
     
     const queryString = params.toString();
     const response = await apiRequest(`/properties${queryString ? `?${queryString}` : ''}`) as any;

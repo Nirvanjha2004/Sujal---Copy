@@ -38,10 +38,9 @@ export interface PropertyImage {
   display_order: number;
 }
 
+// Add or update these types
 export interface PropertyFilters {
   location?: string;
-  city?: string;
-  state?: string;
   property_type?: string;
   listing_type?: string;
   min_price?: number;
@@ -50,12 +49,23 @@ export interface PropertyFilters {
   bathrooms?: number;
   min_area?: number;
   max_area?: number;
-  amenities?: string[];
   status?: string;
-  sort_by?: string;
-  sort_order?: 'asc' | 'desc';
-  page?: number;
-  limit?: number;
+  is_featured?: boolean;
+  keywords?: string;
+}
+
+export interface SavedSearch {
+  id: number;
+  name: string;
+  filters: PropertyFilters;
+  created_at: string;
+}
+
+export interface SearchHistoryItem {
+  id: number;
+  search_query: string;
+  filters: PropertyFilters;
+  created_at: string;
 }
 
 export interface User {
@@ -68,14 +78,6 @@ export interface User {
   avatar?: string;
   created_at: string;
   updated_at: string;
-}
-
-export interface SavedSearch {
-  id: number;
-  user_id: number;
-  name: string;
-  filters: PropertyFilters;
-  created_at: string;
 }
 
 export interface Inquiry {
@@ -375,14 +377,14 @@ export const api = {
   },
 
   // Saved Searches
-  getSavedSearches: (): Promise<{ data: any[] }> => {
+  getSavedSearches: (): Promise<{ data: { searches: SavedSearch[] } }> => {
     return apiRequest('/saved-searches');
   },
 
-  saveSearch: (searchData: any): Promise<any> => {
+  createSavedSearch: (name: string, filters: PropertyFilters): Promise<SavedSearch> => {
     return apiRequest('/saved-searches', {
       method: 'POST',
-      body: JSON.stringify(searchData),
+      body: JSON.stringify({ search_name: name, search_criteria: filters }),
     });
   },
 
@@ -515,14 +517,15 @@ export const api = {
   },
 
   // Legacy inquiry methods (for backward compatibility)
-  createInquiry: (inquiryData: { propertyId: number; message: string; contactInfo?: any }): Promise<any> => {
+  createInquiry: (inquiryData: {
+    property_id: number;
+    message: string;
+    name: string;
+    email: string;
+  }): Promise<any> => {
     return apiRequest('/inquiries', {
       method: 'POST',
-      body: JSON.stringify({
-        property_id: inquiryData.propertyId,
-        message: inquiryData.message,
-        ...inquiryData.contactInfo,
-      }),
+      body: JSON.stringify(inquiryData),
     });
   },
 
@@ -908,4 +911,6 @@ export const api = {
   },
 };
 
+export const getSavedSearches = api.getSavedSearches;
+export const deleteSavedSearch = api.deleteSavedSearch;
 export { ApiError };

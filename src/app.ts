@@ -52,7 +52,7 @@ class App {
     // Security middlewares
     this.app.use(helmetConfig);
     this.app.use(corsConfig);
-    this.app.use(rateLimitConfig);
+    // this.app.use(rateLimitConfig);
     this.app.use(xssProtection);
     this.app.use(sqlInjectionProtection);
 

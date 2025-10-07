@@ -6,14 +6,27 @@ import { Card } from "@/components/ui/card";
 import { useProperties } from "@/hooks/useProperties";
 import { PropertyGridSkeleton } from "@/components/ui/loading";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { PropertyFilters } from "@/lib/api";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from '@/contexts/AuthContext';
+import { api } from '@/lib/api';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { toast } from 'sonner'; // Assuming you use a toast library like sonner
 
 export function PropertyListingGrid() {
   const navigate = useNavigate();
   const { state: authState } = useAuth();
   const [searchParams] = useSearchParams();
+  const [isSaveSearchModalOpen, setIsSaveSearchModalOpen] = useState(false);
+  const [saveSearchName, setSaveSearchName] = useState('');
 
   // Extract filters from URL params
   const filters = useMemo(() => {
@@ -44,6 +57,32 @@ export function PropertyListingGrid() {
       return `₹ ${(price / 100000).toFixed(2)} Lakh`;
     } else {
       return `₹ ${price.toLocaleString()}`;
+    }
+  };
+
+  const handleSaveSearchClick = () => {
+    if (!authState.isAuthenticated) {
+      toast.error('Please log in to save your search.');
+      navigate('/login');
+      return;
+    }
+    setIsSaveSearchModalOpen(true);
+  };
+
+  const handleConfirmSaveSearch = async () => {
+    if (!saveSearchName.trim()) {
+      toast.error('Please enter a name for your search.');
+      return;
+    }
+
+    try {
+      await api.createSavedSearch(saveSearchName, filters);
+      toast.success(`Search "${saveSearchName}" saved successfully!`);
+      setIsSaveSearchModalOpen(false);
+      setSaveSearchName('');
+    } catch (error) {
+      console.error('Failed to save search:', error);
+      toast.error('Failed to save search. Please try again.');
     }
   };
 
@@ -155,6 +194,13 @@ export function PropertyListingGrid() {
         </div>
       </header>
       <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl font-bold">Properties</h2>
+          <Button variant="outline" onClick={handleSaveSearchClick}>
+            <Icon icon="solar:bookmark-bold" className="mr-2 size-4" />
+            Save Search
+          </Button>
+        </div>
         <h2 className="text-2xl font-heading font-semibold tracking-tight mb-6">
           {total || 348} results |{" "}
           {filters.listing_type === "rent"
@@ -493,6 +539,29 @@ export function PropertyListingGrid() {
           )}
         </div>
       </div>
+      <Dialog open={isSaveSearchModalOpen} onOpenChange={setIsSaveSearchModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Save Your Search</DialogTitle>
+            <DialogDescription>
+              Give this search a name so you can easily find it later.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Input
+              placeholder="e.g., '2BHK Apartments in Jaipur'"
+              value={saveSearchName}
+              onChange={(e) => setSaveSearchName(e.target.value)}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsSaveSearchModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleConfirmSaveSearch}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <footer className="bg-gray-900 text-white mt-16">
         <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">

@@ -15,7 +15,11 @@ export function FavoritesPage() {
   const [sortBy, setSortBy] = useState<'date_added' | 'price' | 'title'>('date_added');
   const navigate = useNavigate();
 
-
+  // Extract property data from favorites
+  const favoriteProperties = favorites.map(fav => ({
+    ...fav.property,
+    added_at: fav.added_at, // Keep track of when it was added
+  }));
 
   const handleBulkRemove = async () => {
     try {
@@ -38,11 +42,11 @@ export function FavoritesPage() {
     if (selectedProperties.length === favorites.length) {
       setSelectedProperties([]);
     } else {
-      setSelectedProperties(favorites.map(prop => prop.id));
+      setSelectedProperties(favoriteProperties.map(prop => prop.id));
     }
   };
 
-  const sortedFavorites = [...favorites].sort((a, b) => {
+  const sortedFavorites = [...favoriteProperties].sort((a, b) => {
     switch (sortBy) {
       case 'price':
         return a.price - b.price;
@@ -50,7 +54,7 @@ export function FavoritesPage() {
         return a.title.localeCompare(b.title);
       case 'date_added':
       default:
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        return new Date(b.added_at).getTime() - new Date(a.added_at).getTime();
     }
   });
 

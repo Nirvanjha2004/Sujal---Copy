@@ -398,7 +398,7 @@ export function RealEstateLandingPage() {
               <p className="text-muted-foreground">in South Kolkata</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/properties?property_type=apartment')}>
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/properties?propertyType=apartment')}>
                 <CardContent className="p-0">
                   <img
                     alt="Residential Apartment"
@@ -411,7 +411,7 @@ export function RealEstateLandingPage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/properties?property_type=house')}>
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/properties?propertyType=house')}>
                 <CardContent className="p-0">
                   <img
                     alt="Independent/Builder Floor"
@@ -424,7 +424,7 @@ export function RealEstateLandingPage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/properties?property_type=villa')}>
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/properties?propertyType=villa')}>
                 <CardContent className="p-0">
                   <img
                     alt="Independent House/Villa"
@@ -437,7 +437,7 @@ export function RealEstateLandingPage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/properties?property_type=land')}>
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/properties?propertyType=land')}>
                 <CardContent className="p-0">
                   <img
                     alt="Residential Land"
@@ -657,11 +657,6 @@ export function RealEstateLandingPage() {
                           className="w-full h-32 object-cover rounded-t-xl"
                         />
                         <div className="p-4">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Badge variant="destructive" className="text-xs">
-                              NEW LAUNCH
-                            </Badge>
-                          </div>
                           <h3 className="font-semibold text-sm mb-1">3A, MIRAGE VISTA AVENUE</h3>
                           <p className="text-xs text-muted-foreground mb-2">Luxury Real Bangalore</p>
                           <p className="text-xs text-muted-foreground mb-2">
@@ -689,11 +684,6 @@ export function RealEstateLandingPage() {
                           className="w-full h-32 object-cover rounded-t-xl"
                         />
                         <div className="p-4">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Badge variant="destructive" className="text-xs">
-                              NEW LAUNCH
-                            </Badge>
-                          </div>
                           <h3 className="font-semibold text-sm mb-1">3A, ISWAR GANGULY STREET</h3>
                           <p className="text-xs text-muted-foreground mb-2">
                             ₹3500 Sq Ft | 3, 4 BHK Apartment
@@ -723,11 +713,6 @@ export function RealEstateLandingPage() {
                           className="w-full h-32 object-cover rounded-t-xl"
                         />
                         <div className="p-4">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Badge variant="destructive" className="text-xs">
-                              NEW LAUNCH
-                            </Badge>
-                          </div>
                           <h3 className="font-semibold text-sm mb-1">Swapnalaya Royale</h3>
                           <p className="text-xs text-muted-foreground mb-2">
                             ₹2500 Sq Ft | 2, 3 BHK Apartment
@@ -1034,328 +1019,211 @@ export function RealEstateLandingPage() {
             </div>
           </div>
         </section>
-        <section className="py-16 bg-gradient-to-br from-pink-50 to-pink-100">
-          <div className="container mx-auto px-4">
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="bg-gradient-to-br from-pink-100 to-pink-200 rounded-xl p-8 flex flex-col justify-center">
-                <div className="mb-6">
-                  <Icon icon="solar:mail-bold" className="size-16 text-pink-600" />
-                </div>
-                <h2 className="font-heading text-3xl font-bold tracking-tight mb-2">
-                  Properties posted by
-                </h2>
-                <p className="text-muted-foreground mb-6">Choose type of advertiser</p>
-              </div>
-              <Card className="bg-white shadow-lg">
-                <CardHeader>
-                  <h3 className="font-semibold text-xl mb-2">Choose type of advertiser</h3>
-                  <p className="text-muted-foreground">Browse your choice of listing</p>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer" onClick={() => navigate('/properties?owner_type=dealer')}>
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <Icon icon="solar:user-bold" className="size-6 text-blue-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold">Dealer</h4>
-                        <p className="text-sm text-muted-foreground">7,000+ Properties</p>
-                      </div>
-                    </div>
-                    <Icon icon="solar:arrow-right-bold" className="size-5" />
-                  </div>
-                  <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer" onClick={() => navigate('/properties?owner_type=owner')}>
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <Icon icon="solar:user-circle-bold" className="size-6 text-blue-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold">Owner</h4>
-                        <p className="text-sm text-muted-foreground">5,000+ Properties</p>
-                      </div>
-                    </div>
-                    <Icon icon="solar:arrow-right-bold" className="size-5" />
-                  </div>
-                  <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer" onClick={() => navigate('/properties?owner_type=builder')}>
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <Icon icon="solar:buildings-bold" className="size-6 text-blue-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold">Builder</h4>
-                        <p className="text-sm text-muted-foreground">140+ Properties</p>
-                      </div>
-                    </div>
-                    <Icon icon="solar:arrow-right-bold" className="size-5" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
-        <section className="py-16 bg-gradient-to-br from-green-50 to-green-100">
-          <div className="container mx-auto px-4">
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="bg-gradient-to-br from-green-100 to-green-200 rounded-xl p-8 flex flex-col justify-center">
-                <div className="mb-6">
-                  <Icon icon="solar:home-smile-bold" className="size-16 text-green-600" />
-                </div>
-                <h2 className="font-heading text-3xl font-bold tracking-tight mb-2">
-                  Have a budget in mind?
-                </h2>
-              </div>
-              <Card className="bg-white shadow-lg">
-                <CardHeader>
-                  <h3 className="font-semibold text-xl mb-2">Browse by budget</h3>
-                  <p className="text-muted-foreground">Project options based on your budget</p>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                        <Icon icon="solar:money-bold" className="size-6 text-green-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold">Affordable projects</h4>
-                        <p className="text-sm text-muted-foreground">₹ 50L / sq ft</p>
-                      </div>
-                    </div>
-                    <Icon icon="solar:arrow-right-bold" className="size-5" />
-                  </div>
-                  <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                        <Icon icon="solar:money-bold" className="size-6 text-green-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold">Mid-segment projects</h4>
-                        <p className="text-sm text-muted-foreground">₹ 50L - 1 Cr / sq ft</p>
-                      </div>
-                    </div>
-                    <Icon icon="solar:arrow-right-bold" className="size-5" />
-                  </div>
-                  <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                        <Icon icon="solar:money-bold" className="size-6 text-green-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold">Luxury projects</h4>
-                        <p className="text-sm text-muted-foreground">₹ 1 Cr+ / sq ft</p>
-                      </div>
-                    </div>
-                    <Icon icon="solar:arrow-right-bold" className="size-5" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
-        <section eid="new1" className="py-16">
-          <div eid="new2" className="container mx-auto px-4">
-            <div eid="new3" className="mb-8">
-              <h2 eid="new4" className="font-heading text-3xl font-semibold tracking-tight mb-2">
-                Emerging localities
-              </h2>
-              <p eid="new5" className="text-muted-foreground">
-                Localities with recent development in Kolkata
-              </p>
-            </div>
-            <div eid="new6" className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-12">
-              <Card eid="new7" className="hover:shadow-lg transition-shadow cursor-pointer">
-                <CardContent eid="new8" className="p-0">
-                  <img
-                    alt="Salt lake"
-                    eid="new9"
-                    src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/1.webp"
-                    className="w-full h-32 object-cover rounded-t-xl"
-                  />
-                  <div eid="new10" className="p-4">
-                    <h3 eid="new11" className="font-semibold text-sm mb-1">
-                      Salt lake 4.3★
-                    </h3>
-                    <p eid="new12" className="text-xs text-muted-foreground mb-3">
-                      82 New Projects
-                    </p>
-                    <div eid="new13" className="flex gap-2">
-                      <Button eid="new14" size="sm" variant="outline" className="text-xs h-7 px-3">
-                        Insights
-                      </Button>
-                      <Button eid="new15" size="sm" variant="outline" className="text-xs h-7 px-3">
-                        Projects
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card eid="new16" className="hover:shadow-lg transition-shadow cursor-pointer">
-                <CardContent eid="new17" className="p-0">
-                  <img
-                    alt="Jodhpur Park"
-                    eid="new18"
-                    src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/2.webp"
-                    className="w-full h-32 object-cover rounded-t-xl"
-                  />
-                  <div eid="new19" className="p-4">
-                    <h3 eid="new20" className="font-semibold text-sm mb-1">
-                      Jodhpur Park 4.3★
-                    </h3>
-                    <p eid="new21" className="text-xs text-muted-foreground mb-3">
-                      54 New Projects
-                    </p>
-                    <div eid="new22" className="flex gap-2">
-                      <Button eid="new23" size="sm" variant="outline" className="text-xs h-7 px-3">
-                        Insights
-                      </Button>
-                      <Button eid="new24" size="sm" variant="outline" className="text-xs h-7 px-3">
-                        Projects
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card eid="new25" className="hover:shadow-lg transition-shadow cursor-pointer">
-                <CardContent eid="new26" className="p-0">
-                  <img
-                    alt="Jadavpur"
-                    eid="new27"
-                    src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/3.webp"
-                    className="w-full h-32 object-cover rounded-t-xl"
-                  />
-                  <div eid="new28" className="p-4">
-                    <h3 eid="new29" className="font-semibold text-sm mb-1">
-                      Jadavpur 4.2★
-                    </h3>
-                    <p eid="new30" className="text-xs text-muted-foreground mb-3">
-                      73 New Projects
-                    </p>
-                    <div eid="new31" className="flex gap-2">
-                      <Button eid="new32" size="sm" variant="outline" className="text-xs h-7 px-3">
-                        Insights
-                      </Button>
-                      <Button eid="new33" size="sm" variant="outline" className="text-xs h-7 px-3">
-                        Projects
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card eid="new34" className="hover:shadow-lg transition-shadow cursor-pointer">
-                <CardContent eid="new35" className="p-0">
-                  <img
-                    alt="Southern Avenue"
-                    eid="new36"
-                    src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/4.webp"
-                    className="w-full h-32 object-cover rounded-t-xl"
-                  />
-                  <div eid="new37" className="p-4">
-                    <h3 eid="new38" className="font-semibold text-sm mb-1">
-                      Southern Avenue 4.3★
-                    </h3>
-                    <p eid="new39" className="text-xs text-muted-foreground mb-3">
-                      24 New Projects
-                    </p>
-                    <div eid="new40" className="flex gap-2">
-                      <Button eid="new41" size="sm" variant="outline" className="text-xs h-7 px-3">
-                        Insights
-                      </Button>
-                      <Button eid="new42" size="sm" variant="outline" className="text-xs h-7 px-3">
-                        Projects
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card eid="new43" className="hover:shadow-lg transition-shadow cursor-pointer">
-                <CardContent eid="new44" className="p-0">
-                  <img
-                    alt="Lake Gardens"
-                    eid="new45"
-                    src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/landscape/1.webp"
-                    className="w-full h-32 object-cover rounded-t-xl"
-                  />
-                  <div eid="new46" className="p-4">
-                    <h3 eid="new47" className="font-semibold text-sm mb-1">
-                      Lake Gardens 4.2★
-                    </h3>
-                    <p eid="new48" className="text-xs text-muted-foreground mb-3">
-                      35 New Projects
-                    </p>
-                    <div eid="new49" className="flex gap-2">
-                      <Button eid="new50" size="sm" variant="outline" className="text-xs h-7 px-3">
-                        Insights
-                      </Button>
-                      <Button eid="new51" size="sm" variant="outline" className="text-xs h-7 px-3">
-                        Projects
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-            <div eid="new52" className="space-y-8">
-              <Card
-                eid="new53"
-                className="bg-gradient-to-r from-green-50 to-green-100 border-green-200"
-              >
-                <CardContent eid="new54" className="p-6">
-                  <div eid="new55" className="flex items-center gap-4">
-                    <div
-                      eid="new56"
-                      className="w-16 h-16 bg-green-200 rounded-lg flex items-center justify-center"
-                    >
-                      <Icon
-                        eid="new57"
-                        icon="solar:shield-check-bold"
-                        className="size-8 text-green-600"
-                      />
-                    </div>
-                    <div eid="new58" className="flex-1">
-                      <h3 eid="new59" className="font-semibold text-lg mb-2">
-                        View properties verified by Prop Puzzle
-                      </h3>
-                      <p eid="new60" className="text-muted-foreground">
-                        Verified on site for genuineness. Check out real photos of the property
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card
-                eid="new61"
-                className="bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200"
-              >
-                <CardContent eid="new62" className="p-6">
-                  <div eid="new63" className="flex items-center gap-4">
-                    <div
-                      eid="new64"
-                      className="w-16 h-16 bg-orange-200 rounded-lg flex items-center justify-center"
-                    >
-                      <Icon
-                        eid="new65"
-                        icon="solar:user-speak-bold"
-                        className="size-8 text-orange-600"
-                      />
-                    </div>
-                    <div eid="new66" className="flex-1">
-                      <h3 eid="new67" className="font-semibold text-lg mb-2">
-                        How would you rate your locality/society?
-                      </h3>
-                      <div eid="new68" className="flex gap-1 mt-3">
-                        <Icon eid="new69" icon="solar:star-bold" className="size-6 text-gray-300" />
-                        <Icon eid="new70" icon="solar:star-bold" className="size-6 text-gray-300" />
-                        <Icon eid="new71" icon="solar:star-bold" className="size-6 text-gray-300" />
-                        <Icon eid="new72" icon="solar:star-bold" className="size-6 text-gray-300" />
-                        <Icon eid="new73" icon="solar:star-bold" className="size-6 text-gray-300" />
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
       </div>
+      <section eid="new1" className="py-16">
+        <div eid="new2" className="container mx-auto px-4">
+          <div eid="new3" className="mb-8">
+            <h2 eid="new4" className="font-heading text-3xl font-semibold tracking-tight mb-2">
+              Emerging localities
+            </h2>
+            <p eid="new5" className="text-muted-foreground">
+              Localities with recent development in Kolkata
+            </p>
+          </div>
+          <div eid="new6" className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-12">
+            <Card eid="new7" className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent eid="new8" className="p-0">
+                <img
+                  alt="Salt lake"
+                  eid="new9"
+                  src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/1.webp"
+                  className="w-full h-32 object-cover rounded-t-xl"
+                />
+                <div eid="new10" className="p-4">
+                  <h3 eid="new11" className="font-semibold text-sm mb-1">
+                    Salt lake 4.3★
+                  </h3>
+                  <p eid="new12" className="text-xs text-muted-foreground mb-3">
+                    82 New Projects
+                  </p>
+                  <div eid="new13" className="flex gap-2">
+                    <Button eid="new14" size="sm" variant="outline" className="text-xs h-7 px-3">
+                      Insights
+                    </Button>
+                    <Button eid="new15" size="sm" variant="outline" className="text-xs h-7 px-3">
+                      Projects
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card eid="new16" className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent eid="new17" className="p-0">
+                <img
+                  alt="Jodhpur Park"
+                  eid="new18"
+                  src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/2.webp"
+                  className="w-full h-32 object-cover rounded-t-xl"
+                />
+                <div eid="new19" className="p-4">
+                  <h3 eid="new20" className="font-semibold text-sm mb-1">
+                    Jodhpur Park 4.3★
+                  </h3>
+                  <p eid="new21" className="text-xs text-muted-foreground mb-3">
+                    54 New Projects
+                  </p>
+                  <div eid="new22" className="flex gap-2">
+                    <Button eid="new23" size="sm" variant="outline" className="text-xs h-7 px-3">
+                      Insights
+                    </Button>
+                    <Button eid="new24" size="sm" variant="outline" className="text-xs h-7 px-3">
+                      Projects
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card eid="new25" className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent eid="new26" className="p-0">
+                <img
+                  alt="Jadavpur"
+                  eid="new27"
+                  src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/3.webp"
+                  className="w-full h-32 object-cover rounded-t-xl"
+                />
+                <div eid="new28" className="p-4">
+                  <h3 eid="new29" className="font-semibold text-sm mb-1">
+                    Jadavpur 4.2★
+                  </h3>
+                  <p eid="new30" className="text-xs text-muted-foreground mb-3">
+                    73 New Projects
+                  </p>
+                  <div eid="new31" className="flex gap-2">
+                    <Button eid="new32" size="sm" variant="outline" className="text-xs h-7 px-3">
+                      Insights
+                    </Button>
+                    <Button eid="new33" size="sm" variant="outline" className="text-xs h-7 px-3">
+                      Projects
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card eid="new34" className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent eid="new35" className="p-0">
+                <img
+                  alt="Southern Avenue"
+                  eid="new36"
+                  src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/4.webp"
+                  className="w-full h-32 object-cover rounded-t-xl"
+                />
+                <div eid="new37" className="p-4">
+                  <h3 eid="new38" className="font-semibold text-sm mb-1">
+                    Southern Avenue 4.3★
+                  </h3>
+                  <p eid="new39" className="text-xs text-muted-foreground mb-3">
+                    24 New Projects
+                  </p>
+                  <div eid="new40" className="flex gap-2">
+                    <Button eid="new41" size="sm" variant="outline" className="text-xs h-7 px-3">
+                      Insights
+                    </Button>
+                    <Button eid="new42" size="sm" variant="outline" className="text-xs h-7 px-3">
+                      Projects
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card eid="new43" className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent eid="new44" className="p-0">
+                <img
+                  alt="Lake Gardens"
+                  eid="new45"
+                  src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/landscape/1.webp"
+                  className="w-full h-32 object-cover rounded-t-xl"
+                />
+                <div eid="new46" className="p-4">
+                  <h3 eid="new47" className="font-semibold text-sm mb-1">
+                    Lake Gardens 4.2★
+                  </h3>
+                  <p eid="new48" className="text-xs text-muted-foreground mb-3">
+                    35 New Projects
+                  </p>
+                  <div eid="new49" className="flex gap-2">
+                    <Button eid="new50" size="sm" variant="outline" className="text-xs h-7 px-3">
+                      Insights
+                    </Button>
+                    <Button eid="new51" size="sm" variant="outline" className="text-xs h-7 px-3">
+                      Projects
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          <div eid="new52" className="space-y-8">
+            <Card
+              eid="new53"
+              className="bg-gradient-to-r from-green-50 to-green-100 border-green-200"
+            >
+              <CardContent eid="new54" className="p-6">
+                <div eid="new55" className="flex items-center gap-4">
+                  <div
+                    eid="new56"
+                    className="w-16 h-16 bg-green-200 rounded-lg flex items-center justify-center"
+                  >
+                    <Icon
+                      eid="new57"
+                      icon="solar:shield-check-bold"
+                      className="size-8 text-green-600"
+                    />
+                  </div>
+                  <div eid="new58" className="flex-1">
+                    <h3 eid="new59" className="font-semibold text-lg mb-2">
+                      View properties verified by Prop Puzzle
+                    </h3>
+                    <p eid="new60" className="text-muted-foreground">
+                      Verified on site for genuineness. Check out real photos of the property
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card
+              eid="new61"
+              className="bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200"
+            >
+              <CardContent eid="new62" className="p-6">
+                <div eid="new63" className="flex items-center gap-4">
+                  <div
+                    eid="new64"
+                    className="w-16 h-16 bg-orange-200 rounded-lg flex items-center justify-center"
+                  >
+                    <Icon
+                      eid="new65"
+                      icon="solar:user-speak-bold"
+                      className="size-8 text-orange-600"
+                    />
+                  </div>
+                  <div eid="new66" className="flex-1">
+                    <h3 eid="new67" className="font-semibold text-lg mb-2">
+                      How would you rate your locality/society?
+                    </h3>
+                    <div eid="new68" className="flex gap-1 mt-3">
+                      <Icon eid="new69" icon="solar:star-bold" className="size-6 text-gray-300" />
+                      <Icon eid="new70" icon="solar:star-bold" className="size-6 text-gray-300" />
+                      <Icon eid="new71" icon="solar:star-bold" className="size-6 text-gray-300" />
+                      <Icon eid="new72" icon="solar:star-bold" className="size-6 text-gray-300" />
+                      <Icon eid="new73" icon="solar:star-bold" className="size-6 text-gray-300" />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
       <section eid="new74" className="py-16 bg-secondary/30">
         <div eid="new75" className="container mx-auto px-4">
           <div eid="new76" className="mb-8">

@@ -76,7 +76,7 @@ export function PropertyListingPage() {
         try {
             const defaultMessage = `I'm interested in your property: "${property.title}".`;
 
-            console.log('inquiryResponse:', property.id, authState.user.email , authState.user.first_name);
+            console.log('inquiryResponse:', property.id, authState.user.email , authState.user.first_name, authState.user.id);
 
             // 3. Use guaranteed values from the checks above
             const inquiryResponse = await api.createInquiry({
@@ -84,6 +84,7 @@ export function PropertyListingPage() {
                 message: defaultMessage,
                 name: authState.user.first_name || "Interested Buyer", // Fallback for name
                 email: authState.user.email,
+                inquirer_id: authState.user.id,
             });
 
 

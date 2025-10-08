@@ -14,6 +14,7 @@ import {
   BeforeUpdate,
   HasMany,
 } from 'sequelize-typescript';
+import { Conversation } from './Conversation';
 // Forward declarations to avoid circular imports
 
 export enum PropertyType {
@@ -184,6 +185,7 @@ export class Property extends Model {
   images!: any[];
   inquiries!: any[];
   favorites!: any[];
+  conversations!: Conversation[];
 
 
 

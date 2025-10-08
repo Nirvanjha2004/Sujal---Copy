@@ -11,8 +11,8 @@ import {
   Index,
   BeforeCreate,
   BeforeUpdate,
+  ForeignKey,
 } from 'sequelize-typescript';
-// Forward declarations to avoid circular imports
 
 export enum InquiryStatus {
   NEW = 'new',
@@ -36,6 +36,9 @@ export enum InquiryStatus {
     },
     {
       fields: ['created_at'],
+    },
+    {
+      fields: ['conversation_id'],
     },
   ],
 })
@@ -74,12 +77,17 @@ export class Inquiry extends Model {
   @Index
   status!: InquiryStatus;
 
+  @Column(DataType.INTEGER)
+  @Index
+  conversation_id?: number;
+
   @CreatedAt
   created_at!: Date;
 
-  // Associations - will be defined in database configuration
+  // Remove all decorator-based associations, they'll be defined in associations.ts
   property!: any;
   inquirer?: any;
+  conversation?: any;
 
   // Instance methods
   async markAsContacted(): Promise<void> {

@@ -23,6 +23,7 @@ import { CommunicationDemo } from './components/communication/CommunicationDemo'
 import AgentDashboard from './components/properties/AgentDashboard'
 import { PropertyListingSearchPage } from './components/landing/PropertyListingSearchPage'
 import { PropertySearchDashboard } from './components/landing/SearchViewedDashboard'
+import { Messages } from './components/dashboard/Messages'
 
 function App() {
     return (
@@ -144,6 +145,14 @@ function App() {
                                 element={
                                     <ProtectedRoute requiredRole="agent">
                                         <AgentDashboard />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/dashboard/messages/:conversationId?"
+                                element={
+                                    <ProtectedRoute>
+                                        <Messages />
                                     </ProtectedRoute>
                                 }
                             />

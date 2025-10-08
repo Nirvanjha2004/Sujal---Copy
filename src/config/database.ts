@@ -4,6 +4,12 @@ import path from 'path';
 import { defineAssociations } from '../models/associations';
 import { initializeCmsContent } from '../models/CmsContent';
 import { initializeSeoSettings } from '../models/SeoSettings';
+import { User } from '../models/User';
+import { Property } from '../models/Property';
+import { Inquiry } from '../models/Inquiry';
+import { Conversation } from '../models/Conversation';
+import { ConversationParticipant } from '../models/ConversationParticipant';
+import { Message } from '../models/Message'; // If you have this
 
 const sequelize = new Sequelize({
   database: config.database.name,
@@ -38,6 +44,14 @@ const sequelize = new Sequelize({
     underscored: true,
     freezeTableName: true,
   },
+  models: [
+    User,
+    Property,
+    Inquiry,
+    Conversation,
+    ConversationParticipant,
+    Message, // If you have this
+  ],
 });
 
 export default sequelize;

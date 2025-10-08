@@ -298,10 +298,10 @@ class MessagingService {
             email: participant.email,
             profile_image: participant.profile_image,
           },
-          property: message.property ? {
-            id: message.property.id,
-            title: message.property.title,
-          } : undefined,
+          // property: message.property ? {
+          //   id: message.property.id,
+          //   title: message.property.title,
+          // } : undefined,
           last_message: {
             content: message.content,
             created_at: message.created_at,

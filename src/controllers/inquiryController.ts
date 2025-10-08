@@ -67,12 +67,13 @@ class InquiryController {
         email: req.body.email,
         phone: req.body.phone,
         message: req.body.message,
+        inquirer_id: req.body.inquirer_id, // Optional - if the user is logged in
       };
 
-      // If user is authenticated, add their ID
-      if (req.user) {
-        inquiryData.inquirer_id = req.user.id;
-      }
+      // // If user is authenticated, add their ID
+      // if (req.user) {
+      //   inquiryData.inquirer_id = req.user.id;
+      // }
 
       // 3. Pass the transaction to the service method
       const inquiry = await inquiryService.createInquiry(inquiryData, { transaction: t });
@@ -86,6 +87,7 @@ class InquiryController {
           inquiry: {
             id: inquiry.id,
             property_id: inquiry.property_id,
+            conversation_id: inquiry.conversation_id, // Add conversation_id to the response
             name: inquiry.name,
             email: inquiry.email,
             phone: inquiry.phone,

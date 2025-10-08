@@ -9,6 +9,7 @@ import {
   AllowNull,
   Default,
   HasMany,
+  BelongsToMany,
   CreatedAt,
   UpdatedAt,
   Index,
@@ -20,6 +21,8 @@ import config from '../config';
 // Forward declarations to avoid circular imports
 class Review {} // Will be replaced by actual import at runtime
 class UrlRedirect {} // Will be replaced by actual import at runtime
+class Conversation {} // Will be replaced by actual import at runtime
+class ConversationParticipant {} // Will be replaced by actual import at runtime
 // These will be properly associated in the database configuration
 
 export enum UserRole {
@@ -94,6 +97,8 @@ export class User extends Model {
   inquiries!: any[];
   favorites!: any[];
   saved_searches!: any[];
+  conversations!: Conversation[];
+  participations!: ConversationParticipant[];
 
 
 

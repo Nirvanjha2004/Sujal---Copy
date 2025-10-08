@@ -1,6 +1,8 @@
 import { Inquiry, InquiryStatus } from '../models/Inquiry';
 import { User } from '../models/User';
 import { Property } from '../models/Property';
+import { Conversation } from '../models/Conversation'; // Make sure this import is present
+import { ConversationParticipant } from '../models/ConversationParticipant'; // Make sure this import is present
 import emailService, { InquiryEmailData } from './emailService';
 import { Op, Transaction } from 'sequelize';
 
@@ -55,7 +57,35 @@ class InquiryService {
       email: data.email,
       phone: data.phone,
       message: data.message,
-    }, { transaction: options?.transaction }); // Pass transaction to create
+    }, { transaction: options?.transaction });
+
+    // --- START: Create Conversation Logic ---
+
+    // 3. Create a new conversation
+    const conversation = await Conversation.create({
+      property_id: property.id,
+      subject: `Inquiry for: ${property.title}`,
+    }, { transaction: options?.transaction });
+
+    // 4. Add the property owner and the inquirer as participants
+    const ownerId = property.user_id;
+    console.log("The data is", data)
+    const inquirerId = data.inquirer_id; // This is the logged-in user's ID
+
+    if (!inquirerId) {
+      throw new Error('Authenticated user ID is required to create a conversation.');
+    }
+
+    await ConversationParticipant.bulkCreate([
+      { conversation_id: conversation.id, user_id: ownerId },
+      { conversation_id: conversation.id, user_id: inquirerId },
+    ], { transaction: options?.transaction });
+
+    // 5. Link the conversation to the inquiry
+    inquiry.conversation_id = conversation.id;
+    await inquiry.save({ transaction: options?.transaction });
+
+    // --- END: Create Conversation Logic ---
 
     console.log('The Inquiry logs are', inquiry);
 
@@ -285,7 +315,7 @@ class InquiryService {
   private async sendInquiryNotifications(inquiry: Inquiry): Promise<void> {
     try {
       const property = inquiry.property;
-      const owner = property?.owner;
+      const owner = property?.user;
 
       if (!property || !owner) {
         console.error('Missing property or owner information for inquiry notification');

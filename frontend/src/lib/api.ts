@@ -522,6 +522,8 @@ export const api = {
     message: string;
     name: string;
     email: string;
+    inquirer_id?: number;
+    phone?: string;
   }): Promise<any> => {
     return apiRequest('/inquiries', {
       method: 'POST',
@@ -908,6 +910,43 @@ export const api = {
         method: 'DELETE',
       });
     },
+  },
+
+  // Conversation methods
+  getConversations: (params?: { page?: number; limit?: number }): Promise<any> => {
+    const queryParams = new URLSearchParams();
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    
+    const query = queryParams.toString();
+    return apiRequest(`/conversations${query ? `?${query}` : ''}`, {
+      method: 'GET',
+    });
+  },
+
+  getConversationById: (conversationId: number): Promise<any> => {
+    return apiRequest(`/conversations/${conversationId}`, {
+      method: 'GET',
+    });
+  },
+
+  // Message methods
+  getMessages: (conversationId: number, params?: { page?: number; limit?: number }): Promise<any> => {
+    const queryParams = new URLSearchParams();
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    
+    const query = queryParams.toString();
+    return apiRequest(`/messages/conversation/${conversationId}${query ? `?${query}` : ''}`, {
+      method: 'GET',
+    });
+  },
+
+  sendMessage: (conversationId: number, content: string): Promise<any> => {
+    return apiRequest(`/messages/conversation/${conversationId}`, {
+      method: 'POST',
+      body: JSON.stringify({ content }),
+    });
   },
 };
 

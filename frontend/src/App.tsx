@@ -25,6 +25,15 @@ import { PropertyListingSearchPage } from './components/landing/PropertyListingS
 import { PropertySearchDashboard } from './components/landing/SearchViewedDashboard'
 import { Messages } from './components/dashboard/Messages'
 
+// Builder Pages
+import { ProjectsPage } from './pages/builder/ProjectsPage'
+import { NewProjectPage } from './pages/builder/NewProjectPage'
+import { ProjectDetailsPage } from './pages/builder/ProjectDetailsPage'
+import { ProjectUnitsPage } from './pages/builder/ProjectUnitsPage'
+import { BulkUnitsPage } from './pages/builder/BulkUnitsPage'
+// import { BulkListingPage } from './pages/builder/BulkListingPage'
+
+
 function App() {
     return (
         <ErrorBoundary>
@@ -156,6 +165,56 @@ function App() {
                                     </ProtectedRoute>
                                 }
                             />
+
+                            {/* Builder routes */}
+                            <Route
+                                path="/builder/projects"
+                                element={
+                                    <ProtectedRoute requiredRole="builder">
+                                        <ProjectsPage />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/builder/new-project"
+                                element={
+                                    <ProtectedRoute requiredRole="builder">
+                                        <NewProjectPage />
+                                    </ProtectedRoute>
+                                }
+                            />
+                             <Route
+                                path="/builder/projects/:id"
+                                element={
+                                    <ProtectedRoute requiredRole="builder">
+                                        <ProjectDetailsPage />
+                                    </ProtectedRoute>
+                                }
+                            />
+                             <Route
+                                path="/builder/projects/:id/units"
+                                element={
+                                    <ProtectedRoute requiredRole="builder">
+                                        <ProjectUnitsPage />
+                                    </ProtectedRoute>
+                                }
+                            />
+                             <Route
+                                path="/builder/projects/:id/bulk-units"
+                                element={
+                                    <ProtectedRoute requiredRole="builder">
+                                        <BulkUnitsPage />
+                                    </ProtectedRoute>
+                                }
+                            />
+                             {/* <Route
+                                path="/builder/bulk-listing"
+                                element={
+                                    <ProtectedRoute requiredRole="builder">
+                                        <BulkListingPage />
+                                    </ProtectedRoute>
+                                }
+                            /> */}
                 </Routes>
             </div>
         </ErrorBoundary>

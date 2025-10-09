@@ -17,6 +17,7 @@ import seoRoutes from './seoRoutes';
 import cmsRoutes from './cmsRoutes';
 import conversationRoutes from './conversationRoutes';
 import messageRoutes from './messageRoutes';
+import projectRoutes from './projectRoutes';
 
 const router = Router();
 
@@ -43,6 +44,7 @@ router.use('/v1/seo', seoRoutes);
 router.use('/v1/cms', cmsRoutes);  // MAKE SURE THIS IS REGISTERED
 router.use('/v1/conversations', conversationRoutes);
 router.use('/v1/messages', messageRoutes);
+router.use('/v1/projects', projectRoutes);
 
 
 // Legacy routes (redirect to v1 for backward compatibility)

@@ -1,6 +1,9 @@
 import { User } from '../models/User';
 import { Property, PropertyType, ListingType, PropertyStatus } from '../models/Property';
 import { PropertyImage } from '../models/PropertyImage';
+import { Project, ProjectStatus, ProjectType } from '../models/Project';
+import { ProjectUnit, UnitStatus } from '../models/ProjectUnit';
+import { ProjectImage } from '../models/ProjectImage';
 
 export async function seedProperties() {
   try {
@@ -63,13 +66,206 @@ export async function seedProperties() {
 
     // Check if properties already exist
     const existingProperties = await Property.count();
-    if (existingProperties >= 15) {
+    if (existingProperties < 15) {
+      console.log(`Database has ${existingProperties} properties. Adding sample data...`);
+      await seedIndividualProperties(createdUsers);
+    } else {
       console.log(`Database already has ${existingProperties} properties. Skipping property seed.`);
-      return;
     }
 
-    console.log(`Database has ${existingProperties} properties. Adding sample data...`);
+    // Seed Projects for the builder
+    const builderUser = createdUsers.find(u => u.role === 'builder');
+    if (builderUser) {
+      const existingProjects = await Project.count({ where: { builder_id: builderUser.id } });
+      if (existingProjects < 3) {
+        console.log(`Builder has ${existingProjects} projects. Adding sample projects...`);
+        await seedBuilderProjects(builderUser);
+      } else {
+        console.log(`Builder already has ${existingProjects} projects. Skipping project seed.`);
+      }
+    }
 
+    console.log(`\n🎉 Seeding completed successfully!`);
+
+  } catch (error) {
+    console.error('Error during seeding:', error);
+    throw error;
+  }
+}
+
+async function seedBuilderProjects(builderUser: User) {
+  const projectsToSeed = [
+    {
+      name: 'Elysian Towers',
+      description: 'A landmark of luxury living in the heart of Pune, offering unparalleled views and world-class amenities. Elysian Towers is designed for those who seek a lifestyle of comfort and sophistication.',
+      location: 'Koregaon Park',
+      address: '123 Luxe Avenue, Koregaon Park',
+      city: 'Pune',
+      state: 'Maharashtra',
+      pincode: '411001',
+      status: ProjectStatus.UNDER_CONSTRUCTION,
+      project_type: ProjectType.RESIDENTIAL,
+      start_date: new Date('2023-01-15'),
+      expected_completion_date: new Date('2025-12-31'),
+      rera_number: 'P52100001234',
+      amenities: {
+        "Swimming Pool": true,
+        "Gym/Fitness Center": true,
+        "Clubhouse": true,
+        "24/7 Power Backup": true,
+        "Security": true,
+        "Parking": true,
+        "Garden/Landscaping": true,
+        "Children's Play Area": true,
+      },
+      images: [
+        'https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=800',
+        'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800',
+        'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800',
+      ],
+      units: [
+        { unit_number: 'A-101', unit_type: '3BHK', floor_number: 1, tower: 'A', area_sqft: 1800, carpet_area: 1440, built_up_area: 1620, super_built_up_area: 1800, price: 25000000, bedrooms: 3, bathrooms: 3, facing: 'East', status: UnitStatus.AVAILABLE },
+        { unit_number: 'A-102', unit_type: '3BHK', floor_number: 1, tower: 'A', area_sqft: 1850, carpet_area: 1480, built_up_area: 1665, super_built_up_area: 1850, price: 25500000, bedrooms: 3, bathrooms: 3, facing: 'West', status: UnitStatus.SOLD },
+        { unit_number: 'A-201', unit_type: '3BHK', floor_number: 2, tower: 'A', area_sqft: 1800, carpet_area: 1440, built_up_area: 1620, super_built_up_area: 1800, price: 26000000, bedrooms: 3, bathrooms: 3, facing: 'North', status: UnitStatus.AVAILABLE },
+        { unit_number: 'B-501', unit_type: '4BHK', floor_number: 5, tower: 'B', area_sqft: 2500, carpet_area: 2000, built_up_area: 2250, super_built_up_area: 2500, price: 35000000, bedrooms: 4, bathrooms: 4, facing: 'North', status: UnitStatus.AVAILABLE, is_corner_unit: true },
+        { unit_number: 'B-502', unit_type: '4BHK', floor_number: 5, tower: 'B', area_sqft: 2550, carpet_area: 2040, built_up_area: 2295, super_built_up_area: 2550, price: 35500000, bedrooms: 4, bathrooms: 4, facing: 'South', status: UnitStatus.BLOCKED },
+        { unit_number: 'B-801', unit_type: '4BHK Penthouse', floor_number: 8, tower: 'B', area_sqft: 3200, carpet_area: 2560, built_up_area: 2880, super_built_up_area: 3200, price: 50000000, bedrooms: 4, bathrooms: 5, facing: 'East', status: UnitStatus.AVAILABLE, has_terrace: true },
+      ]
+    },
+    {
+      name: 'Orion Business Hub',
+      description: 'State-of-the-art commercial complex on SG Highway, designed for modern businesses. Offering flexible office spaces and retail showrooms with excellent connectivity.',
+      location: 'SG Highway',
+      address: '55, Corporate Road, SG Highway',
+      city: 'Ahmedabad',
+      state: 'Gujarat',
+      pincode: '380015',
+      status: ProjectStatus.READY_TO_MOVE,
+      project_type: ProjectType.COMMERCIAL,
+      start_date: new Date('2022-03-01'),
+      expected_completion_date: new Date('2024-06-30'),
+      rera_number: 'GJRERA2022A00055',
+      amenities: {
+        "Parking": true,
+        "Security": true,
+        "Cafeteria": true,
+        "24/7 Power Backup": true,
+        "High-Speed Elevators": true,
+        "Conference Rooms": true,
+      },
+      images: [
+        'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=800',
+        'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800',
+      ],
+      units: [
+        { unit_number: 'OF-201', unit_type: 'Office', floor_number: 2, area_sqft: 1200, carpet_area: 960, built_up_area: 1080, super_built_up_area: 1200, price: 9000000, bedrooms: 0, bathrooms: 1, facing: 'North', status: UnitStatus.AVAILABLE },
+        { unit_number: 'OF-202', unit_type: 'Office', floor_number: 2, area_sqft: 1500, carpet_area: 1200, built_up_area: 1350, super_built_up_area: 1500, price: 11000000, bedrooms: 0, bathrooms: 2, facing: 'East', status: UnitStatus.SOLD },
+        { unit_number: 'OF-301', unit_type: 'Office', floor_number: 3, area_sqft: 2000, carpet_area: 1600, built_up_area: 1800, super_built_up_area: 2000, price: 15000000, bedrooms: 0, bathrooms: 2, facing: 'South', status: UnitStatus.AVAILABLE },
+        { unit_number: 'RT-G01', unit_type: 'Retail', floor_number: 0, area_sqft: 2000, carpet_area: 1600, built_up_area: 1800, super_built_up_area: 2000, price: 25000000, bedrooms: 0, bathrooms: 2, facing: 'Street', status: UnitStatus.AVAILABLE },
+        { unit_number: 'RT-G02', unit_type: 'Retail', floor_number: 0, area_sqft: 1500, carpet_area: 1200, built_up_area: 1350, super_built_up_area: 1500, price: 18000000, bedrooms: 0, bathrooms: 1, facing: 'Street', status: UnitStatus.SOLD },
+      ]
+    },
+    {
+      name: 'Greenwood Villas',
+      description: 'Exclusive gated community of luxurious villas nestled in nature. Experience serene living with modern comforts in Bangalore. Each villa comes with a private garden and premium finishes.',
+      location: 'Sarjapur Road',
+      address: 'Greenwood County, Sarjapur Road',
+      city: 'Bangalore',
+      state: 'Karnataka',
+      pincode: '560035',
+      status: ProjectStatus.PRE_LAUNCH,
+      project_type: ProjectType.VILLA,
+      start_date: new Date('2024-06-01'),
+      expected_completion_date: new Date('2026-12-31'),
+      rera_number: 'KA/RERA/2024/GW001',
+      amenities: {
+        "Clubhouse": true,
+        "Garden/Landscaping": true,
+        "Jogging Track": true,
+        "Security": true,
+        "Swimming Pool": true,
+        "Tennis Court": true,
+        "Children's Play Area": true,
+      },
+      images: [
+        'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800',
+        'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800',
+      ],
+      units: [
+        { unit_number: 'V-001', unit_type: '3BHK Villa', floor_number: 0, area_sqft: 2800, carpet_area: 2240, built_up_area: 2520, super_built_up_area: 2800, price: 18000000, bedrooms: 3, bathrooms: 4, facing: 'East', status: UnitStatus.AVAILABLE },
+        { unit_number: 'V-002', unit_type: '4BHK Villa', floor_number: 0, area_sqft: 3500, carpet_area: 2800, built_up_area: 3150, super_built_up_area: 3500, price: 25000000, bedrooms: 4, bathrooms: 5, facing: 'North', status: UnitStatus.AVAILABLE },
+        { unit_number: 'V-003', unit_type: '4BHK Villa', floor_number: 0, area_sqft: 3500, carpet_area: 2800, built_up_area: 3150, super_built_up_area: 3500, price: 25000000, bedrooms: 4, bathrooms: 5, facing: 'West', status: UnitStatus.BLOCKED },
+      ]
+    }
+  ];
+
+  for (const projectData of projectsToSeed) {
+    const { images, units, ...coreProjectData } = projectData;
+
+    // Create Project
+    const project = await Project.create({
+      ...coreProjectData,
+      builder_id: builderUser.id,
+      total_units: 0,
+      available_units: 0,
+      sold_units: 0,
+      blocked_units: 0,
+      approval_status: '',
+      is_active: false,
+      featured: false,
+      amenities: Object.keys(coreProjectData.amenities).filter(key => (coreProjectData.amenities as any)[key])
+    });
+    console.log(`✅ Created project: ${project.name} in ${project.city}`);
+
+    // Create Project Images
+    if (images && images.length > 0) {
+      const imagePayload = images.map((url, index) => ({
+        project_id: project.id,
+        image_url: url,
+        alt_text: `${project.name} - Image ${index + 1}`,
+        is_primary: index === 0,
+        display_order: index + 1,
+        image_type: 'gallery' as const,
+      }));
+      await ProjectImage.bulkCreate(imagePayload);
+      console.log(`   📸 Added ${images.length} images`);
+    }
+
+    // Create Project Units
+    if (units && units.length > 0) {
+      const unitPayload = units.map(unit => ({
+        ...unit,
+        project_id: project.id,
+        price_per_sqft: Math.round(unit.price / unit.area_sqft),
+        area_sqm: Math.round(unit.area_sqft * 0.092903), // Convert sqft to sqm
+        parking_spaces: unit.bedrooms >= 3 ? 2 : 1,
+        balconies: unit.bedrooms >= 2 ? 2 : 1,
+        is_corner_unit: (unit as any).is_corner_unit || false,
+        has_terrace: (unit as any).has_terrace || false,
+      }));
+      await ProjectUnit.bulkCreate(unitPayload);
+      console.log(`   🏠 Added ${units.length} units`);
+
+      // Update project unit counts
+      const total_units = units.length;
+      const available_units = units.filter(u => u.status === UnitStatus.AVAILABLE).length;
+      const sold_units = units.filter(u => u.status === UnitStatus.SOLD).length;
+      const blocked_units = units.filter(u => u.status === UnitStatus.BLOCKED).length;
+
+      await project.update({
+        total_units,
+        available_units,
+        sold_units,
+        blocked_units,
+      });
+      console.log(`   📊 Units: ${total_units} total, ${available_units} available, ${sold_units} sold, ${blocked_units} blocked`);
+    }
+  }
+
+  console.log(`\n✅ Created ${projectsToSeed.length} builder projects with units and images`);
+}
+
+async function seedIndividualProperties(createdUsers: User[]) {
     // 15 Properties across different Indian states
     const properties = [
       // Mumbai, Maharashtra - Luxury Properties
@@ -455,7 +651,7 @@ export async function seedProperties() {
         description: 'Well-planned 2BHK apartment in Chandigarh\'s prime sector with excellent infrastructure.',
         property_type: PropertyType.APARTMENT,
         listing_type: ListingType.SALE,
-        status: PropertyType.APARTMENT,
+        status: PropertyStatus.NEW,
         price: 7800000,
         area_sqft: 1200,
         bedrooms: 2,
@@ -492,7 +688,7 @@ export async function seedProperties() {
     for (const propertyData of properties) {
       try {
         const property = await Property.create(propertyData);
-        console.log(`Created property: ${property.title} in ${property.city}, ${property.state}`);
+        console.log(`✅ Created property: ${property.title} in ${property.city}, ${property.state}`);
 
         // Add 1-3 sample images for each property
         const imageCount = Math.floor(Math.random() * 3) + 1;
@@ -507,34 +703,9 @@ export async function seedProperties() {
         }
         createdCount++;
       } catch (error) {
-        console.error(`Error creating property: ${propertyData.title}`, error);
+        console.error(`❌ Error creating property: ${propertyData.title}`, error);
       }
     }
 
-    console.log(`\n🎉 Seeding completed successfully!`);
-    console.log(`📊 Created ${createdUsers.length} users across all roles`);
-    console.log(`🏠 Created ${createdCount} properties across ${new Set(properties.map(p => p.state)).size} states`);
-    console.log(`📸 Added sample images for all properties`);
-    
-    // Print user summary
-    console.log(`\n👥 User Summary:`);
-    createdUsers.forEach(user => {
-      console.log(`   - ${user.first_name} ${user.last_name} (${user.role}) - ${user.email}`);
-    });
-
-    // Print state-wise property summary
-    const stateCount = properties.reduce((acc, prop) => {
-      acc[prop.state] = (acc[prop.state] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-    
-    console.log(`\n🗺️  Properties by State:`);
-    Object.entries(stateCount).forEach(([state, count]) => {
-      console.log(`   - ${state}: ${count} properties`);
-    });
-
-  } catch (error) {
-    console.error('Error during seeding:', error);
-    throw error;
-  }
+    console.log(`\n✅ Created ${createdCount} individual properties with images`);
 }

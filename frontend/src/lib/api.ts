@@ -29,6 +29,113 @@ export interface Property {
   area?: number;
 }
 
+export interface ProjectFilters {
+  status?: string;
+  project_type?: string;
+  city?: string;
+  state?: string;
+  min_price?: number;
+  max_price?: number;
+  featured?: boolean;
+  is_active?: boolean;
+  page?: number;
+  limit?: number;
+}
+
+export interface ProjectStats {
+  totalProjects: number;
+  activeProjects: number;
+  totalUnits: number;
+  soldUnits: number;
+  availableUnits: number;
+  blockedUnits: number;
+}
+
+export interface ProjectUnit {
+  id: number;
+  project_id: number;
+  unit_number: string;
+  unit_type: string;
+  floor_number: number;
+  tower?: string;
+  area_sqft: number;
+  area_sqm: number;
+  carpet_area: number;
+  built_up_area: number;
+  super_built_up_area: number;
+  price: number;
+  price_per_sqft: number;
+  maintenance_charge?: number;
+  parking_spaces: number;
+  balconies: number;
+  bathrooms: number;
+  bedrooms: number;
+  facing: string;
+  status: 'available' | 'sold' | 'blocked' | 'reserved';
+  floor_plan_image?: string;
+  specifications?: Record<string, any>;
+  amenities?: string[];
+  is_corner_unit: boolean;
+  has_terrace: boolean;
+  created_at: string;
+  updated_at: string;
+  project?: Project;
+}
+
+export interface ProjectImage {
+  id: number;
+  project_id: number;
+  image_url: string;
+  alt_text?: string;
+  image_type: 'exterior' | 'interior' | 'amenity' | 'floor_plan' | 'site_plan' | 'location' | 'gallery';
+  is_primary: boolean;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Project {
+  id: number;
+  builder_id: number;
+  name: string;
+  description?: string;
+  location: string;
+  address: string;
+  city: string;
+  state: string;
+  pincode: string;
+  project_type: 'residential' | 'commercial' | 'mixed_use' | 'villa' | 'apartment' | 'office' | 'retail';
+  status: 'planning' | 'pre_launch' | 'under_construction' | 'ready_to_move' | 'completed' | 'on_hold';
+  total_units: number;
+  available_units: number;
+  sold_units: number;
+  blocked_units: number;
+  start_date?: string;
+  expected_completion?: string;
+  actual_completion?: string;
+  rera_number?: string;
+  approval_status: string;
+  amenities?: string[];
+  specifications?: Record<string, any>;
+  pricing?: Record<string, any>;
+  floor_plans?: string[];
+  brochure_url?: string;
+  video_url?: string;
+  virtual_tour_url?: string;
+  is_active: boolean;
+  featured: boolean;
+  created_at: string;
+  updated_at: string;
+  builder?: User;
+  images?: ProjectImage[];
+  units?: ProjectUnit[];
+  unitStats?: {
+    total: number;
+    available: number;
+    sold: number;
+    blocked: number;
+  };
+}
 export interface PropertyImage {
   id: number;
   property_id: number;
@@ -948,8 +1055,669 @@ export const api = {
       body: JSON.stringify({ content }),
     });
   },
-};
 
+  // Builder Project Management APIs
+  projects: {
+    // Get all projects for the authenticated builder
+    getBuilderProjects: (params?: { 
+      page?: number; 
+      limit?: number; 
+      status?: string;
+      project_type?: string;
+    }): Promise<{
+      success: boolean;
+      data: {
+        projects: Project[];
+        pagination: {
+          page: number;
+          limit: number;
+          total: number;
+          totalPages: number;
+        };
+      };
+    }> => {
+      const queryParams = new URLSearchParams();
+      if (params) {
+        Object.entries(params).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            queryParams.append(key, value.toString());
+          }
+        });
+      }
+      
+      const query = queryParams.toString();
+      return apiRequest(`/projects${query ? `?${query}` : ''}`);
+    },
+
+    // Get project by ID
+    getProjectById: (id: number): Promise<{
+      success: boolean;
+      data: { project: Project };
+    }> => {
+      return apiRequest(`/projects/${id}`);
+    },
+
+    // Create new project
+    createProject: (projectData: {
+      name: string;
+      description?: string;
+      location: string;
+      address: string;
+      city: string;
+      state: string;
+      pincode: string;
+      projectType: string;
+      totalUnits?: number;
+      startDate?: string;
+      expectedCompletion?: string;
+      reraNumber?: string;
+      amenities?: string[];
+      specifications?: Record<string, any>;
+      pricing?: Record<string, any>;
+    }): Promise<{
+      success: boolean;
+      data: { project: Project };
+      message: string;
+    }> => {
+      return apiRequest('/projects', {
+        method: 'POST',
+        body: JSON.stringify(projectData),
+      });
+    },
+
+    // Update project
+    updateProject: (id: number, projectData: Partial<Project>): Promise<{
+      success: boolean;
+      data: { project: Project };
+      message: string;
+    }> => {
+      return apiRequest(`/projects/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(projectData),
+      });
+    },
+
+    // Update project status
+    updateProjectStatus: (id: number, status: string): Promise<{
+      success: boolean;
+      data: { project: Project };
+      message: string;
+    }> => {
+      return apiRequest(`/projects/${id}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+      });
+    },
+
+    // Delete project
+    deleteProject: (id: number): Promise<{
+      success: boolean;
+      message: string;
+    }> => {
+      return apiRequest(`/projects/${id}`, {
+        method: 'DELETE',
+      });
+    },
+
+    // Get project statistics
+    getProjectStats: (): Promise<{
+      success: boolean;
+      data: ProjectStats;
+    }> => {
+      return apiRequest('/projects/stats');
+    },
+
+    // Project Units Management
+    units: {
+      // Get units for a project
+      getUnits: async (projectId: number, params?: {
+        page?: number;
+        limit?: number;
+        status?: string;
+        unitType?: string;
+        floorNumber?: number;
+        tower?: string;
+      }): Promise<{
+        success: boolean;
+        data: {
+          units: ProjectUnit[];
+          pagination: {
+            page: number;
+            limit: number;
+            total: number;
+            totalPages: number;
+          };
+        };
+      }> => {
+        const queryParams = new URLSearchParams();
+        if (params) {
+          Object.entries(params).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+              queryParams.append(key, value.toString());
+            }
+          });
+        }
+        
+        const query = queryParams.toString();
+        return apiRequest(`/projects/${projectId}/units${query ? `?${query}` : ''}`);
+      },
+
+      // Get unit by ID
+      getUnit: async (projectId: number, unitId: number): Promise<{
+        success: boolean;
+        data: { unit: ProjectUnit };
+      }> => {
+        return apiRequest(`/projects/${projectId}/units/${unitId}`);
+      },
+
+      // Create new unit
+      createUnit: async (projectId: number, unitData: {
+        unitNumber: string;
+        unitType: string;
+        floorNumber: number;
+        tower?: string;
+        areaSqft: number;
+        areaSqm?: number;
+        carpetArea?: number;
+        builtUpArea?: number;
+        superBuiltUpArea?: number;
+        price: number;
+        pricePerSqft?: number;
+        maintenanceCharge?: number;
+        parkingSpaces?: number;
+        balconies?: number;
+        bathrooms: number;
+        bedrooms: number;
+        facing?: string;
+        specifications?: Record<string, any>;
+        amenities?: string[];
+        isCornerUnit?: boolean;
+        hasTerrace?: boolean;
+      }): Promise<{
+        success: boolean;
+        data: { unit: ProjectUnit };
+        message: string;
+      }> => {
+        return apiRequest(`/projects/${projectId}/units`, {
+          method: 'POST',
+          body: JSON.stringify(unitData),
+        });
+      },
+
+      // Update unit
+      updateUnit: async (projectId: number, unitId: number, unitData: {
+        unitNumber?: string;
+        unitType?: string;
+        floorNumber?: number;
+        tower?: string;
+        areaSqft?: number;
+        areaSqm?: number;
+        carpetArea?: number;
+        builtUpArea?: number;
+        superBuiltUpArea?: number;
+        price?: number;
+        pricePerSqft?: number;
+        maintenanceCharge?: number;
+        parkingSpaces?: number;
+        balconies?: number;
+        bathrooms?: number;
+        bedrooms?: number;
+        facing?: string;
+        status?: string;
+        specifications?: Record<string, any>;
+        amenities?: string[];
+        isCornerUnit?: boolean;
+        hasTerrace?: boolean;
+      }): Promise<{
+        success: boolean;
+        data: { unit: ProjectUnit };
+        message: string;
+      }> => {
+        return apiRequest(`/projects/${projectId}/units/${unitId}`, {
+          method: 'PUT',
+          body: JSON.stringify(unitData),
+        });
+      },
+
+      // Update unit status
+      updateUnitStatus: async (projectId: number, unitId: number, status: string): Promise<{
+        success: boolean;
+        data: { unit: ProjectUnit };
+        message: string;
+      }> => {
+        return apiRequest(`/projects/${projectId}/units/${unitId}/status`, {
+          method: 'PATCH',
+          body: JSON.stringify({ status }),
+        });
+      },
+
+      // Delete unit
+      deleteUnit: async (projectId: number, unitId: number): Promise<{
+        success: boolean;
+        message: string;
+      }> => {
+        return apiRequest(`/projects/${projectId}/units/${unitId}`, {
+          method: 'DELETE',
+        });
+      },
+
+      // Bulk create units
+      bulkCreateUnits: async (projectId: number, units: Array<{
+        unitNumber: string;
+        unitType: string;
+        floorNumber: number;
+        tower?: string;
+        areaSqft: number;
+        areaSqm?: number;
+        carpetArea?: number;
+        builtUpArea?: number;
+        superBuiltUpArea?: number;
+        price: number;
+        pricePerSqft?: number;
+        maintenanceCharge?: number;
+        parkingSpaces?: number;
+        balconies?: number;
+        bathrooms: number;
+        bedrooms: number;
+        facing?: string;
+        specifications?: Record<string, any>;
+        amenities?: string[];
+        isCornerUnit?: boolean;
+        hasTerrace?: boolean;
+      }>): Promise<{
+        success: boolean;
+        data: { units: ProjectUnit[]; count: number };
+        message: string;
+      }> => {
+        return apiRequest(`/projects/${projectId}/units/bulk`, {
+          method: 'POST',
+          body: JSON.stringify({ units }),
+        });
+      },
+
+      // Bulk create units from CSV
+      bulkCreateUnitsFromCSV: async (projectId: number, file: File): Promise<{
+        success: boolean;
+        data: { units: ProjectUnit[]; count: number; errors?: string[] };
+        message: string;
+      }> => {
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        const validToken = getValidToken();
+        const response = await fetch(`${API_BASE_URL}/projects/${projectId}/units/bulk-csv`, {
+          method: 'POST',
+          headers: {
+            ...(validToken && { Authorization: `Bearer ${validToken}` }),
+          },
+          body: formData,
+        });
+        
+        return response.json();
+      },
+
+      // Download CSV template
+      downloadTemplate: async (projectId: number): Promise<Blob> => {
+        const validToken = getValidToken();
+        const response = await fetch(`${API_BASE_URL}/projects/${projectId}/units/template`, {
+          headers: {
+            ...(validToken && { Authorization: `Bearer ${validToken}` }),
+          },
+        });
+        
+        return response.blob();
+      },
+
+      // Bulk update units
+      bulkUpdateUnits: async (projectId: number, updates: Array<{
+        unitId: number;
+        data: Partial<ProjectUnit>;
+      }>): Promise<{
+        success: boolean;
+        data: { units: ProjectUnit[]; count: number };
+        message: string;
+      }> => {
+        return apiRequest(`/projects/${projectId}/units/bulk-update`, {
+          method: 'PUT',
+          body: JSON.stringify({ updates }),
+        });
+      },
+
+      // Get unit statistics for a project
+      getUnitStats: async (projectId: number): Promise<{
+        success: boolean;
+        data: {
+          total: number;
+          available: number;
+          sold: number;
+          blocked: number;
+          reserved: number;
+          byType: Record<string, number>;
+          byFloor: Record<number, number>;
+          byTower: Record<string, number>;
+          averagePrice: number;
+          priceRange: { min: number; max: number };
+        };
+      }> => {
+        return apiRequest(`/projects/${projectId}/units/stats`);
+      },
+
+      // Generate unit pricing
+      generateUnitPricing: async (projectId: number, pricingData: {
+        basePrice: number;
+        floorRisePercent?: number;
+        cornerUnitPremium?: number;
+        facingPremiums?: Record<string, number>;
+        unitTypePremiums?: Record<string, number>;
+      }): Promise<{
+        success: boolean;
+        data: { updatedUnits: number };
+        message: string;
+      }> => {
+        return apiRequest(`/projects/${projectId}/units/generate-pricing`, {
+          method: 'POST',
+          body: JSON.stringify(pricingData),
+        });
+      },
+    },
+
+    // Project Images Management
+    images: {
+      // Get project images
+      getProjectImages: (projectId: number, imageType?: string): Promise<{
+        success: boolean;
+        data: { images: ProjectImage[] };
+      }> => {
+        const params = imageType ? `?image_type=${imageType}` : '';
+        return apiRequest(`/projects/${projectId}/images${params}`);
+      },
+
+      // Upload project images
+      uploadProjectImages: (projectId: number, formData: FormData): Promise<{
+        success: boolean;
+        data: { images: ProjectImage[] };
+        message: string;
+      }> => {
+        const validToken = getValidToken();
+        return fetch(`${API_BASE_URL}/projects/${projectId}/images`, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            ...(validToken && { Authorization: `Bearer ${validToken}` }),
+          },
+        }).then(res => res.json());
+      },
+
+      // Update image details
+      updateProjectImage: (projectId: number, imageId: number, imageData: {
+        alt_text?: string;
+        image_type?: string;
+        is_primary?: boolean;
+        display_order?: number;
+      }): Promise<{
+        success: boolean;
+        data: { image: ProjectImage };
+        message: string;
+      }> => {
+        return apiRequest(`/projects/${projectId}/images/${imageId}`, {
+          method: 'PUT',
+          body: JSON.stringify(imageData),
+        });
+      },
+
+      // Set primary image
+      setPrimaryImage: (projectId: number, imageId: number): Promise<{
+        success: boolean;
+        data: { image: ProjectImage };
+        message: string;
+      }> => {
+        return apiRequest(`/projects/${projectId}/images/${imageId}/primary`, {
+          method: 'PATCH',
+        });
+      },
+
+      // Delete project image
+      deleteProjectImage: (projectId: number, imageId: number): Promise<{
+        success: boolean;
+        message: string;
+      }> => {
+        return apiRequest(`/projects/${projectId}/images/${imageId}`, {
+          method: 'DELETE',
+        });
+      },
+
+      // Reorder images
+      reorderImages: (projectId: number, imageOrders: Array<{
+        imageId: number;
+        displayOrder: number;
+      }>): Promise<{
+        success: boolean;
+        data: { images: ProjectImage[] };
+        message: string;
+      }> => {
+        return apiRequest(`/projects/${projectId}/images/reorder`, {
+          method: 'PUT',
+          body: JSON.stringify({ imageOrders }),
+        });
+      },
+    },
+
+    // Project Marketing Management
+    marketing: {
+      // Upload brochure
+      uploadBrochure: (projectId: number, formData: FormData): Promise<{
+        success: boolean;
+        data: { brochure_url: string };
+        message: string;
+      }> => {
+        const validToken = getValidToken();
+        return fetch(`${API_BASE_URL}/projects/${projectId}/brochure`, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            ...(validToken && { Authorization: `Bearer ${validToken}` }),
+          },
+        }).then(res => res.json());
+      },
+
+      // Update marketing materials
+      updateMarketingMaterials: (projectId: number, materials: {
+        brochure_url?: string;
+        video_url?: string;
+        virtual_tour_url?: string;
+        floor_plans?: string[];
+      }): Promise<{
+        success: boolean;
+        data: { project: Project };
+        message: string;
+      }> => {
+        return apiRequest(`/projects/${projectId}/marketing`, {
+          method: 'PUT',
+          body: JSON.stringify(materials),
+        });
+      },
+
+      // Get marketing analytics
+      getMarketingAnalytics: (projectId: number, range?: string): Promise<{
+        success: boolean;
+        data: {
+          views: number;
+          inquiries: number;
+          brochureDownloads: number;
+          virtualTourViews: number;
+          leadConversion: number;
+        };
+      }> => {
+        const params = range ? `?range=${range}` : '';
+        return apiRequest(`/projects/${projectId}/marketing/analytics${params}`);
+      },
+    },
+
+    // Project Timeline Management
+    timeline: {
+      // Get project timeline
+      getProjectTimeline: (projectId: number): Promise<{
+        success: boolean;
+        data: {
+          milestones: Array<{
+            id: number;
+            title: string;
+            description?: string;
+            planned_date: string;
+            actual_date?: string;
+            status: 'pending' | 'in_progress' | 'completed' | 'delayed';
+            completion_percentage: number;
+          }>;
+        };
+      }> => {
+        return apiRequest(`/projects/${projectId}/timeline`);
+      },
+
+      // Add milestone
+      addMilestone: (projectId: number, milestone: {
+        title: string;
+        description?: string;
+        planned_date: string;
+        status?: string;
+      }): Promise<{
+        success: boolean;
+        data: { milestone: any };
+        message: string;
+      }> => {
+        return apiRequest(`/projects/${projectId}/timeline/milestones`, {
+          method: 'POST',
+          body: JSON.stringify(milestone),
+        });
+      },
+
+      // Update milestone
+      updateMilestone: (projectId: number, milestoneId: number, milestone: {
+        title?: string;
+        description?: string;
+        planned_date?: string;
+        actual_date?: string;
+        status?: string;
+        completion_percentage?: number;
+      }): Promise<{
+        success: boolean;
+        data: { milestone: any };
+        message: string;
+      }> => {
+        return apiRequest(`/projects/${projectId}/timeline/milestones/${milestoneId}`, {
+          method: 'PUT',
+          body: JSON.stringify(milestone),
+        });
+      },
+
+      // Delete milestone
+      deleteMilestone: (projectId: number, milestoneId: number): Promise<{
+        success: boolean;
+        message: string;
+      }> => {
+        return apiRequest(`/projects/${projectId}/timeline/milestones/${milestoneId}`, {
+          method: 'DELETE',
+        });
+      },
+    },
+
+    // Project Analytics
+    analytics: {
+      // Get project performance analytics
+      getProjectAnalytics: (projectId: number, range?: string): Promise<{
+        success: boolean;
+        data: {
+          views: number;
+          inquiries: number;
+          unitsSold: number;
+          revenue: number;
+          conversionRate: number;
+          averagePricePerSqft: number;
+          topPerformingUnits: ProjectUnit[];
+          monthlyTrends: Array<{
+            month: string;
+            views: number;
+            inquiries: number;
+            sales: number;
+          }>;
+        };
+      }> => {
+        const params = range ? `?range=${range}` : '';
+        return apiRequest(`/projects/${projectId}/analytics${params}`);
+      },
+
+      // Get builder dashboard analytics
+      getBuilderAnalytics: (range?: string): Promise<{
+        success: boolean;
+        data: {
+          totalProjects: number;
+          activeProjects: number;
+          totalUnits: number;
+          soldUnits: number;
+          totalRevenue: number;
+          averageUnitPrice: number;
+          projectPerformance: Array<{
+            project: Project;
+            performance: {
+              views: number;
+              inquiries: number;
+              sales: number;
+              revenue: number;
+            };
+          }>;
+          monthlyTrends: Array<{
+            month: string;
+            projects: number;
+            units: number;
+            sales: number;
+            revenue: number;
+          }>;
+        };
+      }> => {
+        const params = range ? `?range=${range}` : '';
+        return apiRequest(`/projects/analytics/dashboard${params}`);
+      },
+    },
+
+    // Project Reports
+    reports: {
+      // Generate project report
+      generateProjectReport: (projectId: number, reportType: 'sales' | 'inventory' | 'financial', format?: 'pdf' | 'excel'): Promise<{
+        success: boolean;
+        data: { reportUrl: string };
+        message: string;
+      }> => {
+        return apiRequest(`/projects/${projectId}/reports`, {
+          method: 'POST',
+          body: JSON.stringify({ reportType, format: format || 'pdf' }),
+        });
+      },
+
+      // Get available reports
+      getProjectReports: (projectId: number): Promise<{
+        success: boolean;
+        data: {
+          reports: Array<{
+            id: number;
+            type: string;
+            format: string;
+            generated_at: string;
+            download_url: string;
+          }>;
+        };
+      }> => {
+        return apiRequest(`/projects/${projectId}/reports`);
+      },
+
+      // Download report
+      downloadProjectReport: (projectId: number, reportId: number): string => {
+        const validToken = getValidToken();
+        return `${API_BASE_URL}/projects/${projectId}/reports/${reportId}/download?token=${validToken}`;
+      },
+    },
+  },
+
+  // ... rest of your existing methods
+};
 export const getSavedSearches = api.getSavedSearches;
 export const deleteSavedSearch = api.deleteSavedSearch;
 export { ApiError };

@@ -7,7 +7,6 @@ import userRoutes from './userRoutes';
 import propertyRoutes from './propertyRoutes';
 import uploadRoutes from './uploadRoutes';
 import inquiryRoutes from './inquiryRoutes';
-import messagingRoutes from './messagingRoutes';
 import favoritesRoutes from './favoritesRoutes';
 import savedSearchRoutes from './savedSearchRoutes';
 import searchHistoryRoutes from './searchHistoryRoutes';
@@ -18,6 +17,7 @@ import cmsRoutes from './cmsRoutes';
 import conversationRoutes from './conversationRoutes';
 import messageRoutes from './messageRoutes';
 import projectRoutes from './projectRoutes';
+import siteVisitRoutes from './siteVisitRoutes';
 
 const router = Router();
 
@@ -34,7 +34,6 @@ router.use('/v1/users', userRoutes);
 router.use('/v1/properties', propertyRoutes);
 router.use('/v1/uploads', uploadRoutes);
 router.use('/v1/inquiries', inquiryRoutes);
-router.use('/v1/messages', messagingRoutes);
 router.use('/v1/favorites', favoritesRoutes);
 router.use('/v1/saved-searches', savedSearchRoutes);
 router.use('/v1/search-history', searchHistoryRoutes);
@@ -45,6 +44,7 @@ router.use('/v1/cms', cmsRoutes);  // MAKE SURE THIS IS REGISTERED
 router.use('/v1/conversations', conversationRoutes);
 router.use('/v1/messages', messageRoutes);
 router.use('/v1/projects', projectRoutes);
+router.use('/v1/site-visits', siteVisitRoutes);
 
 
 // Legacy routes (redirect to v1 for backward compatibility)

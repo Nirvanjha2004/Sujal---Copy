@@ -120,7 +120,7 @@ class PropertyService {
             // Check for saved search matches and send notifications
             // Import savedSearchService at the top of the file to avoid circular dependency
             const { default: savedSearchService } = await import('./savedSearchService');
-            await savedSearchService.checkForNewMatches(property.id);
+            // await savedSearchService.checkForNewMatches(property); // implement later to notify the user of matches
 
             return property;
         } catch (error) {

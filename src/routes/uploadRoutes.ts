@@ -9,6 +9,7 @@ import {
   uploadCSV, 
   handleUploadError 
 } from '../middleware/upload';
+import fs from 'fs';
 
 const router = Router();
 
@@ -76,12 +77,16 @@ router.get(
 
 // CSV template download
 router.get(
-  '/bulk/template',
-  (req: Request, res: Response) => {
-    const templatePath = path.join(__dirname, '../templates/property-bulk-upload-template.csv');
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename="property-bulk-upload-template.csv"');
-    res.sendFile(templatePath);
+  '/bulk/properties/template',
+  (req, res) => {
+    const templateContent = 
+`title,description,property_type,listing_type,price,address,city,state,postal_code,bedrooms,bathrooms,area_sqft,status,amenities,latitude,longitude
+Beautiful Family Home,Spacious 3BHK home in prime location,house,sale,5000000,123 Main St,Mumbai,Maharashtra,400001,3,2,1500,active,"parking,garden,security",19.0760,72.8777
+Modern Apartment,Fully furnished 2BHK apartment,apartment,rent,25000,456 Park Ave,Pune,Maharashtra,411001,2,2,1200,active,"gym,pool,parking",18.5204,73.8567`;
+
+    res.header('Content-Type', 'text/csv');
+    res.attachment('property-template.csv');
+    res.send(templateContent);
   }
 );
 

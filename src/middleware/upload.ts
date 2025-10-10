@@ -285,7 +285,7 @@ export const uploadCSV = multer({
     files: 1,
   },
   fileFilter: csvFileFilter,
-}).single('csvFile');
+}).single('file'); // Change 'csvFile' to 'file'
 
 // CSV parsing and validation
 export interface PropertyCSVRow {
@@ -403,35 +403,103 @@ const validateCSVRow = (row: any, rowIndex: number): Array<{ row: number; field:
 // Parse and validate CSV file
 export const parseAndValidateCSV = (filePath: string): Promise<CSVValidationResult> => {
   return new Promise((resolve) => {
+    // First check if file is empty
+    try {
+      const stats = fs.statSync(filePath);
+      if (stats.size === 0) {
+        resolve({
+          valid: false,
+          errors: [{ row: 0, field: 'file', message: 'CSV file is empty' }],
+          validRows: [],
+          totalRows: 0
+        });
+        return;
+      }
+    } catch (err) {
+      resolve({
+        valid: false,
+        errors: [{ row: 0, field: 'file', message: `Error reading file: ${err instanceof Error ? err.message : String(err)}` }],
+        validRows: [],
+        totalRows: 0
+      });
+      return;
+    }
+    
+    // Read file content to check format and detect issues
+    let fileContent: string;
+    try {
+      fileContent = fs.readFileSync(filePath, { encoding: 'utf8' });
+      
+      // Handle BOM character that Excel sometimes adds
+      if (fileContent.charCodeAt(0) === 0xFEFF) {
+        fileContent = fileContent.substring(1);
+        // Write back the file without BOM
+        fs.writeFileSync(filePath, fileContent);
+      }
+      
+      // Check if file has any content after headers
+      const lines = fileContent.split(/\r?\n/).filter(line => line.trim() !== '');
+      if (lines.length <= 1) {
+        resolve({
+          valid: false,
+          errors: [{ row: 0, field: 'file', message: 'CSV file has no data rows' }],
+          validRows: [],
+          totalRows: 0
+        });
+        return;
+      }
+    } catch (err) {
+      resolve({
+        valid: false,
+        errors: [{ row: 0, field: 'file', message: `Error reading file content: ${err instanceof Error ? err.message : String(err)}` }],
+        validRows: [],
+        totalRows: 0
+      });
+      return;
+    }
+    
     const results: PropertyCSVRow[] = [];
     const errors: Array<{ row: number; field: string; message: string; value?: any }> = [];
     let rowIndex = 0;
 
     fs.createReadStream(filePath)
-      .pipe(csvParser())
+      .pipe(csvParser({
+        skipLines: 0,
+        headers: true
+      }))
       .on('data', (row) => {
         rowIndex++;
         
+        // Log row data for debugging
+        console.log(`Processing row ${rowIndex}:`, row);
+        
+        // Skip rows with all empty values
+        if (Object.values(row).every(val => !val || val.toString().trim() === '')) {
+          console.log(`Skipping empty row ${rowIndex}`);
+          return;
+        }
+        
         // Validate row
         const rowErrors = validateCSVRow(row, rowIndex);
-        errors.push(...rowErrors);
-
-        // If no errors, add to valid rows
-        if (rowErrors.length === 0) {
+        
+        if (rowErrors.length > 0) {
+          console.log(`Row ${rowIndex} has ${rowErrors.length} errors:`, rowErrors);
+          errors.push(...rowErrors);
+        } else {
           // Clean and format the row data
           const cleanRow: PropertyCSVRow = {
-            title: row.title.trim(),
+            title: row.title?.trim() || '',
             description: row.description?.trim() || '',
-            property_type: row.property_type.toLowerCase(),
-            listing_type: row.listing_type.toLowerCase(),
-            status: row.status.toLowerCase(),
-            price: row.price.toString().replace(/[,$]/g, ''),
+            property_type: (row.property_type || 'house').toLowerCase(),
+            listing_type: (row.listing_type || 'sale').toLowerCase(),
+            status: (row.status || 'new').toLowerCase(),
+            price: row.price?.toString().replace(/[,$]/g, '') || '0',
             area_sqft: row.area_sqft ? row.area_sqft.toString() : undefined,
             bedrooms: row.bedrooms ? row.bedrooms.toString() : undefined,
             bathrooms: row.bathrooms ? row.bathrooms.toString() : undefined,
-            address: row.address.trim(),
-            city: row.city.trim(),
-            state: row.state.trim(),
+            address: row.address?.trim() || '',
+            city: row.city?.trim() || '',
+            state: row.state?.trim() || '',
             postal_code: row.postal_code?.trim(),
             amenities: row.amenities?.trim()
           };
@@ -440,14 +508,27 @@ export const parseAndValidateCSV = (filePath: string): Promise<CSVValidationResu
         }
       })
       .on('end', () => {
+        console.log(`CSV parsing complete. ${rowIndex} rows processed. ${results.length} valid rows. ${errors.length} errors.`);
+        
+        if (rowIndex === 0) {
+          resolve({
+            valid: false,
+            errors: [{ row: 0, field: 'file', message: 'CSV file appears to be empty or invalid. Check headers and formatting.' }],
+            validRows: [],
+            totalRows: 0
+          });
+          return;
+        }
+        
         resolve({
-          valid: errors.length === 0,
+          valid: errors.length === 0 && results.length > 0,
           errors,
           validRows: results,
           totalRows: rowIndex
         });
       })
       .on('error', (error) => {
+        console.error('CSV parsing error:', error);
         resolve({
           valid: false,
           errors: [{ row: 0, field: 'file', message: `CSV parsing error: ${error.message}` }],

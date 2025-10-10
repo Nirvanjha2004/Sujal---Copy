@@ -16,13 +16,35 @@ import { api } from "@/lib/api"; // 1. Import api
 import { toast } from "sonner"; // 2. Import toast for notifications
 import "./PropertyListingPage.css";
 import { useState } from "react";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 export function PropertyListingPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { state: authState } = useAuth();
     const propertyId = id ? parseInt(id) : 0;
-    
+
+    // Add these new state variables
+    const [isSiteVisitModalOpen, setSiteVisitModalOpen] = useState(false);
+    const [visitDate, setVisitDate] = useState<Date | undefined>(undefined);
+    const [visitTime, setVisitTime] = useState<string>("10:00");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const { property, loading, error } = useProperty(propertyId);
     const { isFavorite, addToFavorites, removeFromFavorites } = useFavorites();
 
@@ -47,7 +69,7 @@ export function PropertyListingPage() {
             navigate('/login');
             return;
         }
-        
+
         try {
             if (isFavorite(property.id)) {
                 await removeFromFavorites(property.id);
@@ -76,7 +98,7 @@ export function PropertyListingPage() {
         try {
             const defaultMessage = `I'm interested in your property: "${property.title}".`;
 
-            console.log('inquiryResponse:', property.id, authState.user.email , authState.user.first_name, authState.user.id);
+            console.log('inquiryResponse:', property.id, authState.user.email, authState.user.first_name, authState.user.id);
 
             // 3. Use guaranteed values from the checks above
             const inquiryResponse = await api.createInquiry({
@@ -106,8 +128,59 @@ export function PropertyListingPage() {
         }
     };
 
-    // The handleSendInquiry function is now merged into handleContactOwnerClick
-    // and can be removed.
+    // Add these handler functions in your component
+    const handleScheduleVisitClick = () => {
+        if (!authState.isAuthenticated) {
+            toast.info("Please log in to schedule a site visit.");
+            navigate('/login');
+            return;
+        }
+
+        setSiteVisitModalOpen(true);
+    };
+
+    const handleScheduleSubmit = async () => {
+        if (!visitDate) {
+            toast.error("Please select a date for your visit");
+            return;
+        }
+
+        if (!property || !property.id) {
+            toast.error("Property details not available. Please refresh the page.");
+            return;
+        }
+
+        try {
+            setIsSubmitting(true);
+
+            // Format the date and time for submission
+            const formattedDate = format(visitDate, 'yyyy-MM-dd');
+            const visitDateTime = `${formattedDate}T${visitTime}:00`;
+
+            // Example API call - you'll need to implement this endpoint
+            const response = await api.createSiteVisit({
+                property_id: property.id,
+                scheduled_at: visitDateTime,
+                visitor_name: authState.user?.first_name || "Visitor",
+                visitor_email: authState.user?.email || "",
+                visitor_id: authState.user?.id,
+                notes: `Site visit request for ${property.title}`
+            });
+
+            // Handle successful submission
+            toast.success("Site visit scheduled successfully!");
+            setSiteVisitModalOpen(false);
+
+            // Optionally navigate to a confirmation or dashboard page
+            // navigate('/dashboard/visits');
+
+        } catch (err) {
+            console.error("Failed to schedule site visit:", err);
+            toast.error("Could not schedule visit. Please try again later.");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     if (loading) {
         return <PropertyGridSkeleton />;
@@ -121,8 +194,8 @@ export function PropertyListingPage() {
                     <AlertDescription>
                         Property not found or failed to load.
                     </AlertDescription>
-                    <Button 
-                        variant="outline" 
+                    <Button
+                        variant="outline"
                         className="mt-4"
                         onClick={() => navigate('/properties')}
                     >
@@ -240,9 +313,9 @@ export function PropertyListingPage() {
                                 onClick={handleFavoriteToggle}
                                 className="hover:bg-red-50"
                             >
-                                <Icon 
-                                    icon={isFavorite(property.id) ? "solar:heart-bold" : "solar:heart-linear"} 
-                                    className={`size-6 ${isFavorite(property.id) ? 'text-red-500' : 'text-gray-400'}`} 
+                                <Icon
+                                    icon={isFavorite(property.id) ? "solar:heart-bold" : "solar:heart-linear"}
+                                    className={`size-6 ${isFavorite(property.id) ? 'text-red-500' : 'text-gray-400'}`}
                                 />
                             </Button>
                         </div>
@@ -285,9 +358,9 @@ export function PropertyListingPage() {
                             size="lg"
                             onClick={handleFavoriteToggle}
                         >
-                            <Icon 
-                                icon={isFavorite(property.id) ? "solar:heart-bold" : "solar:heart-linear"} 
-                                className={`size-5 mr-2 ${isFavorite(property.id) ? 'text-red-500' : 'text-gray-400'}`} 
+                            <Icon
+                                icon={isFavorite(property.id) ? "solar:heart-bold" : "solar:heart-linear"}
+                                className={`size-5 mr-2 ${isFavorite(property.id) ? 'text-red-500' : 'text-gray-400'}`}
                             />
                             {isFavorite(property.id) ? 'Saved' : 'Save'}
                         </Button>
@@ -298,6 +371,15 @@ export function PropertyListingPage() {
                             onClick={handleContactOwnerClick}
                         >
                             Contact Owner
+                        </Button>
+                        <Button
+                            variant="default"
+                            size="lg"
+                            className="bg-secondary hover:bg-secondary/90 shadow-lg shadow-secondary/20"
+                            onClick={handleScheduleVisitClick}
+                        >
+                            <Icon icon="solar:calendar-bold" className="size-5 mr-2" />
+                            Schedule Site Visit
                         </Button>
                     </div>
                 </div>
@@ -391,7 +473,7 @@ export function PropertyListingPage() {
                     <div className="space-y-6">
                         {/* Property Owner/Agent Profile */}
                         {property.owner && (
-                            <PropertyOwnerProfile 
+                            <PropertyOwnerProfile
                                 owner={property.owner}
                                 propertyCount={5} // This would come from API
                                 onContact={() => {
@@ -400,11 +482,11 @@ export function PropertyListingPage() {
                                 }}
                             />
                         )}
-                        
+                        {/*                         
                         <PropertyShare 
                             propertyId={property.id} 
                             propertyTitle={property.title}
-                        />
+                        /> */}
                     </div>
                 </div>
                 <div className="mt-12">
@@ -677,6 +759,83 @@ export function PropertyListingPage() {
                     </div>
                 </div>
             </footer>
+
+            {/* Site Visit Modal */}
+            <Dialog open={isSiteVisitModalOpen} onOpenChange={setSiteVisitModalOpen}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Schedule a Site Visit</DialogTitle>
+                        <DialogDescription>
+                            Select your preferred date and time to visit this property.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-1 gap-2">
+                            <label className="text-sm font-medium">Select Date</label>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        className={cn(
+                                            "justify-start text-left font-normal",
+                                            !visitDate && "text-muted-foreground"
+                                        )}
+                                    >
+                                        <Icon icon="solar:calendar-bold" className="mr-2 h-4 w-4" />
+                                        {visitDate ? format(visitDate, "PPP") : "Select a date"}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0">
+                                    <Calendar
+                                        mode="single"
+                                        selected={visitDate}
+                                        onSelect={setVisitDate}
+                                        initialFocus
+                                        disabled={(date) => date < new Date() || date > new Date(new Date().setMonth(new Date().getMonth() + 1))}
+                                    />
+                                </PopoverContent>
+                            </Popover>
+                        </div>
+                        <div className="grid grid-cols-1 gap-2">
+                            <label className="text-sm font-medium">Select Time</label>
+                            <select
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                value={visitTime}
+                                onChange={(e) => setVisitTime(e.target.value)}
+                            >
+                                <option value="09:00">9:00 AM</option>
+                                <option value="10:00">10:00 AM</option>
+                                <option value="11:00">11:00 AM</option>
+                                <option value="12:00">12:00 PM</option>
+                                <option value="13:00">1:00 PM</option>
+                                <option value="14:00">2:00 PM</option>
+                                <option value="15:00">3:00 PM</option>
+                                <option value="16:00">4:00 PM</option>
+                                <option value="17:00">5:00 PM</option>
+                            </select>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setSiteVisitModalOpen(false)}>
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleScheduleSubmit}
+                            disabled={!visitDate || isSubmitting}
+                            className="bg-primary"
+                        >
+                            {isSubmitting ? (
+                                <>
+                                    <Icon icon="solar:refresh-bold" className="mr-2 h-4 w-4 animate-spin" />
+                                    Scheduling...
+                                </>
+                            ) : (
+                                "Schedule Visit"
+                            )}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

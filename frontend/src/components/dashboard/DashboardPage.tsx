@@ -194,10 +194,17 @@ export function DashboardPage() {
               color: 'bg-primary'
             },
             {
+              title: 'Bulk Upload Properties',
+              description: 'Upload multiple properties via CSV',
+              icon: 'solar:upload-bold',
+              action: () => navigate('/agent/bulk-upload'),
+              color: 'bg-purple-600'
+            },
+            {
               title: 'Client Portfolio',
               description: 'Manage all client properties',
               icon: 'solar:buildings-3-bold',
-              action: () => navigate('/client-properties'),
+              action: () => navigate('/my-properties'),
               color: 'bg-accent'
             },
             {
@@ -206,13 +213,6 @@ export function DashboardPage() {
               icon: 'solar:users-group-two-rounded-bold',
               action: () => navigate('/leads'),
               color: 'bg-orange-500'
-            },
-            {
-              title: 'Commission Tracker',
-              description: 'Track earnings and commissions',
-              icon: 'solar:dollar-minimalistic-bold',
-              action: () => navigate('/commissions'),
-              color: 'bg-green-500'
             },
             {
               title: 'Client Communication',

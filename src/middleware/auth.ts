@@ -17,9 +17,18 @@ export const authenticate = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    // First check the authorization header
     const authHeader = req.headers.authorization;
+    let token: string | undefined;
     
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7); // Remove 'Bearer ' prefix
+    } else if (req.query && req.query.token) {
+      // Also check for token in query parameters (for file downloads)
+      token = req.query.token as string;
+    }
+    
+    if (!token) {
       res.status(401).json({
         success: false,
         error: {
@@ -31,8 +40,6 @@ export const authenticate = async (
       return;
     }
 
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-    
     try {
       const payload = authService.verifyAccessToken(token);
       req.user = payload;

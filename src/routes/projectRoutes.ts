@@ -29,12 +29,14 @@ router.put('/:id', authenticate, projectController.updateProject.bind(projectCon
 
 // Unit routes
 router.get('/:projectId/units', authenticate, projectController.getProjectUnits.bind(projectController));
+// Specific routes must come BEFORE parameterized routes
+router.get('/:projectId/units/template', authenticate, projectController.downloadCSVTemplate.bind(projectController));
+router.post('/:projectId/units/bulk', authenticate, projectController.bulkCreateUnits.bind(projectController));
+router.post('/:projectId/units/bulk-csv', authenticate, upload.single('file'), projectController.bulkCreateUnitsFromCSV.bind(projectController));
+// Parameterized routes come after specific routes
 router.get('/:projectId/units/:unitId', authenticate, projectController.getProjectUnit.bind(projectController));
 router.post('/:projectId/units', authenticate, ProjectController.createUnitValidation, projectController.createProjectUnit.bind(projectController));
 router.put('/:projectId/units/:unitId', authenticate, ProjectController.createUnitValidation, projectController.updateProjectUnit.bind(projectController));
 router.delete('/:projectId/units/:unitId', authenticate, projectController.deleteProjectUnit.bind(projectController));
-router.post('/:projectId/units/bulk', authenticate, projectController.bulkCreateUnits.bind(projectController));
-router.post('/:projectId/units/bulk-csv', authenticate, upload.single('file'), projectController.bulkCreateUnitsFromCSV.bind(projectController));
-router.get('/:projectId/units/template', authenticate, projectController.downloadCSVTemplate.bind(projectController));
 
 export default router;

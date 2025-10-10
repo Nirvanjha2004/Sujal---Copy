@@ -4,8 +4,7 @@ import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
 import { Property } from '../models';
 import PropertyService from './propertyService';
-import { PropertyType } from '../models/Property';
-import { PropertyStatus } from '../types';
+import { PropertyType, PropertyStatus } from '../models/Property';
 
 // Define the expected CSV headers
 const REQUIRED_HEADERS = [
@@ -42,31 +41,30 @@ export class BulkUploadService {
   }> {
     return new Promise((resolve) => {
       const fileStream = fs.createReadStream(filePath);
+
       Papa.parse(fileStream, {
         header: true,
-        step: (results, parser) => {
-          parser.abort(); // We only need the header row
+        preview: 1, // only parse first row
+        complete: (results) => {
           const foundHeaders = results.meta.fields || [];
-          const missingHeaders = REQUIRED_HEADERS.filter(h => !foundHeaders.includes(h));
+          const missingHeaders = REQUIRED_HEADERS.filter(
+            (h) => !foundHeaders.includes(h)
+          );
 
           if (missingHeaders.length > 0) {
             resolve({
               valid: false,
-              message: 'CSV file is missing required columns.',
+              message: "CSV file is missing required columns.",
               requiredColumns: REQUIRED_HEADERS,
               foundColumns: foundHeaders,
               missingColumns: missingHeaders,
             });
           } else {
-            resolve({ valid: true, message: 'CSV format is valid.' });
+            resolve({ valid: true, message: "CSV format is valid." });
           }
         },
         error: (error) => {
           resolve({ valid: false, message: `Failed to parse CSV: ${error.message}` });
-        },
-        complete: () => {
-            // This is in case the file is empty or has only headers
-            resolve({ valid: false, message: 'CSV file appears to be empty or invalid.' });
         }
       });
     });
@@ -111,35 +109,58 @@ export class BulkUploadService {
       progress.processedRows++;
 
       try {
-        // Basic data validation and transformation
+        // Map the status from the CSV to a valid PropertyStatus enum value
+        // Use the exact enum values, not enum properties
+        let propertyStatus: PropertyStatus;
+        
+        switch ((row.status || '').toLowerCase()) {
+          case 'available':
+          case 'active':
+            propertyStatus = PropertyStatus.ACTIVE;
+            break;
+          case 'sold':
+            propertyStatus = PropertyStatus.SOLD;
+            break;
+          case 'rented':
+            propertyStatus = PropertyStatus.RENTED;
+            break;
+          case 'pending':
+            propertyStatus = PropertyStatus.PENDING;
+            break;
+          default:
+            propertyStatus = PropertyStatus.ACTIVE; // Default value
+        }
+
+        // Check PropertyCreateData interface to make sure all properties match
         const propertyData = {
-            title: row.title,
-            description: row.description,
-            propertyType: row.property_type as PropertyType,
-            listingType: row.listing_type as any,
-            status: row.status as PropertyStatus,
-            price: parseFloat(row.price),
-            areaSqft: row.area_sqft ? parseInt(row.area_sqft, 10) : undefined,
-            bedrooms: row.bedrooms ? parseInt(row.bedrooms, 10) : undefined,
-            bathrooms: row.bathrooms ? parseInt(row.bathrooms, 10) : undefined,
-            address: row.address,
-            city: row.city,
-            state: row.state,
-            postalCode: row.postal_code,
+          title: row.title,
+          description: row.description,
+          propertyType: row.property_type as PropertyType,
+          listingType: row.listing_type,
+          status: propertyStatus as PropertyStatus, // Explicitly cast to PropertyStatus
+          price: parseFloat(row.price),
+          areaSqft: row.area_sqft ? parseInt(row.area_sqft, 10) : undefined,
+          bedrooms: row.bedrooms ? parseInt(row.bedrooms, 10) : undefined,
+          bathrooms: row.bathrooms ? parseInt(row.bathrooms, 10) : undefined,
+          address: row.address,
+          city: row.city,
+          state: row.state,
+          postalCode: row.postal_code,
         };
 
         // More robust validation
         if (!propertyData.title || isNaN(propertyData.price) || !propertyData.city) {
-            throw new Error('Missing required fields: title, price, or city.');
+          throw new Error('Missing required fields: title, price, or city.');
         }
         if (!Object.values(PropertyType).includes(propertyData.propertyType)) {
-            throw new Error(`Invalid property_type: ${propertyData.propertyType}`);
+          throw new Error(`Invalid property_type: ${propertyData.propertyType}`);
         }
 
         const propertyService = new PropertyService();
         await propertyService.createProperty(userId, propertyData);
         progress.successfulRows++;
       } catch (error: any) {
+        console.error(`Error processing row ${i+2}:`, error);
         progress.failedRows++;
         progress.errors.push({
           row: i + 2, // CSV rows are 1-based, +1 for header
@@ -190,7 +211,7 @@ export class BulkUploadService {
   }
 
   static getErrorReportPath(uploadId: string): string | undefined {
-      const progress = uploadProgress[uploadId];
-      return progress?.errorReportPath;
+    const progress = uploadProgress[uploadId];
+    return progress?.errorReportPath;
   }
 }

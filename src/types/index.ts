@@ -80,6 +80,11 @@ export enum PropertyStatus {
   NEW = 'new',
   RESALE = 'resale',
   UNDER_CONSTRUCTION = 'under_construction',
+  ACTIVE = 'active',
+  SOLD = 'sold',
+  RENTED = 'rented',
+  INACTIVE = 'inactive',
+  PENDING = 'pending',
 }
 
 // Database connection types

@@ -283,31 +283,20 @@ export class SavedSearchService {
   /**
    * Check for new properties matching saved searches and send notifications
    */
-  async checkForNewMatches(propertyId: number): Promise<void> {
+  async checkForNewMatches(property: Property): Promise<void> {
     try {
-      const property = await Property.findByPk(propertyId, {
-        include: [
-          {
-            model: User,
-            as: 'owner',
-            attributes: ['first_name', 'last_name'],
-          },
-        ],
-      });
-
-      if (!property || !property.is_active) {
-        return;
-      }
-
-      // Get all saved searches that might match this property
+      // Find saved searches that might match this new property
       const savedSearches = await SavedSearch.findAll({
         include: [
           {
             model: User,
-            as: 'user',
-            attributes: ['id', 'email', 'first_name', 'last_name'],
-          },
+            as: 'searchUser', // Use 'searchUser' instead of 'user' to match the association alias
+            attributes: ['id', 'email', 'first_name', 'last_name']
+          }
         ],
+        where: {
+          is_active: true
+        }
       });
 
       for (const savedSearch of savedSearches) {
@@ -318,6 +307,8 @@ export class SavedSearchService {
       }
     } catch (error) {
       console.error('Error checking for new matches:', error);
+      // Don't throw the error as this is a background task
+      // We don't want it to stop property creation
     }
   }
 

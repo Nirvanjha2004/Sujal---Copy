@@ -17,13 +17,11 @@ import { CalculatorsPage } from './components/calculators'
 import { AdminPanel } from './components/admin'
 import { AddPropertyPage } from './components/property/AddPropertyPage'
 import { MyPropertiesPage } from './components/property/MyPropertiesPage'
-import { InquiriesPage } from './components/communication/InquiriesPage'
-import { CommunicationPageWrapper } from './components/communication/CommunicationPageWrapper'
-import { CommunicationDemo } from './components/communication/CommunicationDemo'
 import AgentDashboard from './components/properties/AgentDashboard'
 import { PropertyListingSearchPage } from './components/landing/PropertyListingSearchPage'
 import { PropertySearchDashboard } from './components/landing/SearchViewedDashboard'
 import { Messages } from './components/dashboard/Messages'
+import { BulkUploadPage } from '@/pages/agent/BulkUploadPage'
 
 // Builder Pages
 import { ProjectsPage } from './pages/builder/ProjectsPage'
@@ -31,6 +29,7 @@ import { NewProjectPage } from './pages/builder/NewProjectPage'
 import { ProjectDetailsPage } from './pages/builder/ProjectDetailsPage'
 import { ProjectUnitsPage } from './pages/builder/ProjectUnitsPage'
 import { BulkUnitsPage } from './pages/builder/BulkUnitsPage'
+import LeadManagementPage from './pages/agent/LeadManagementPage'
 // import { BulkListingPage } from './pages/builder/BulkListingPage'
 
 
@@ -68,6 +67,14 @@ function App() {
                                 element={
                                     <ProtectedRoute>
                                         <DashboardPage />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/leads"
+                                element={
+                                    <ProtectedRoute>
+                                        <LeadManagementPage />
                                     </ProtectedRoute>
                                 }
                             />
@@ -125,28 +132,6 @@ function App() {
                                     <ProtectedRoute>
                                         <MyPropertiesPage />
                                     </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/inquiries"
-                                element={
-                                    <ProtectedRoute>
-                                        <InquiriesPage />
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/communication"
-                                element={
-                                    <ProtectedRoute>
-                                        <CommunicationPageWrapper />
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/communication-demo"
-                                element={
-                                    <CommunicationDemo />
                                 }
                             />
                             <Route
@@ -215,6 +200,14 @@ function App() {
                                     </ProtectedRoute>
                                 }
                             /> */}
+                            <Route
+                                path="/agent/bulk-upload"
+                                element={
+                                    <ProtectedRoute requiredRole="agent">
+                                      <BulkUploadPage />
+                                    </ProtectedRoute>
+                                  }
+                            />
                 </Routes>
             </div>
         </ErrorBoundary>

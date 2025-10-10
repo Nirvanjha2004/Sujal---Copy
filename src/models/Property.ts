@@ -33,6 +33,10 @@ export enum PropertyStatus {
   NEW = 'new',
   RESALE = 'resale',
   UNDER_CONSTRUCTION = 'under_construction',
+  RENTED = "RENTED",
+  SOLD = "SOLD",
+  PENDING = "PENDING",
+  ACTIVE = "ACTIVE",
 }
 
 export interface PropertyAmenities {

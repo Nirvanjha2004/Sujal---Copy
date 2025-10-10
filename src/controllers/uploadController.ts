@@ -2,14 +2,6 @@ import { Response } from 'express';
 import { AuthenticatedRequest } from '../types';
 import { BulkUploadService } from '../services/bulkUploadService';
 import { ImageService } from '../services/imageService';
-import { 
-  uploadPropertyImages, 
-  uploadBulkPropertyImages, 
-  uploadCSV, 
-  handleUploadError,
-  validateImageDimensions 
-} from '../middleware/upload';
-import path from 'path';
 import fs from 'fs';
 
 export class UploadController {

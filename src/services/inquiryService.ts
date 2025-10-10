@@ -1,8 +1,10 @@
 import { Inquiry, InquiryStatus } from '../models/Inquiry';
 import { User } from '../models/User';
 import { Property } from '../models/Property';
-import { Conversation } from '../models/Conversation'; // Make sure this import is present
-import { ConversationParticipant } from '../models/ConversationParticipant'; // Make sure this import is present
+import { Conversation } from '../models/Conversation';
+import { Message } from '../models/Message';
+import { ConversationParticipant } from '../models/ConversationParticipant';
+import sequelize from '../config/database';
 import emailService, { InquiryEmailData } from './emailService';
 import { Op, Transaction } from 'sequelize';
 
@@ -31,99 +33,121 @@ export interface InquiryListOptions {
   order?: 'ASC' | 'DESC';
 }
 
-class InquiryService {
-  async createInquiry(data: CreateInquiryData, options?: { transaction: Transaction }): Promise<Inquiry> {
-    // Validate that property exists
-    const property = await Property.findByPk(data.property_id, {
-      include: [
-        {
-          model: User,
-          as: 'owner',
-          attributes: ['id', 'email', 'first_name', 'last_name'],
-        },
-      ],
-      transaction: options?.transaction, // Pass transaction to findByPk
-    });
+export class InquiryService {
+  public async createInquiry(data: {
+    property_id: number;
+    name: string;
+    email: string;
+    phone?: string;
+    message: string;
+    inquirer_id?: number;
+  }): Promise<Inquiry> {
+    const t = await sequelize.transaction();
+    try {
+      // 1. Find the property to get the owner
+      const property = await Property.findByPk(data.property_id, { transaction: t });
+      if (!property) {
+        throw new Error('Property not found');
+      }
+      const ownerId = property.user_id;
+      const inquirerId = data.inquirer_id;
 
-    if (!property) {
-      throw new Error('Property not found');
-    }
+      // 2. Find an existing Inquiry or prepare to create a new one
+      let inquiry: Inquiry | null = null;
 
-    // Create the inquiry
-    const inquiry = await Inquiry.create({
-      property_id: data.property_id,
-      inquirer_id: data.inquirer_id,
-      name: data.name,
-      email: data.email,
-      phone: data.phone,
-      message: data.message,
-    }, { transaction: options?.transaction });
+      // If the user is logged in, check for an existing inquiry by their ID
+      if (inquirerId) {
+        inquiry = await Inquiry.findOne({
+          where: {
+            property_id: data.property_id,
+            inquirer_id: inquirerId,
+          },
+          transaction: t,
+        });
+      }
 
-    // --- START: Create Conversation Logic ---
+      // If no inquiry was found (or user is a guest), create a new one
+      if (!inquiry) {
+        inquiry = await Inquiry.create(data, { transaction: t });
+      } else {
+        // An inquiry already exists. We can optionally update its timestamp or status.
+        // For now, we'll just proceed with the existing inquiry record.
+        // You could add: inquiry.changed('updated_at', true); await inquiry.save({ transaction: t });
+      }
 
-    // 3. Create a new conversation
-    const conversation = await Conversation.create({
-      property_id: property.id,
-      subject: `Inquiry for: ${property.title}`,
-    }, { transaction: options?.transaction });
 
-    // 4. Add the property owner and the inquirer as participants
-    const ownerId = property.user_id;
-    console.log("The data is", data)
-    const inquirerId = data.inquirer_id; // This is the logged-in user's ID
+      // 3. Find or create a conversation
+      // Do not create a conversation if the inquirer is the owner
+      if (inquirerId && ownerId && inquirerId !== ownerId) {
+        let conversation: Conversation | null = null;
 
-    if (!inquirerId) {
-      throw new Error('Authenticated user ID is required to create a conversation.');
-    }
+        // Find an existing conversation between these two users for this property
+        const existingConversations = await Conversation.findAll({
+          where: { property_id: data.property_id },
+          include: [{
+            model: ConversationParticipant,
+            as: 'participants',
+            attributes: ['user_id'],
+          }],
+          transaction: t,
+        });
 
-    await ConversationParticipant.bulkCreate([
-      { conversation_id: conversation.id, user_id: ownerId },
-      { conversation_id: conversation.id, user_id: inquirerId },
-    ], { transaction: options?.transaction });
+        for (const conv of existingConversations) {
+          const participantIds = conv.participants.map(p => p.user_id);
+          const hasBothParticipants = participantIds.includes(inquirerId) && participantIds.includes(ownerId);
+          if (hasBothParticipants && participantIds.length === 2) {
+            conversation = conv;
+            break;
+          }
+        }
 
-    // 5. Link the conversation to the inquiry
-    inquiry.conversation_id = conversation.id;
-    await inquiry.save({ transaction: options?.transaction });
-
-    // --- END: Create Conversation Logic ---
-
-    console.log('The Inquiry logs are', inquiry);
-
-    // Load the created inquiry with associations
-    const createdInquiry = await Inquiry.findByPk(inquiry.id, {
-      include: [
-        {
-          model: Property,
-          as: 'property',
-          attributes: ['id', 'title', 'user_id'],
-          include: [
+        // If no conversation exists, create a new one
+        if (!conversation) {
+          conversation = await Conversation.create(
             {
-              model: User,
-              as: 'owner',
-              attributes: ['id', 'email', 'first_name', 'last_name'],
+              property_id: data.property_id,
+              subject: `Inquiry for: ${property.title}`,
             },
-          ],
-        },
-        {
-          model: User,
-          as: 'inquirer',
-          attributes: ['id', 'email', 'first_name', 'last_name'],
-          required: false,
-        },
-      ],
-      transaction: options?.transaction, // Pass transaction here as well
-    });
+            { transaction: t }
+          );
 
-    console.log('The CreatedInquiry logs are', createdInquiry);
+          // Add participants to the new conversation
+          await ConversationParticipant.bulkCreate(
+            [
+              { conversation_id: conversation.id, user_id: inquirerId },
+              { conversation_id: conversation.id, user_id: ownerId },
+            ],
+            { transaction: t }
+          );
+        }
 
-    if (!createdInquiry) {
-      throw new Error('Failed to create inquiry');
+        // Link the inquiry to the found or created conversation
+        // This is important for both new and existing inquiries
+        if (inquiry.conversation_id !== conversation.id) {
+            await inquiry.update({ conversation_id: conversation.id }, { transaction: t });
+        }
+
+        // Add the new message to the conversation
+        if (data.message) {
+          await Message.create(
+            {
+              conversation_id: conversation.id,
+              sender_id: inquirerId,
+              recipient_id: ownerId,
+              content: data.message,
+            },
+            { transaction: t }
+          );
+        }
+      }
+
+      await t.commit();
+      return inquiry;
+    } catch (error) {
+      await t.rollback();
+      console.error('Error in createInquiry service:', error);
+      throw error;
     }
-
-    // Send email notifications
-    // await this.sendInquiryNotifications(createdInquiry);
-
-    return createdInquiry;
   }
 
   async getInquiries(

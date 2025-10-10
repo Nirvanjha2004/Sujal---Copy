@@ -216,10 +216,10 @@ class ApiError extends Error {
 
 async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
-  
+
   // Get valid token (automatically clears invalid tokens)
   const validToken = getValidToken();
-  
+
   const config: RequestInit = {
     headers: {
       'Content-Type': 'application/json',
@@ -231,7 +231,7 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
 
   try {
     const response = await fetch(url, config);
-    
+
     // Handle 401 responses by clearing invalid tokens
     if (response.status === 401) {
       const errorData = await response.json().catch(() => ({}));
@@ -241,11 +241,11 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
       }
       throw new ApiError(response.status, `HTTP error! status: ${response.status}`);
     }
-    
+
     if (!response.ok) {
       throw new ApiError(response.status, `HTTP error! status: ${response.status}`);
     }
-    
+
     return await response.json();
   } catch (error) {
     if (error instanceof ApiError) {
@@ -259,7 +259,7 @@ export const api = {
   // Properties
   getProperties: async (filters?: PropertyFilters): Promise<{ data: Property[]; total: number; page: number; limit: number }> => {
     const params = new URLSearchParams();
-    
+
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {
@@ -280,14 +280,14 @@ export const api = {
             }
             return;
           }
-          
+
           params.append(backendKey, value.toString());
         }
       });
     }
 
     console.log("The params are", params.toString())
-    
+
     const queryString = params.toString();
     const response = await apiRequest(`/properties${queryString ? `?${queryString}` : ''}`) as any;
     return response;
@@ -300,7 +300,7 @@ export const api = {
 
   searchProperties: async (query: string, filters?: PropertyFilters): Promise<{ data: Property[]; total: number }> => {
     const params = new URLSearchParams({ keywords: query });
-    
+
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {
@@ -309,13 +309,13 @@ export const api = {
             params.append('location', value.toString());
             return;
           }
-          
+
           // Handle amenities array specially
           if (key === 'amenities' && Array.isArray(value) && value.length > 0) {
             params.append('amenities', value.join(','));
             return;
           }
-          
+
           // Map other frontend parameter names to backend parameter names
           let backendKey = key;
           if (key === 'property_type') backendKey = 'propertyType';
@@ -326,12 +326,12 @@ export const api = {
           if (key === 'max_area') backendKey = 'maxArea';
           if (key === 'sort_by') backendKey = 'sortBy';
           if (key === 'sort_order') backendKey = 'sortOrder';
-          
+
           params.append(backendKey, value.toString());
         }
       });
     }
-    
+
     const response = await apiRequest(`/properties/search?${params.toString()}`) as any;
     return response.data;
   },
@@ -640,32 +640,35 @@ export const api = {
 
   // File Upload
   upload: {
+    // This method is fine
     bulkPropertyCSV: (formData: FormData): Promise<any> => {
       const validToken = getValidToken();
-      return fetch(`${API_BASE_URL}/upload/bulk/properties`, {
+      return fetch(`${API_BASE_URL}/uploads/bulk/properties`, {
         method: 'POST',
         body: formData,
         headers: {
           ...(validToken && { Authorization: `Bearer ${validToken}` }),
         },
-      }).then(res => res.json());
+      }).then(res => {
+        if (!res.ok) {
+          return res.json().then(err => { throw new Error(err.error?.message || 'Upload failed') });
+        }
+        return res.json;
+      });
     },
+
+    // This is the method that needs fixing - note the 's' in 'uploads'
     getProgress: (uploadId: string): Promise<any> => {
-      return apiRequest(`/upload/bulk/progress/${uploadId}`);
+      return apiRequest(`/uploads/bulk/progress/${uploadId}`);
     },
+
+    // Also check this method if you're having issues with error reports
     getReportUri: (uploadId: string): string => {
-      const validToken = getValidToken();
-      return `${API_BASE_URL}/upload/bulk/error-report/${uploadId}?token=${validToken}`;
+      return `${API_BASE_URL}/uploads/bulk/error-report/${uploadId}`;
     },
-    propertyImages: (propertyId: number, formData: FormData): Promise<any> => {
-      const validToken = getValidToken();
-      return fetch(`${API_BASE_URL}/upload/properties/${propertyId}/images`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          ...(validToken && { Authorization: `Bearer ${validToken}` }),
-        },
-      }).then(res => res.json());
+
+    downloadPropertyTemplate: (): string => {
+      return `${API_BASE_URL}/uploads/bulk/properties/template`;
     }
   },
 
@@ -781,18 +784,18 @@ export const api = {
   // CMS Management
   cms: {
     // Get all content (admin only)
-    getContent: (filters?: { 
-      type?: string; 
-      isActive?: boolean; 
-      page?: number; 
-      limit?: number; 
-    }): Promise<{ 
-      success: boolean; 
-      data: { 
-        content: any[]; 
-        total: number; 
-        totalPages: number; 
-      } 
+    getContent: (filters?: {
+      type?: string;
+      isActive?: boolean;
+      page?: number;
+      limit?: number;
+    }): Promise<{
+      success: boolean;
+      data: {
+        content: any[];
+        total: number;
+        totalPages: number;
+      }
     }> => {
       const params = new URLSearchParams();
       if (filters) {
@@ -806,9 +809,9 @@ export const api = {
     },
 
     // Get active content (public)
-    getActiveContent: (type?: string): Promise<{ 
-      success: boolean; 
-      data: any[] 
+    getActiveContent: (type?: string): Promise<{
+      success: boolean;
+      data: any[]
     }> => {
       const params = type ? `?type=${type}` : '';
       return apiRequest(`/cms/active${params}`, {
@@ -817,9 +820,9 @@ export const api = {
     },
 
     // Get banners (public)
-    getBanners: (): Promise<{ 
-      success: boolean; 
-      data: any[] 
+    getBanners: (): Promise<{
+      success: boolean;
+      data: any[]
     }> => {
       return apiRequest('/cms/banners', {
         headers: {} // No auth required for public routes
@@ -827,9 +830,9 @@ export const api = {
     },
 
     // Get announcements (public)
-    getAnnouncements: (): Promise<{ 
-      success: boolean; 
-      data: any[] 
+    getAnnouncements: (): Promise<{
+      success: boolean;
+      data: any[]
     }> => {
       return apiRequest('/cms/announcements', {
         headers: {} // No auth required for public routes
@@ -837,9 +840,9 @@ export const api = {
     },
 
     // Get content by key (public)
-    getContentByKey: (key: string): Promise<{ 
-      success: boolean; 
-      data: any 
+    getContentByKey: (key: string): Promise<{
+      success: boolean;
+      data: any
     }> => {
       return apiRequest(`/cms/key/${key}`, {
         headers: {} // No auth required for public routes
@@ -847,9 +850,9 @@ export const api = {
     },
 
     // Get content by ID (admin only)
-    getContentById: (id: number): Promise<{ 
-      success: boolean; 
-      data: any 
+    getContentById: (id: number): Promise<{
+      success: boolean;
+      data: any
     }> => {
       return apiRequest(`/cms/content/${id}`);
     },
@@ -863,9 +866,9 @@ export const api = {
       metadata?: object;
       isActive?: boolean;
       displayOrder?: number;
-    }): Promise<{ 
-      success: boolean; 
-      data: any 
+    }): Promise<{
+      success: boolean;
+      data: any
     }> => {
       return apiRequest('/cms/content', {
         method: 'POST',
@@ -880,9 +883,9 @@ export const api = {
       metadata?: object;
       isActive?: boolean;
       displayOrder?: number;
-    }): Promise<{ 
-      success: boolean; 
-      data: any 
+    }): Promise<{
+      success: boolean;
+      data: any
     }> => {
       return apiRequest(`/cms/content/${id}`, {
         method: 'PUT',
@@ -891,9 +894,9 @@ export const api = {
     },
 
     // Toggle content status (admin only)
-    toggleContentStatus: (id: number): Promise<{ 
-      success: boolean; 
-      data: any 
+    toggleContentStatus: (id: number): Promise<{
+      success: boolean;
+      data: any
     }> => {
       return apiRequest(`/cms/content/${id}/toggle`, {
         method: 'PATCH',
@@ -901,9 +904,9 @@ export const api = {
     },
 
     // Delete content (admin only)
-    deleteContent: (id: number): Promise<{ 
-      success: boolean; 
-      message: string 
+    deleteContent: (id: number): Promise<{
+      success: boolean;
+      message: string
     }> => {
       return apiRequest(`/cms/content/${id}`, {
         method: 'DELETE',
@@ -911,8 +914,8 @@ export const api = {
     },
 
     // Get content stats (admin only)
-    getContentStats: (): Promise<{ 
-      success: boolean; 
+    getContentStats: (): Promise<{
+      success: boolean;
       data: {
         totalContent: number;
         activeContent: number;
@@ -1024,7 +1027,7 @@ export const api = {
     const queryParams = new URLSearchParams();
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.limit) queryParams.append('limit', params.limit.toString());
-    
+
     const query = queryParams.toString();
     return apiRequest(`/conversations${query ? `?${query}` : ''}`, {
       method: 'GET',
@@ -1042,7 +1045,7 @@ export const api = {
     const queryParams = new URLSearchParams();
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.limit) queryParams.append('limit', params.limit.toString());
-    
+
     const query = queryParams.toString();
     return apiRequest(`/messages/conversation/${conversationId}${query ? `?${query}` : ''}`, {
       method: 'GET',
@@ -1056,12 +1059,80 @@ export const api = {
     });
   },
 
+  // Site Visits - ALL SITE VISIT METHODS SHOULD BE HERE
+  createSiteVisit: (visitData: {
+    property_id: number;
+    scheduled_at: string;
+    visitor_name: string;
+    visitor_email: string;
+    visitor_id?: number;
+    visitor_phone?: string;
+    notes?: string;
+  }): Promise<any> => {
+    return apiRequest('/site-visits', {
+      method: 'POST',
+      body: JSON.stringify(visitData)
+    });
+  },
+
+  getSiteVisits: (filters?: {
+    status?: string;
+    startDate?: string;
+    endDate?: string;
+    propertyId?: number
+  }): Promise<{
+    success: boolean;
+    data: {
+      visits: any[]
+    }
+  }> => {
+    const params = new URLSearchParams();
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          params.append(key, value.toString());
+        }
+      });
+    }
+    return apiRequest(`/site-visits/agent${params.toString() ? `?${params.toString()}` : ''}`);
+  },
+
+  getSiteVisitStats: (): Promise<{
+    success: boolean;
+    data: {
+      total: number;
+      scheduled: number;
+      completed: number;
+      cancelled: number;
+      no_show: number;
+      upcoming: number;
+    }
+  }> => {
+    return apiRequest('/site-visits/stats');
+  },
+
+  updateSiteVisit: (visitId: number, updates: {
+    status?: string;
+    scheduled_at?: string;
+    agent_notes?: string;
+  }): Promise<{
+    success: boolean;
+    data: any;
+    message: string;
+  }> => {
+    return apiRequest(`/site-visits/${visitId}`, {
+      method: 'PUT',
+      body: JSON.stringify(updates)
+    });
+  },
+
+
   // Builder Project Management APIs
   projects: {
     // Get all projects for the authenticated builder
-    getBuilderProjects: (params?: { 
-      page?: number; 
-      limit?: number; 
+    getBuilderProjects: (params?: {
+      page?: number;
+      limit?: number;
       status?: string;
       project_type?: string;
     }): Promise<{
@@ -1084,7 +1155,7 @@ export const api = {
           }
         });
       }
-      
+
       const query = queryParams.toString();
       return apiRequest(`/projects${query ? `?${query}` : ''}`);
     },
@@ -1197,7 +1268,7 @@ export const api = {
             }
           });
         }
-        
+
         const query = queryParams.toString();
         return apiRequest(`/projects/${projectId}/units${query ? `?${query}` : ''}`);
       },
@@ -1343,7 +1414,7 @@ export const api = {
       }> => {
         const formData = new FormData();
         formData.append('file', file);
-        
+
         const validToken = getValidToken();
         const response = await fetch(`${API_BASE_URL}/projects/${projectId}/units/bulk-csv`, {
           method: 'POST',
@@ -1352,7 +1423,7 @@ export const api = {
           },
           body: formData,
         });
-        
+
         return response.json();
       },
 
@@ -1364,7 +1435,7 @@ export const api = {
             ...(validToken && { Authorization: `Bearer ${validToken}` }),
           },
         });
-        
+
         return response.blob();
       },
 
@@ -1715,8 +1786,6 @@ export const api = {
       },
     },
   },
-
-  // ... rest of your existing methods
 };
 export const getSavedSearches = api.getSavedSearches;
 export const deleteSavedSearch = api.deleteSavedSearch;

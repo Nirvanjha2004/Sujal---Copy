@@ -14,7 +14,6 @@ import { PropertyOwnerProfile } from "@/components/property/PropertyOwnerProfile
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api"; // 1. Import api
 import { toast } from "sonner"; // 2. Import toast for notifications
-import "./PropertyListingPage.css";
 import { useState } from "react";
 import {
     Dialog,

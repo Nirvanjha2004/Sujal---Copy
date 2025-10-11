@@ -220,13 +220,13 @@ export function FavoritesPage() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-accent">
-                    ₹{Math.round(favorites.reduce((sum, prop) => sum + prop.price, 0) / favorites.length / 100000)}L
+                    ₹{Math.round(favorites.reduce((sum, prop) => sum + prop.property?.price, 0) / favorites.length / 100000)}L
                   </p>
                   <p className="text-sm text-muted-foreground">Average Price</p>
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-secondary">
-                    {Math.round(favorites.reduce((sum, prop) => sum + (prop.area_sqft || 0), 0) / favorites.length)}
+                    {Math.round(favorites.reduce((sum, prop) => sum + (prop.property?.area_sqft || 0), 0) / favorites.length)}
                   </p>
                   <p className="text-sm text-muted-foreground">Average Area (sq ft)</p>
                 </div>

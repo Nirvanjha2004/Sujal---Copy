@@ -348,28 +348,6 @@ export function PropertyListingSearchPage() {
         
         <div className="flex gap-6">
           <aside className="w-80 shrink-0">
-            <Card className="mb-4">
-              <CardContent className="flex items-center justify-between p-4">
-                <span className="font-medium">Hide already seen</span>
-                <Switch 
-                  checked={hideAlreadySeen}
-                  onCheckedChange={setHideAlreadySeen}
-                />
-              </CardContent>
-            </Card>
-            
-            <Card className="mb-4">
-              <CardContent className="flex items-center gap-3 p-4">
-                <div className="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded">
-                  <Checkbox 
-                    checked={showVerifiedOnly}
-                    onCheckedChange={setShowVerifiedOnly}
-                  />
-                  <span className="text-sm font-medium">Verified</span>
-                </div>
-                <span className="text-xs text-muted-foreground">by PropHuzzles verification team</span>
-              </CardContent>
-            </Card>
             
             <Card className="mb-4">
               <CardHeader className="flex flex-row items-center justify-between">

@@ -493,7 +493,7 @@ export function PropertyListingSearchPage() {
           <main className="flex-1 mr-4">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold">
-                {loading ? 'Loading...' : `${total || 0} results`} | Property in {searchQuery || 'All Locations'}
+                {loading ? 'Loading...' : `${properties.length || 0} results`} | Property in {searchQuery || 'All Locations'}
               </h2>
               <Button variant="outline" onClick={handleSaveSearchClick}>
                 <Icon icon="solar:bookmark-bold" className="mr-2 size-4" />

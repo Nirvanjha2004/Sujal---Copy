@@ -338,13 +338,13 @@ export function DashboardPage() {
       ];
     } else {
       return [
-        {
-          title: 'Property Views',
-          value: stats.propertyViews,
-          icon: 'solar:eye-bold',
-          color: 'bg-primary/10 text-primary',
-          subtitle: 'This month'
-        },
+        // {
+        //   title: 'Property Views',
+        //   value: stats.propertyViews,
+        //   icon: 'solar:eye-bold',
+        //   color: 'bg-primary/10 text-primary',
+        //   subtitle: 'This month'
+        // },
         {
           title: 'Saved Properties',
           value: stats.savedProperties,

@@ -73,6 +73,8 @@ export function ProjectsPage() {
     project.location.toLowerCase().includes(filters.search.toLowerCase())
   );
 
+  console.log('Filtered Projects:', filteredProjects);
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
@@ -203,16 +205,14 @@ export function ProjectsPage() {
                       </Badge>
                     </div>
                   </div>
-                  
                   <CardContent className="p-6">
                     <div className="mb-4">
                       <h3 className="text-lg font-semibold mb-1">{project.name}</h3>
                       <p className="text-sm text-muted-foreground flex items-center">
                         <Icon icon="solar:map-point-bold" className="size-4 mr-1" />
-                        {project.location}
+                        {project.location}, {project.city}, {project.state}
                       </p>
                     </div>
-
                     <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
                       <div>
                         <p className="text-muted-foreground">Total Units</p>
@@ -221,6 +221,14 @@ export function ProjectsPage() {
                       <div>
                         <p className="text-muted-foreground">Available</p>
                         <p className="font-semibold text-green-600">{project.available_units}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Sold</p>
+                        <p className="font-semibold text-orange-600">{project.sold_units}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Blocked</p>
+                        <p className="font-semibold text-red-600">{project.blocked_units}</p>
                       </div>
                     </div>
 

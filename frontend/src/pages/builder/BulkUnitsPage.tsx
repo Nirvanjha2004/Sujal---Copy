@@ -21,9 +21,6 @@ interface BulkUnit {
   tower?: string;
   area_sqft: number;
   area_sqm?: number;
-  carpet_area?: number;
-  built_up_area?: number;
-  super_built_up_area?: number;
   price: number;
   price_per_sqft?: number;
   maintenance_charge?: number;
@@ -31,7 +28,6 @@ interface BulkUnit {
   balconies?: number;
   bathrooms: number;
   bedrooms: number;
-  facing?: string;
   is_corner_unit?: boolean;
   has_terrace?: boolean;
 }
@@ -139,7 +135,6 @@ export function BulkUnitsPage() {
           bedrooms: parseInt(unit.bedrooms) || 0,
           parking_spaces: parseInt(unit.parking_spaces) || 0,
           balconies: parseInt(unit.balconies) || 0,
-          facing: unit.facing,
           is_corner_unit: unit.is_corner_unit === 'true' || unit.is_corner_unit === '1',
           has_terrace: unit.has_terrace === 'true' || unit.has_terrace === '1',
         });

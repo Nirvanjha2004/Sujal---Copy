@@ -8,7 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { api, Project, ProjectUnit } from '@/lib/api';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
+import { ProjectImageUpload } from '@/components/builder/ProjectImageUpload';
 
 export function ProjectDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -17,6 +18,7 @@ export function ProjectDetailsPage() {
   const [units, setUnits] = useState<ProjectUnit[]>([]);
   const [loading, setLoading] = useState(true);
   const [unitsLoading, setUnitsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
     if (id) {
@@ -44,7 +46,7 @@ export function ProjectDetailsPage() {
   const fetchUnits = async () => {
     try {
       setUnitsLoading(true);
-      const response = await api.projects.units.getProjectUnits(parseInt(id!), {
+      const response = await api.projects.units.getUnits(parseInt(id!), {
         limit: 10
       });
       if (response.success) {
@@ -192,10 +194,66 @@ export function ProjectDetailsPage() {
           </div>
         </div>
 
+        {/* Units Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-primary/10 text-primary rounded-full">
+                  <Icon icon="solar:home-2-bold" className="size-6" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{project.total_units}</p>
+                  <p className="text-sm font-medium">Total Units</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-green-100 text-green-600 rounded-full">
+                  <Icon icon="solar:check-circle-bold" className="size-6" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{project.available_units}</p>
+                  <p className="text-sm font-medium">Available</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-orange-100 text-orange-600 rounded-full">
+                  <Icon icon="solar:star-bold" className="size-6" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{project.sold_units}</p>
+                  <p className="text-sm font-medium">Sold</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-red-100 text-red-600 rounded-full">
+                  <Icon icon="solar:danger-circle-bold" className="size-6" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{project.blocked_units}</p>
+                  <p className="text-sm font-medium">Blocked</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
-            <Tabs defaultValue="overview" className="space-y-6">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="units">Units ({units.length})</TabsTrigger>
@@ -206,7 +264,10 @@ export function ProjectDetailsPage() {
               <TabsContent value="overview" className="space-y-6">
                 {/* Project Images */}
                 <Card>
-                  <CardContent className="p-6">
+                  <CardHeader>
+                    <CardTitle>Project Images</CardTitle>
+                  </CardHeader>
+                  <CardContent>
                     {project.images && project.images.length > 0 ? (
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         {project.images.slice(0, 6).map((image) => (
@@ -227,7 +288,7 @@ export function ProjectDetailsPage() {
                         <div className="text-center">
                           <Icon icon="solar:camera-bold" className="size-12 text-muted-foreground mx-auto mb-2" />
                           <p className="text-muted-foreground">No images uploaded</p>
-                          <Button size="sm" className="mt-2">
+                          <Button size="sm" className="mt-2" onClick={() => setActiveTab('gallery')}>
                             Upload Images
                           </Button>
                         </div>
@@ -399,19 +460,11 @@ export function ProjectDetailsPage() {
               </TabsContent>
 
               <TabsContent value="gallery">
-                <Card>
-                  <CardContent className="p-8 text-center">
-                    <Icon icon="solar:gallery-bold" className="size-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="font-semibold mb-2">Gallery Management</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Upload and manage project images, floor plans, and videos
-                    </p>
-                    <Button>
-                      <Icon icon="solar:upload-bold" className="size-4 mr-2" />
-                      Upload Images
-                    </Button>
-                  </CardContent>
-                </Card>
+                <ProjectImageUpload
+                  projectId={project.id}
+                  images={project.images || []}
+                  onImagesUpdate={fetchProject}
+                />
               </TabsContent>
 
               <TabsContent value="analytics">
@@ -486,6 +539,7 @@ export function ProjectDetailsPage() {
                 <Button
                   className="w-full justify-start"
                   variant="outline"
+                  onClick={() => setActiveTab('gallery')}
                 >
                   <Icon icon="solar:upload-bold" className="size-4 mr-2" />
                   Upload Images

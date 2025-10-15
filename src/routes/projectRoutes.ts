@@ -39,4 +39,8 @@ router.post('/:projectId/units', authenticate, ProjectController.createUnitValid
 router.put('/:projectId/units/:unitId', authenticate, ProjectController.createUnitValidation, projectController.updateProjectUnit.bind(projectController));
 router.delete('/:projectId/units/:unitId', authenticate, projectController.deleteProjectUnit.bind(projectController));
 
+// Project image upload
+router.post('/:projectId/images', authenticate, upload.array('images', 10), projectController.uploadProjectImages.bind(projectController));
+router.delete('/:projectId/images/:imageId', authenticate, projectController.deleteProjectImage.bind(projectController));
+
 export default router;

@@ -60,9 +60,6 @@ export interface ProjectUnit {
   tower?: string;
   area_sqft: number;
   area_sqm: number;
-  carpet_area: number;
-  built_up_area: number;
-  super_built_up_area: number;
   price: number;
   price_per_sqft: number;
   maintenance_charge?: number;
@@ -70,7 +67,6 @@ export interface ProjectUnit {
   balconies: number;
   bathrooms: number;
   bedrooms: number;
-  facing: string;
   status: 'available' | 'sold' | 'blocked' | 'reserved';
   floor_plan_image?: string;
   specifications?: Record<string, any>;
@@ -1785,6 +1781,68 @@ export const api = {
         return `${API_BASE_URL}/projects/${projectId}/reports/${reportId}/download?token=${validToken}`;
       },
     },
+  },
+
+  // Projects - Public projects listing
+  getProjects: async (filters?: ProjectFilters): Promise<{
+    success: boolean;
+    data: {
+      projects: Project[];
+      pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+      };
+    };
+  }> => {
+    const params = new URLSearchParams();
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          params.append(key, value.toString());
+        }
+      });
+    }
+
+    const query = params.toString();
+    return apiRequest(`/public/projects${query ? `?${query}` : ''}`);
+  },
+
+  // Project details - Public project view
+  getProject: async (id: number): Promise<{
+    success: boolean;
+    data: {
+      project: Project;
+    };
+  }> => {
+    return apiRequest(`/public/projects/${id}`);
+  },
+
+  // Search projects
+  searchProjects: async (query: string, filters?: ProjectFilters): Promise<{
+    success: boolean;
+    data: {
+      projects: Project[];
+      pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+      };
+    };
+  }> => {
+    const queryParams = new URLSearchParams({ keywords: query });
+    
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          queryParams.append(key, value.toString());
+        }
+      });
+    }
+    
+    return apiRequest(`/public/projects/search?${queryParams.toString()}`);
   },
 };
 export const getSavedSearches = api.getSavedSearches;

@@ -25,7 +25,6 @@ const projectSchema = z.object({
   state: z.string().min(2, 'State is required'),
   pincode: z.string().regex(/^\d{6}$/, 'Pincode must be 6 digits'),
   projectType: z.enum(['residential', 'commercial', 'mixed_use', 'villa', 'apartment', 'office', 'retail']),
-  totalUnits: z.number().min(1, 'Total units must be at least 1').optional(),
   startDate: z.string().optional(),
   expectedCompletion: z.string().optional(),
   reraNumber: z.string().optional(),
@@ -270,19 +269,6 @@ export function NewProjectPage() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="totalUnits">Total Units (Optional)</Label>
-                  <Input
-                    id="totalUnits"
-                    type="number"
-                    {...register('totalUnits', { valueAsNumber: true })}
-                    placeholder="e.g., 120"
-                  />
-                  {errors.totalUnits && (
-                    <p className="text-sm text-red-500 mt-1">{errors.totalUnits.message}</p>
-                  )}
-                </div>
-
-                <div>
                   <Label htmlFor="startDate">Start Date (Optional)</Label>
                   <Input
                     id="startDate"
@@ -299,15 +285,15 @@ export function NewProjectPage() {
                     {...register('expectedCompletion')}
                   />
                 </div>
-              </div>
-
-              <div>
-                <Label htmlFor="reraNumber">RERA Number (Optional)</Label>
-                <Input
-                  id="reraNumber"
-                  {...register('reraNumber')}
-                  placeholder="e.g., RERA-GGM-567-2023"
-                />
+                
+                <div>
+                  <Label htmlFor="reraNumber">RERA Number (Optional)</Label>
+                  <Input
+                    id="reraNumber"
+                    {...register('reraNumber')}
+                    placeholder="e.g., RERA-GGM-567-2023"
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>

@@ -48,7 +48,8 @@ export function ProjectUnitsPage() {
 
   const fetchProjectDetails = async () => {
     try {
-      const response = await api.projects.getProject(parseInt(id!));
+      const response = await api.getProject(parseInt(id!));
+      console.log("The response is ", response)
       if (response.success) {
         setProject(response.data.project);
       }
@@ -72,7 +73,7 @@ export function ProjectUnitsPage() {
       }
 
       const response = await api.projects.units.getUnits(parseInt(id!), params);
-      
+      console.log("the response in fetchUnits " , response)
       if (response.success) {
         setUnits(response.data.units);
       }
@@ -139,6 +140,8 @@ export function ProjectUnitsPage() {
     return matchesSearch;
   });
 
+  console.log('filteredUnits', filteredUnits);  
+  console.log('the units are', units);
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
@@ -176,7 +179,7 @@ export function ProjectUnitsPage() {
                     <Icon icon="solar:home-2-bold" className="size-6" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{project.total_units}</p>
+                    <p className="text-2xl font-bold">{filteredUnits.length}</p>
                     <p className="text-sm font-medium">Total Units</p>
                   </div>
                 </div>

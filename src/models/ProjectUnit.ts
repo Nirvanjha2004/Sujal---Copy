@@ -17,9 +17,6 @@ interface ProjectUnitAttributes {
   tower?: string;
   area_sqft: number;
   area_sqm: number;
-  carpet_area: number;
-  built_up_area: number;
-  super_built_up_area: number;
   price: number;
   price_per_sqft: number;
   maintenance_charge?: number;
@@ -27,7 +24,6 @@ interface ProjectUnitAttributes {
   balconies: number;
   bathrooms: number;
   bedrooms: number;
-  facing: string; // North, South, East, West, etc.
   status: UnitStatus;
   floor_plan_image?: string;
   specifications?: Record<string, any>;
@@ -49,9 +45,6 @@ class ProjectUnit extends Model<ProjectUnitAttributes, ProjectUnitCreationAttrib
   public tower?: string;
   public area_sqft!: number;
   public area_sqm!: number;
-  public carpet_area!: number;
-  public built_up_area!: number;
-  public super_built_up_area!: number;
   public price!: number;
   public price_per_sqft!: number;
   public maintenance_charge?: number;
@@ -59,7 +52,6 @@ class ProjectUnit extends Model<ProjectUnitAttributes, ProjectUnitCreationAttrib
   public balconies!: number;
   public bathrooms!: number;
   public bedrooms!: number;
-  public facing!: string;
   public status!: UnitStatus;
   public floor_plan_image?: string;
   public specifications?: Record<string, any>;
@@ -109,18 +101,6 @@ ProjectUnit.init(
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
-    carpet_area: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: false,
-    },
-    built_up_area: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: false,
-    },
-    super_built_up_area: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: false,
-    },
     price: {
       type: DataTypes.DECIMAL(15, 2),
       allowNull: false,
@@ -149,10 +129,6 @@ ProjectUnit.init(
     },
     bedrooms: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    facing: {
-      type: DataTypes.STRING(20),
       allowNull: false,
     },
     status: {

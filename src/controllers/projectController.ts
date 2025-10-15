@@ -6,6 +6,8 @@ import { ProjectUnit, UnitStatus } from '../models/ProjectUnit';
 import { User, UserRole } from '../models/User';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { Op } from 'sequelize';
+import fs from 'fs';
+import path from 'path';
 
 interface ProjectRequest extends AuthenticatedRequest {
   user?: {
@@ -424,9 +426,6 @@ class ProjectController {
         tower,
         area_sqft: areaSqft,
         area_sqm: areaSqm || (areaSqft * 0.092903),
-        carpet_area: carpetArea,
-        built_up_area: builtUpArea,
-        super_built_up_area: superBuiltUpArea,
         price,
         price_per_sqft: pricePerSqft || (price / areaSqft),
         maintenance_charge: maintenanceCharge,
@@ -434,7 +433,6 @@ class ProjectController {
         balconies: balconies || 0,
         bathrooms,
         bedrooms,
-        facing,
         status: UnitStatus.AVAILABLE,
         specifications: specifications || {},
         amenities: amenities || [],
@@ -668,9 +666,6 @@ class ProjectController {
           tower: unit.tower || null,
           area_sqft: parseFloat(unit.area_sqft),
           area_sqm: unit.area_sqm ? parseFloat(unit.area_sqm) : parseFloat(unit.area_sqft) * 0.092903,
-          carpet_area: unit.carpet_area ? parseFloat(unit.carpet_area) : null,
-          built_up_area: unit.built_up_area ? parseFloat(unit.built_up_area) : null,
-          super_built_up_area: unit.super_built_up_area ? parseFloat(unit.super_built_up_area) : null,
           price: parseFloat(unit.price),
           price_per_sqft: unit.price_per_sqft ? parseFloat(unit.price_per_sqft) : parseFloat(unit.price) / parseFloat(unit.area_sqft),
           maintenance_charge: unit.maintenance_charge ? parseFloat(unit.maintenance_charge) : null,
@@ -678,7 +673,6 @@ class ProjectController {
           balconies: parseInt(unit.balconies) || 0,
           bathrooms: parseInt(unit.bathrooms) || 1,
           bedrooms: parseInt(unit.bedrooms) || 0,
-          facing: unit.facing || null,
           status: UnitStatus.AVAILABLE,
           specifications: {},
           amenities: [],
@@ -726,6 +720,130 @@ class ProjectController {
     }
   }
 
+  // Upload images for a project
+  async uploadProjectImages(req: ProjectRequest, res: Response): Promise<void> {
+    const t = await Project.sequelize!.transaction();
+    try {
+      const projectId = parseInt(req.params.projectId);
+      const files = req.files as Express.Multer.File[];
+
+      if (!req.user || req.user.role !== 'builder') {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Access denied. Builder role required.' } });
+        return;
+      }
+
+      if (!files || files.length === 0) {
+        res.status(400).json({ success: false, error: { message: 'No image files provided' } });
+        return;
+      }
+
+      const project = await Project.findOne({
+        where: { id: projectId, builder_id: req.user.userId },
+        transaction: t,
+      });
+
+      if (!project) {
+        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Project not found or access denied' } });
+        return;
+      }
+
+      const existingImageCount = await ProjectImage.count({ where: { project_id: projectId }, transaction: t });
+
+      const imagePromises = files.map((file, index) => {
+        const imageUrl = `/uploads/projects/${file.filename}`;
+        return ProjectImage.create({
+          project_id: projectId,
+          image_url: imageUrl,
+          is_primary: existingImageCount === 0 && index === 0, // First image of the first upload is primary
+          display_order: existingImageCount + index + 1,
+          image_type: 'location'
+        }, { transaction: t });
+      });
+
+      const savedImages = await Promise.all(imagePromises);
+
+      await t.commit();
+
+      res.status(201).json({
+        success: true,
+        data: { images: savedImages },
+        message: `${savedImages.length} image(s) uploaded successfully.`,
+      });
+
+    } catch (error) {
+      await t.rollback();
+      console.error('Upload project images error:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to upload images' } });
+    }
+  }
+
+  // Delete an image from a project
+  async deleteProjectImage(req: ProjectRequest, res: Response): Promise<void> {
+    const t = await Project.sequelize!.transaction();
+    try {
+      const { projectId, imageId } = req.params;
+
+      if (!req.user || req.user.role !== 'builder') {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Access denied. Builder role required.' } });
+        return;
+      }
+
+      const project = await Project.findOne({
+        where: { id: parseInt(projectId), builder_id: req.user.userId },
+        transaction: t,
+      });
+
+      if (!project) {
+        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Project not found or access denied' } });
+        return;
+      }
+
+      const image = await ProjectImage.findOne({
+        where: { id: parseInt(imageId), project_id: parseInt(projectId) },
+        transaction: t,
+      });
+
+      if (!image) {
+        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Image not found' } });
+        return;
+      }
+
+      // Delete the physical file
+      const filePath = path.join(__dirname, '..', '..', 'public', image.image_url);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+
+      const wasPrimary = image.is_primary;
+      await image.destroy({ transaction: t });
+
+      // If the deleted image was primary, assign a new primary image
+      if (wasPrimary) {
+        const newPrimary = await ProjectImage.findOne({
+          where: { project_id: parseInt(projectId) },
+          order: [['display_order', 'ASC']],
+          transaction: t,
+        });
+
+        if (newPrimary) {
+          await newPrimary.update({ is_primary: true }, { transaction: t });
+        }
+      }
+
+      await t.commit();
+
+      res.json({
+        success: true,
+        message: 'Image deleted successfully',
+      });
+
+    } catch (error) {
+      await t.rollback();
+      console.error('Delete project image error:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to delete image' } });
+    }
+  }
+
   // Download CSV template
   async downloadCSVTemplate(req: ProjectRequest, res: Response): Promise<void> {
     try {
@@ -736,9 +854,6 @@ class ProjectController {
         'tower',
         'area_sqft',
         'area_sqm',
-        'carpet_area',
-        'built_up_area',
-        'super_built_up_area',
         'price',
         'price_per_sqft',
         'maintenance_charge',
@@ -746,7 +861,6 @@ class ProjectController {
         'balconies',
         'bathrooms',
         'bedrooms',
-        'facing',
         'is_corner_unit',
         'has_terrace'
       ];
@@ -876,9 +990,6 @@ class ProjectController {
         tower,
         area_sqft: areaSqft,
         area_sqm: areaSqm || (areaSqft * 0.092903),
-        carpet_area: carpetArea,
-        built_up_area: builtUpArea,
-        super_built_up_area: superBuiltUpArea,
         price,
         price_per_sqft: pricePerSqft || (price / areaSqft),
         maintenance_charge: maintenanceCharge,
@@ -886,7 +997,6 @@ class ProjectController {
         balconies: balconies,
         bathrooms,
         bedrooms,
-        facing,
         status,
         specifications: specifications || {},
         amenities: amenities || [],

@@ -39,13 +39,6 @@ export function BuyerDashboard({ stats }: BuyerDashboardProps) {
       color: 'bg-accent'
     },
     {
-      title: 'Activity History',
-      description: 'View your property search history',
-      icon: 'solar:history-bold',
-      action: () => navigate('/activity'),
-      color: 'bg-secondary'
-    },
-    {
       title: 'Communication',
       description: 'Messages and inquiries',
       icon: 'solar:letter-bold',
@@ -132,44 +125,6 @@ export function BuyerDashboard({ stats }: BuyerDashboardProps) {
           ))}
         </div>
       </div>
-
-      {/* Recent Activity */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Icon icon="solar:history-bold" className="size-5" />
-              Recent Activity
-            </CardTitle>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => navigate('/activity')}
-            >
-              View All
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8">
-            <Icon icon="solar:document-bold" className="size-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="font-semibold mb-2">No recent activity</h3>
-            <p className="text-muted-foreground mb-4">
-              Start exploring properties to see your activity here
-            </p>
-            <div className="flex gap-2 justify-center">
-              <Button onClick={() => navigate('/properties')}>
-                <Icon icon="solar:magnifer-bold" className="size-4 mr-2" />
-                Browse Properties
-              </Button>
-              <Button variant="outline" onClick={() => navigate('/settings')}>
-                <Icon icon="solar:settings-bold" className="size-4 mr-2" />
-                Settings
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </>
   );
 }

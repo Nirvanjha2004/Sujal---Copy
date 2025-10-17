@@ -220,14 +220,14 @@ export function AdminPanel() {
 
             {/* Quick Actions */}
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm">
+              {/* <Button variant="outline" size="sm">
                 <Icon icon="solar:settings-bold" className="mr-2 size-4" />
                 Settings
               </Button>
               <Button variant="outline" size="sm">
                 <Icon icon="solar:bell-bold" className="mr-2 size-4" />
                 Notifications
-              </Button>
+              </Button> */}
               <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                 <Icon icon="solar:user-bold" className="size-4 text-blue-600" />
               </div>

@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { store } from './store'
-import { AuthProvider } from './contexts/AuthContext'
+import { AuthProvider } from '@/shared/contexts/AuthContext.tsx'
 import App from './App.tsx'
 import './index.css'
 

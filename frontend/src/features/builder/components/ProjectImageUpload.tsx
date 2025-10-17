@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/shared/components/ui/card';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { Alert, AlertDescription } from '@/shared/components/ui/alert';
-import { projectService } from '../services/projectService';
+import  projectService  from '../services/projectService';
 import { toast } from 'sonner';
 
 interface ProjectImageUploadProps {

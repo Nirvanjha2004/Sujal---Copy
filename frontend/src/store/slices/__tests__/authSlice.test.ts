@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import authReducer, { clearError, clearAuth } from '../authSlice';
 
 // Mock the API
-jest.mock('@/lib/api', () => ({
+jest.mock('@/shared/lib/api', () => ({
   api: {
     login: jest.fn(),
     register: jest.fn(),

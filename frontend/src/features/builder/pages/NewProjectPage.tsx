@@ -13,7 +13,7 @@ import { Textarea } from '@/shared/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Badge } from '@/shared/components/ui/badge';
-import { projectService } from '../services/projectService';
+import  projectService  from '../services/projectService';
 import { toast } from 'react-hot-toast';
 
 const projectSchema = z.object({

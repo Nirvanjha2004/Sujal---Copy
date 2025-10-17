@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { api, PropertyFilters, SavedSearch } from "@/lib/api";
+import { api, PropertyFilters, SavedSearch } from "@/shared/lib/api";
 
 interface SavedSearchesProps {
   onSearchLoad: (filters: PropertyFilters) => void;

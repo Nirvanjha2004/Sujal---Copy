@@ -12,8 +12,8 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { api } from '@/lib/api';
-import { useAuth } from '@/contexts/AuthContext';
+import { api } from '@/shared/lib/api';
+import { useAuth } from '@/shared/contexts/AuthContext';
 
 interface PropertyFormData {
   title: string;

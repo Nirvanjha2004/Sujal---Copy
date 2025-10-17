@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Card } from '../ui/card';
-import { Button } from '../ui/button';
+import { Card } from '@/shared/components/ui/card';
+import { Button } from '@/shared/components/ui/button';
 import EMICalculator from './EMICalculator';
 import LoanEligibilityCalculator from './LoanEligibilityCalculator';
 import PropertyComparisonCalculator from './PropertyComparisonCalculator';

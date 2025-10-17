@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { api } from '../../lib/api';
+import { api } from '@/shared/lib/api';
 import { Button } from '../ui/button';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { CheckCircle, XCircle, UploadCloud, File as FileIcon } from 'lucide-react';

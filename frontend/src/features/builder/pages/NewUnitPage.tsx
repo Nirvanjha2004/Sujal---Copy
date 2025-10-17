@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
-import { projectService } from '../services/projectService';
+import  projectService  from '../services/projectService';
 import { toast } from 'sonner';
 
 // Updated schema with field names matching the backend expectations

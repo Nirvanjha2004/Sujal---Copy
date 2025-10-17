@@ -15,11 +15,11 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { useProperties } from "@/hooks/useProperties";
-import { PropertyFilters } from "@/lib/api";
+import { useProperties } from "@/shared/hooks/useProperties";
+import { PropertyFilters } from "@/shared/lib/api";
 import { PropertyGridSkeleton } from "@/components/ui/loading";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/shared/contexts/AuthContext";
 import {
   Dialog,
   DialogContent,
@@ -28,7 +28,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { api } from "@/lib/api";
+import { api } from "@/shared/lib/api";
 import { toast } from "sonner";
 
 export function PropertyListingSearchPage() {

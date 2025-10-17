@@ -3,7 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Icon } from '@iconify/react';
-import { httpClient } from '@/lib/httpClient';
+import { httpClient } from '@/shared/lib/httpClient';
 import { AdminLayout } from '../layout/AdminLayout';
 
 // Tooltip imports - add these to your project if they don't exist

@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Alert } from '@/components/ui/alert';
 import { Icon } from '@iconify/react';
-import { httpClient } from '@/lib/httpClient';
+import { httpClient } from '@/shared/lib/httpClient';
 import { Layout } from '@/components/layout/Layout';
 import { AdminLayout } from '../layout/AdminLayout';
 

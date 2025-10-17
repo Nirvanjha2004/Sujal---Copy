@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { loginUser, registerUser, logoutUser, updateUserProfile, loadUser, clearError } from '@/store/slices/authSlice';
-import { User } from '@/lib/api';
-import { getValidToken } from '@/utils/tokenUtils';
+import { User } from '@/shared/lib/api';
+import { getValidToken } from '@/shared/utils/tokenUtils';
 
 interface AuthContextType {
   state: {

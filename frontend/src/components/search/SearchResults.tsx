@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { PropertyCard } from "@/components/property/PropertyCard";
 import { PropertyGridSkeleton } from "@/components/ui/loading";
-import { Property, PropertyFilters } from "@/lib/api";
+import { Property, PropertyFilters } from "@/shared/lib/api";
 
 interface SearchResultsProps {
   properties: Property[];

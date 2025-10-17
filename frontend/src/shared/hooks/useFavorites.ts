@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { api, Favorite } from '@/lib/api';
-import { useAuth } from '@/contexts/AuthContext';
+import { api, Favorite } from '@/shared/lib/api';
+import { useAuth } from '@/shared/contexts/AuthContext';
 
 export function useFavorites() {
   const [favorites, setFavorites] = useState<Favorite[]>([]);

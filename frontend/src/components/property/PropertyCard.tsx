@@ -2,9 +2,9 @@ import { Icon } from "@iconify/react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { useFavorites } from "@/hooks/useFavorites";
+import { useFavorites } from "@/shared/hooks/useFavorites";
 import { useNavigate } from "react-router-dom";
-import { Property } from "@/lib/api";
+import { Property } from "@/shared/lib/api";
 
 interface PropertyCardProps {
   property: Property;

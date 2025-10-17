@@ -31,7 +31,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Icon } from '@iconify/react';
-import { api } from '@/lib/api';
+import { api } from '@/shared/lib/api';
 import { format } from 'date-fns';
 import { toast } from 'react-hot-toast';
 

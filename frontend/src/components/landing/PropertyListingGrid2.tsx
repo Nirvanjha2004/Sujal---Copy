@@ -3,13 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { useProperties } from "@/hooks/useProperties";
+import { useProperties } from "@/shared/hooks/useProperties";
 import { PropertyGridSkeleton } from "@/components/ui/loading";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
-import { PropertyFilters } from "@/lib/api";
-import { useAuth } from '@/contexts/AuthContext';
-import { api } from '@/lib/api';
+import { PropertyFilters } from "@/shared/lib/api";
+import { useAuth } from '@/shared/contexts/AuthContext';
+import { api } from '@/shared/lib/api';
 import {
   Dialog,
   DialogContent,

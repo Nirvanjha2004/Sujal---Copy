@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Card } from '../ui/card';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
+import { Card } from '@/shared/components/ui/card';
+import { Button } from '@/shared/components/ui/button';
+import { Input } from '@/shared/components/ui/input';
+import { Label } from '@/shared/components/ui/label';
 
-import { Separator } from '../ui/separator';
+import { Separator } from '@/shared/components/ui/separator';
 
 interface EligibilityResult {
   maxLoanAmount: number;

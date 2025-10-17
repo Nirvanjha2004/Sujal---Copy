@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from '@/contexts/AuthContext';
-import { useFavorites } from '@/hooks/useFavorites';
-import { api, Property, SavedSearch } from '@/lib/api';
+import { useAuth } from '@/shared/contexts/AuthContext';
+import { useFavorites } from '@/shared/hooks/useFavorites';
+import { api, Property, SavedSearch } from '@/shared/lib/api';
 import { useNavigate } from 'react-router-dom';
 import { PropertyCard } from '@/components/property/PropertyCard';
 

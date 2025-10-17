@@ -24,13 +24,13 @@ import { Messages } from './components/dashboard/Messages'
 import { BulkUploadPage } from '@/pages/agent/BulkUploadPage'
 
 // Builder Pages
-import { ProjectsPage } from './pages/builder/ProjectsPage'
-import { NewProjectPage } from './pages/builder/NewProjectPage'
-import { ProjectDetailsPage } from './pages/builder/ProjectDetailsPage'
-import { ProjectUnitsPage } from './pages/builder/ProjectUnitsPage'
-import { BulkUnitsPage } from './pages/builder/BulkUnitsPage'
+import { ProjectsPage } from './features/builder/pages/ProjectsPage'
+import { NewProjectPage } from './features/builder/pages/NewProjectPage'
+import { ProjectDetailsPage } from './features/builder/pages/ProjectDetailsPage'
+import { ProjectUnitsPage } from './features/builder/pages/ProjectUnitsPage'
+import { BulkUnitsPage } from './features/builder/pages/BulkUnitsPage'
 import LeadManagementPage from './pages/agent/LeadManagementPage'
-import { NewUnitPage } from './pages/builder/NewUnitPage'
+import { NewUnitPage } from './features/builder/pages/NewUnitPage'
 // import { BulkListingPage } from './pages/builder/BulkListingPage'
 
 

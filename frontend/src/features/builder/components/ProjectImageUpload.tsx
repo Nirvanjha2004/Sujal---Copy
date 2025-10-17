@@ -1,11 +1,11 @@
 import { useState, useCallback } from 'react';
 import { Icon } from '@iconify/react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { api } from '@/lib/api';
+import { Button } from '@/shared/components/ui/button';
+import { Card, CardContent } from '@/shared/components/ui/card';
+import { Input } from '@/shared/components/ui/input';
+import { Label } from '@/shared/components/ui/label';
+import { Alert, AlertDescription } from '@/shared/components/ui/alert';
+import { projectService } from '../services/projectService';
 import { toast } from 'sonner';
 
 interface ProjectImageUploadProps {
@@ -44,14 +44,14 @@ export function ProjectImageUpload({ projectId, images, onImagesUpdate }: Projec
     try {
       setUploading(true);
       
-      // FIX: Create a FormData object and append files to it
+      // Create a FormData object and append files to it
       const formData = new FormData();
       validFiles.forEach(file => {
         formData.append('images', file);
       });
 
       // Pass the FormData object to the API call
-      await api.projects.images.uploadProjectImages(projectId, formData);
+      await projectService.uploadProjectImages(projectId, formData);
       
       toast.success(`${validFiles.length} image(s) uploaded successfully`);
       onImagesUpdate();
@@ -91,7 +91,7 @@ export function ProjectImageUpload({ projectId, images, onImagesUpdate }: Projec
 
   const handleDeleteImage = async (imageId: number) => {
     try {
-      await api.projects.images.deleteProjectImage(projectId, imageId);
+      await projectService.deleteProjectImage(projectId, imageId);
       toast.success('Image deleted successfully');
       onImagesUpdate();
     } catch (error) {

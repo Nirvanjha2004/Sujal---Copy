@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Icon } from '@iconify/react';
-import { Layout } from '@/components/layout/Layout';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { api, Project } from '@/lib/api';
+import { Layout } from '@/shared/components/layout/Layout';
+import { Button } from '@/shared/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { Badge } from '@/shared/components/ui/badge';
+import { Input } from '@/shared/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
+import { projectService } from '../services/projectService';
+import { Project } from '../types';
 import { toast } from 'react-hot-toast';
 
 export function ProjectsPage() {
@@ -33,7 +34,7 @@ export function ProjectsPage() {
   const fetchProjects = async () => {
     try {
       setLoading(true);
-      const response = await api.projects.getBuilderProjects({
+      const response = await projectService.getBuilderProjects({
         page: pagination.page,
         limit: pagination.limit,
         ...(filters.status !== 'all' && { status: filters.status }),
@@ -72,8 +73,6 @@ export function ProjectsPage() {
     project.name.toLowerCase().includes(filters.search.toLowerCase()) ||
     project.location.toLowerCase().includes(filters.search.toLowerCase())
   );
-
-  console.log('Filtered Projects:', filteredProjects);
 
   return (
     <Layout>

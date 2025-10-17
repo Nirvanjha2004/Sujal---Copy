@@ -1,19 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Icon } from '@iconify/react';
-import { Layout } from '@/components/layout/Layout';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Layout } from '@/shared/components/layout/Layout';
+import { Button } from '@/shared/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { Input } from '@/shared/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
+import { Badge } from '@/shared/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/ui/table';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/shared/components/ui/dropdown-menu';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,9 +23,9 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { EditUnitDialog } from '@/components/builder/EditUnitDialog';
-import { api } from '@/lib/api';
+} from '@/shared/components/ui/alert-dialog';
+import { EditUnitDialog } from '../components/EditUnitDialog';
+import { projectService } from '../services/projectService';
 import { toast } from 'react-hot-toast';
 
 export function ProjectUnitsPage() {
@@ -48,8 +48,7 @@ export function ProjectUnitsPage() {
 
   const fetchProjectDetails = async () => {
     try {
-      const response = await api.getProject(parseInt(id!));
-      console.log("The response is ", response)
+      const response = await projectService.getProject(parseInt(id!));
       if (response.success) {
         setProject(response.data.project);
       }
@@ -72,8 +71,7 @@ export function ProjectUnitsPage() {
         params.unitType = unitTypeFilter;
       }
 
-      const response = await api.projects.units.getUnits(parseInt(id!), params);
-      console.log("the response in fetchUnits " , response)
+      const response = await projectService.getUnits(parseInt(id!), params);
       if (response.success) {
         setUnits(response.data.units);
       }
@@ -103,7 +101,7 @@ export function ProjectUnitsPage() {
     if (!selectedUnitId) return;
 
     try {
-      const response = await api.projects.units.deleteUnit(parseInt(id!), selectedUnitId);
+      const response = await projectService.deleteUnit(parseInt(id!), selectedUnitId);
       
       if (response.success) {
         toast.success('Unit deleted successfully');
@@ -140,8 +138,6 @@ export function ProjectUnitsPage() {
     return matchesSearch;
   });
 
-  console.log('filteredUnits', filteredUnits);  
-  console.log('the units are', units);
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">

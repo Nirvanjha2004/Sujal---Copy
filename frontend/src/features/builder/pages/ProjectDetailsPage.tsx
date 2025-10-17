@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Icon } from '@iconify/react';
-import { Layout } from '@/components/layout/Layout';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { api, Project, ProjectUnit } from '@/lib/api';
+import { Layout } from '@/shared/components/layout/Layout';
+import { Button } from '@/shared/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { Badge } from '@/shared/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
+import { projectService } from '../services/projectService';
+import { Project, ProjectUnit } from '../types';
+import { ProjectImageUpload } from '../components/ProjectImageUpload';
 import { toast } from 'sonner';
-import { ProjectImageUpload } from '@/components/builder/ProjectImageUpload';
 
 export function ProjectDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -30,7 +31,7 @@ export function ProjectDetailsPage() {
   const fetchProject = async () => {
     try {
       setLoading(true);
-      const response = await api.projects.getProjectById(parseInt(id!));
+      const response = await projectService.getProjectById(parseInt(id!));
       if (response.success) {
         setProject(response.data.project);
       }
@@ -46,7 +47,7 @@ export function ProjectDetailsPage() {
   const fetchUnits = async () => {
     try {
       setUnitsLoading(true);
-      const response = await api.projects.units.getUnits(parseInt(id!), {
+      const response = await projectService.getUnits(parseInt(id!), {
         limit: 10
       });
       if (response.success) {
@@ -61,7 +62,7 @@ export function ProjectDetailsPage() {
 
   const handleStatusUpdate = async (newStatus: string) => {
     try {
-      await api.projects.updateProjectStatus(parseInt(id!), newStatus);
+      await projectService.updateProjectStatus(parseInt(id!), newStatus);
       toast.success('Project status updated successfully');
       fetchProject();
     } catch (error) {

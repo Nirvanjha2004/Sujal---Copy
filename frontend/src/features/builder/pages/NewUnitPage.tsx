@@ -4,13 +4,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Icon } from '@iconify/react';
-import { Layout } from '@/components/layout/Layout';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { api } from '@/lib/api';
+import { Layout } from '@/shared/components/layout/Layout';
+import { Button } from '@/shared/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { Input } from '@/shared/components/ui/input';
+import { Label } from '@/shared/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
+import { projectService } from '../services/projectService';
 import { toast } from 'sonner';
 
 // Updated schema with field names matching the backend expectations
@@ -54,7 +54,7 @@ export function NewUnitPage() {
       if (!projectId) return;
       
       try {
-        const response = await api.getProject(parseInt(projectId));
+        const response = await projectService.getProject(parseInt(projectId));
         if (response.success) {
           setProject(response.data.project);
         }
@@ -74,7 +74,7 @@ export function NewUnitPage() {
 
     try {
       setLoading(true);
-      const response = await api.projects.units.createUnit(parseInt(projectId), data);
+      const response = await projectService.createUnit(parseInt(projectId), data);
 
       if (response.success) {
         toast.success('Unit created successfully!');

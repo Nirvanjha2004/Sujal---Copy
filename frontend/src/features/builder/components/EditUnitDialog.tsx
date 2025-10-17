@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { api } from '@/lib/api';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/shared/components/ui/dialog';
+import { Button } from '@/shared/components/ui/button';
+import { Input } from '@/shared/components/ui/input';
+import { Label } from '@/shared/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
+import { Checkbox } from '@/shared/components/ui/checkbox';
+import  projectService  from '../services/projectService';
 import { toast } from 'react-hot-toast';
 
 interface EditUnitDialogProps {
@@ -69,7 +69,7 @@ export function EditUnitDialog({ open, onOpenChange, projectId, unitId, onSucces
   const fetchUnitDetails = async () => {
     try {
       setFetchingUnit(true);
-      const response = await api.projects.units.getUnit(projectId, unitId);
+      const response = await projectService.getUnit(projectId, unitId);
       
       if (response.success) {
         const unit = response.data.unit;
@@ -106,7 +106,7 @@ export function EditUnitDialog({ open, onOpenChange, projectId, unitId, onSucces
     try {
       setLoading(true);
       
-      const response = await api.projects.units.updateUnit(projectId, unitId, formData);
+      const response = await projectService.updateUnit(projectId, unitId, formData);
       
       if (response.success) {
         toast.success('Unit updated successfully');

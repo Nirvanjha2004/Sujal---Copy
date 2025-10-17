@@ -14,7 +14,7 @@ import { SavedSearchesPage } from './components/dashboard/SavedSearchesPage'
 import { UserActivityPage } from './components/dashboard/UserActivityPage'
 import { AccountSettingsPage } from './components/dashboard/AccountSettingsPage'
 import { CalculatorsPage } from '@/features/calculators'
-import { AdminPanel } from './components/admin'
+import { AdminPanelPage } from '@/features/admin'
 import { AddPropertyPage } from './components/property/AddPropertyPage'
 import { MyPropertiesPage } from './components/property/MyPropertiesPage'
 import { AgentPropertyDashboard } from './features/agent/components'
@@ -115,7 +115,7 @@ function App() {
                         path="/admin"
                         element={
                             <ProtectedRoute requiredRole="admin">
-                                <AdminPanel />
+                                <AdminPanelPage />
                             </ProtectedRoute>
                         }
                     />

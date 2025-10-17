@@ -93,8 +93,8 @@ class ReviewModerationService {
         },
         {
           model: User,
-          as: 'user',
-          attributes: ['id', 'firstName', 'lastName', 'email'],
+          as: 'reviewer',
+          attributes: ['id', 'first_name', 'last_name', 'email'],
         },
         {
           model: User,

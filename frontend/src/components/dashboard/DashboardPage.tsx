@@ -55,37 +55,6 @@ export function DashboardPage() {
             totalInquiries: 47,
             messages: 23
           }));
-
-          // Mock recent projects - replace with actual API
-          setRecentProjects([
-            {
-              id: 1,
-              name: "Sunrise Residency",
-              location: "Sector 15, Gurgaon",
-              phase: "Pre-Launch",
-              units: 120,
-              sold: 0,
-              status: "upcoming"
-            },
-            {
-              id: 2,
-              name: "Green Valley Apartments",
-              location: "New Town, Kolkata",
-              phase: "Under Construction",
-              units: 80,
-              sold: 45,
-              status: "active"
-            },
-            {
-              id: 3,
-              name: "Metro Heights",
-              location: "Andheri West, Mumbai",
-              phase: "Ready to Move",
-              units: 60,
-              sold: 52,
-              status: "completed"
-            }
-          ]);
         } else if (['owner', 'agent'].includes(state.user?.role || '')) {
           // Fetch owner/agent specific data
           const searchesResponse = await api.getSavedSearches();

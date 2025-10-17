@@ -1,4 +1,4 @@
-import { getValidToken } from '@/utils/tokenUtils';
+import { getValidToken } from '@/shared/utils/tokenUtils';
 
 // Update the API_BASE_URL to match your backend port
 const API_BASE_URL = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3001/api/v1';
@@ -1055,7 +1055,7 @@ export const api = {
     });
   },
 
-  // Site Visits - ALL SITE VISIT METHODS SHOULD BE HERE
+  // Site Visits - Updated to match backend routes
   createSiteVisit: (visitData: {
     property_id: number;
     scheduled_at: string;
@@ -1065,9 +1065,18 @@ export const api = {
     visitor_phone?: string;
     notes?: string;
   }): Promise<any> => {
-    return apiRequest('/site-visits', {
+    // Public endpoint - no auth required based on backend routes
+    return fetch(`${API_BASE_URL}/site-visits`, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(visitData)
+    }).then(res => {
+      if (!res.ok) {
+        throw new ApiError(res.status, `HTTP error! status: ${res.status}`);
+      }
+      return res.json();
     });
   },
 
@@ -1091,6 +1100,15 @@ export const api = {
       });
     }
     return apiRequest(`/site-visits/agent${params.toString() ? `?${params.toString()}` : ''}`);
+  },
+
+  getPropertySiteVisits: (propertyId: number): Promise<{
+    success: boolean;
+    data: {
+      visits: any[]
+    }
+  }> => {
+    return apiRequest(`/site-visits/property/${propertyId}`);
   },
 
   getSiteVisitStats: (): Promise<{

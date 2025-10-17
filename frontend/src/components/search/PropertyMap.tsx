@@ -3,7 +3,7 @@ import { Loader } from '@googlemaps/js-api-loader';
 import { Icon } from "@iconify/react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Property, PropertyFilters } from "@/lib/api";
+import { Property, PropertyFilters } from "@/shared/lib/api";
 
 interface PropertyMapProps {
   properties: Property[];

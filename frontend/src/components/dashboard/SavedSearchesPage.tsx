@@ -6,7 +6,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Layout } from '@/components/layout/Layout';
 import { useNavigate } from 'react-router-dom';
-import { getSavedSearches, deleteSavedSearch, PropertyFilters, SavedSearch } from '@/lib/api';
+import { getSavedSearches, deleteSavedSearch, PropertyFilters, SavedSearch } from '@/shared/lib/api';
 
 export function SavedSearchesPage() {
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);

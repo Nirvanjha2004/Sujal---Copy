@@ -9,7 +9,7 @@ interface BreadcrumbItem {
   href?: string;
   icon?: string;
 }
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/lib/utils';
 
 interface LayoutProps {
   children: ReactNode;

@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { Icon } from '@iconify/react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/lib/utils';
 
 interface SidebarProps {
   children: ReactNode;

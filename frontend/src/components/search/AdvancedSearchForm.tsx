@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { PropertyFilters } from "@/lib/api";
+import { PropertyFilters } from "@/shared/lib/api";
 
 interface AdvancedSearchFormProps {
   onSearch: (filters: PropertyFilters) => void;

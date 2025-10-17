@@ -1,8 +1,8 @@
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/shared/contexts/AuthContext';
 import { Layout } from '@/components/layout/Layout';
-import { useFavorites } from '@/hooks/useFavorites';
+import { useFavorites } from '@/shared/hooks/useFavorites';
 import { useState, useEffect } from 'react';
-import { api } from '@/lib/api';
+import { api } from '@/shared/lib/api';
 import { BuyerDashboard, OwnerDashboard, AgentDashboard, BuilderDashboard } from './UserDashboard';
 
 interface Project {

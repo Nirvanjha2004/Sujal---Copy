@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { Icon } from '@iconify/react';
-import { api } from '@/lib/api';
+import { api } from '@/shared/lib/api';
 import { useNavigate } from 'react-router-dom';
 
 interface UploadProgress {

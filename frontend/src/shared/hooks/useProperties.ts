@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { api, Property, PropertyFilters } from '@/lib/api';
+import { api, Property, PropertyFilters } from '@/shared/lib/api';
 
 export function useFeaturedProperties(limit: number = 10) {
   const [properties, setProperties] = useState<Property[]>([]);

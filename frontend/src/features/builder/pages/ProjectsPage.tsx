@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui
 import { Badge } from '@/shared/components/ui/badge';
 import { Input } from '@/shared/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
-import { projectService } from '../services/projectService';
+import  projectService  from '../services/projectService';
 import { Project } from '../types';
 import { toast } from 'react-hot-toast';
 

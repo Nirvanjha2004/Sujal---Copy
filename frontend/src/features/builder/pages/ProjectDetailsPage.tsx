@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui
 import { Badge } from '@/shared/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
-import { projectService } from '../services/projectService';
+import  projectService  from '../services/projectService';
 import { Project, ProjectUnit } from '../types';
 import { ProjectImageUpload } from '../components/ProjectImageUpload';
 import { toast } from 'sonner';

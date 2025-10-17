@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { User } from "@/lib/api";
+import { User } from "@/shared/lib/api";
 
 interface PropertyOwnerProfileProps {
   owner: User;

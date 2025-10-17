@@ -25,7 +25,7 @@ import {
   AlertDialogTitle,
 } from '@/shared/components/ui/alert-dialog';
 import { EditUnitDialog } from '../components/EditUnitDialog';
-import { projectService } from '../services/projectService';
+import  projectService  from '../services/projectService';
 import { toast } from 'react-hot-toast';
 
 export function ProjectUnitsPage() {

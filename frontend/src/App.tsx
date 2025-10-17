@@ -13,11 +13,11 @@ import { FavoritesPage } from './components/dashboard/FavoritesPage'
 import { SavedSearchesPage } from './components/dashboard/SavedSearchesPage'
 import { UserActivityPage } from './components/dashboard/UserActivityPage'
 import { AccountSettingsPage } from './components/dashboard/AccountSettingsPage'
-import { CalculatorsPage } from './components/calculators'
+import { CalculatorsPage } from '@/features/calculators'
 import { AdminPanel } from './components/admin'
 import { AddPropertyPage } from './components/property/AddPropertyPage'
 import { MyPropertiesPage } from './components/property/MyPropertiesPage'
-import AgentDashboard from './components/properties/AgentPropertyDashboard'
+import { AgentPropertyDashboard } from './features/agent/components'
 import { PropertyListingSearchPage } from './components/landing/PropertyListingSearchPage'
 import { PropertySearchDashboard } from './components/landing/SearchViewedDashboard'
 import { Messages } from './components/dashboard/Messages'
@@ -29,7 +29,7 @@ import { NewProjectPage } from './features/builder/pages/NewProjectPage'
 import { ProjectDetailsPage } from './features/builder/pages/ProjectDetailsPage'
 import { ProjectUnitsPage } from './features/builder/pages/ProjectUnitsPage'
 import { BulkUnitsPage } from './features/builder/pages/BulkUnitsPage'
-import LeadManagementPage from './pages/agent/LeadManagementPage'
+import { LeadManagementPage } from './features/agent/pages/LeadManagementPage'
 import { NewUnitPage } from './features/builder/pages/NewUnitPage'
 // import { BulkListingPage } from './pages/builder/BulkListingPage'
 
@@ -139,7 +139,7 @@ function App() {
                         path="/agent-dashboard"
                         element={
                             <ProtectedRoute requiredRole="agent">
-                                <AgentDashboard />
+                                <AgentPropertyDashboard />
                             </ProtectedRoute>
                         }
                     />

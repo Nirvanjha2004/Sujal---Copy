@@ -1,5 +1,5 @@
-import { api } from '@/lib/api';
-import type { Property, PropertyFilters, PaginatedResponse, ApiResponse } from '@/types';
+import { api } from '@/shared/lib/api';
+import type { Property, PropertyFilters, PaginatedResponse, ApiResponse } from '@/shared/types';
 
 class PropertyService {
   /**

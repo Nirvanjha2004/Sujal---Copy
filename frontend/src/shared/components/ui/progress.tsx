@@ -1,7 +1,7 @@
 // filepath: c:\Users\nirva\OneDrive\Desktop\Sujal - Copy\frontend\src\components\ui\progress.tsx
 import * as React from "react"
 import * as ProgressPrimitive from "@radix-ui/react-progress"
-import { cn } from "@/lib/utils"
+import { cn } from "@/shared/lib/utils"
 
 const Progress = React.forwardRef<
   React.ElementRef<typeof ProgressPrimitive.Root>,

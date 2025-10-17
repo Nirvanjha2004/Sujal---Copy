@@ -1,4 +1,4 @@
-import { api } from '@/lib/api';
+import { api } from '@/shared/lib/api';
 import type { Property, PropertyFilters, PaginatedResponse, ApiResponse } from '@/types';
 
 class PropertyService {

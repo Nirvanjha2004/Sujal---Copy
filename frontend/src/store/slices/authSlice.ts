@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { api, User } from '@/lib/api';
-import { setToken, clearToken, getValidToken } from '@/utils/tokenUtils';
+import { api, User } from '@/shared/lib/api';
+import { setToken, clearToken, getValidToken } from '@/shared/utils/tokenUtils';
 
 interface AuthState {
   user: User | null;

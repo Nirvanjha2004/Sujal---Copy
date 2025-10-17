@@ -7,8 +7,8 @@ import { AdvancedSearchForm } from './AdvancedSearchForm';
 import { SearchResults } from './SearchResults';
 import { PropertyMap } from './PropertyMap';
 import { SavedSearches } from './SavedSearches';
-import { useSearchProperties } from '@/hooks/useProperties';
-import { Property, PropertyFilters } from '@/lib/api';
+import { useSearchProperties } from '@/shared/hooks/useProperties';
+import { Property, PropertyFilters } from '@/shared/lib/api';
 
 export function SearchPage() {
   const navigate = useNavigate();

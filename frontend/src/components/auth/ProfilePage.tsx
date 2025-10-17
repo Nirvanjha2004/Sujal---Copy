@@ -5,10 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/shared/contexts/AuthContext';
 import { Layout } from '@/components/layout/Layout';
-import { useFavorites } from '@/hooks/useFavorites';
-import { api } from '@/lib/api';
+import { useFavorites } from '@/shared/hooks/useFavorites';
+import { api } from '@/shared/lib/api';
 
 export function ProfilePage() {
   const { state, updateUser, clearError } = useAuth();

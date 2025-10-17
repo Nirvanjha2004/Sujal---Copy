@@ -42,15 +42,11 @@ export function UrlRedirectManagementPage() {
       setLoading(true);
       setError(null);
       
-      const response = await contentService.getUrlRedirects({
-        page: currentPage,
-        limit: 20,
-        ...filters
-      });
-
+      const response = await contentService.getRedirects();
+      console.log("The response in URLRedirectManagementPage is", response)
       if (response.success && response.data) {
-        setRedirects(response.data.data);
-        setTotalPages(response.data.totalPages);
+        setRedirects(response.data.data || []);
+        setTotalPages(response.data.totalPages || 0);
       } else {
         throw new Error(response.message || 'Failed to fetch redirects');
       }

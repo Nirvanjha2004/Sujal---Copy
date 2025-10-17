@@ -72,13 +72,13 @@ const navigationItems: NavItem[] = [
     description: 'Site banners & notifications',
     color: 'text-red-600'
   },
-  {
-    id: 'seo',
-    label: 'SEO Management',
-    icon: 'solar:chart-2-bold',
-    description: 'Meta tags & search optimization',
-    color: 'text-indigo-600'
-  },
+  // {
+  //   id: 'seo',
+  //   label: 'SEO Management',
+  //   icon: 'solar:chart-2-bold',
+  //   description: 'Meta tags & search optimization',
+  //   color: 'text-indigo-600'
+  // },
   {
     id: 'analytics',
     label: 'Analytics',

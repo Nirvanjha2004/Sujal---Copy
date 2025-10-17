@@ -355,9 +355,10 @@ class ContentServiceImpl implements ContentService {
         data: UrlRedirect[];
       }>('/admin/redirects');
 
+      console.log('The response is urlRedirects,', response)
       return {
         success: true,
-        data: response.data,
+        data: response.data || [],
         message: 'Redirects retrieved successfully'
       };
     } catch (error: any) {
@@ -451,14 +452,15 @@ class ContentServiceImpl implements ContentService {
         }
       }>(`/admin/reviews${params.toString() ? `?${params.toString()}` : ''}`);
 
+      console.log("The response in getReviews is", response)
       return {
         success: true,
         data: {
-          data: response.data.reviews,
-          total: response.data.total,
+          data: response.data?.reviews || [],
+          total: response.data?.total || 0,
           page: filters?.page || 1,
           limit: filters?.limit || 20,
-          totalPages: response.data.totalPages
+          totalPages: response.data?.totalPages || 0
         },
         message: 'Reviews retrieved successfully'
       };

@@ -36,6 +36,8 @@ export function ReviewModerationPage() {
         ...filters
       });
 
+      console.log("The response is", response)
+
       if (response.success && response.data) {
         setReviews(response.data.data);
         setTotalPages(response.data.totalPages);

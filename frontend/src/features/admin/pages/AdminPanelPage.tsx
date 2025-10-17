@@ -71,13 +71,13 @@ const navigationItems: NavItem[] = [
     description: 'Site banners & notifications',
     color: 'text-red-600'
   },
-  {
-    id: 'seo',
-    label: 'SEO Management',
-    icon: 'solar:chart-2-bold',
-    description: 'Meta tags & search optimization',
-    color: 'text-indigo-600'
-  },
+  // {
+  //   id: 'seo',
+  //   label: 'SEO Management',
+  //   icon: 'solar:chart-2-bold',
+  //   description: 'Meta tags & search optimization',
+  //   color: 'text-indigo-600'
+  // },
   {
     id: 'analytics',
     label: 'Analytics',
@@ -126,8 +126,8 @@ export function AdminPanelPage() {
         return <ContentManagementPage />;
       case 'banners':
         return <BannerManagementPage />;
-      case 'seo':
-        return <SeoManagementPage />;
+      // case 'seo':
+      //   return <SeoManagementPage />;
       case 'analytics':
         return <AnalyticsDashboardPage />;
       case 'reviews':

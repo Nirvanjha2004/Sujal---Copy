@@ -52,14 +52,14 @@ export function AdminDashboardPage({ onNavigate }: AdminDashboardPageProps) {
       color: 'bg-purple-500',
       action: () => onNavigate?.('content')
     },
-    {
-      id: 'seo-optimization',
-      title: 'SEO Management',
-      description: 'Optimize search engine visibility',
-      icon: 'solar:chart-2-bold',
-      color: 'bg-orange-500',
-      action: () => onNavigate?.('seo')
-    },
+    // {
+    //   id: 'seo-optimization',
+    //   title: 'SEO Management',
+    //   description: 'Optimize search engine visibility',
+    //   icon: 'solar:chart-2-bold',
+    //   color: 'bg-orange-500',
+    //   action: () => onNavigate?.('seo')
+    // },
     {
       id: 'review-reports',
       title: 'Review Reports',

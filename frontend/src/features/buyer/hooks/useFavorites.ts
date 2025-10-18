@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { api, Favorite } from '@/shared/lib/api';
 import { useAuth } from '@/shared/contexts/AuthContext';
+import { favoritesService } from '../services/favoritesService';
+import type { Favorite } from '../types/favorites';
 
 export function useFavorites() {
   const [favorites, setFavorites] = useState<Favorite[]>([]);
@@ -17,10 +18,9 @@ export function useFavorites() {
 
     try {
       setLoading(true);
-      const response = await api.getFavorites();
-      // The API returns { data: { favorites: [...] } }
-      const favoritesData = response?.data?.favorites || [];
-      setFavorites(Array.isArray(favoritesData) ? favoritesData : []);
+      setError(null);
+      const favoritesData = await favoritesService.getFavorites();
+      setFavorites(favoritesData);
     } catch (err) {
       console.error('Error fetching favorites:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch favorites');
@@ -36,7 +36,7 @@ export function useFavorites() {
 
   const addToFavorites = async (propertyId: number) => {
     try {
-      await api.addToFavorites(propertyId);
+      await favoritesService.addToFavorites(propertyId);
       // Re-fetch the list to get the complete Favorite object from the server
       await fetchFavorites();
     } catch (err) {
@@ -47,23 +47,38 @@ export function useFavorites() {
 
   const removeFromFavorites = async (propertyId: number) => {
     try {
-      await api.removeFromFavorites(propertyId);
       // Optimistically remove from local state for instant UI update
       setFavorites(prev => prev.filter(fav => fav.property.id !== propertyId));
+      
+      await favoritesService.removeFromFavorites(propertyId);
     } catch (err) {
       console.error('Error removing from favorites:', err);
-      // If the API call fails, we can re-fetch to revert the optimistic update
+      // If the API call fails, re-fetch to revert the optimistic update
       await fetchFavorites();
       throw new Error(err instanceof Error ? err.message : 'Failed to remove from favorites');
     }
   };
 
-  const isFavorite = (propertyId: number) => {
-    if (!propertyId || !Array.isArray(favorites)) {
-      return false;
+  const bulkRemoveFromFavorites = async (propertyIds: number[]) => {
+    try {
+      // Optimistically remove from local state for instant UI update
+      setFavorites(prev => prev.filter(fav => !propertyIds.includes(fav.property.id)));
+      
+      await favoritesService.bulkRemoveFromFavorites(propertyIds);
+    } catch (err) {
+      console.error('Error bulk removing from favorites:', err);
+      // If the API call fails, re-fetch to revert the optimistic update
+      await fetchFavorites();
+      throw new Error(err instanceof Error ? err.message : 'Failed to remove properties from favorites');
     }
-    // Correctly check the nested property ID within each favorite object
-    return favorites.some(fav => fav.property && fav.property.id === propertyId);
+  };
+
+  const isFavorite = (propertyId: number) => {
+    return favoritesService.isFavorite(propertyId, favorites);
+  };
+
+  const refreshFavorites = () => {
+    return fetchFavorites();
   };
 
   return {
@@ -72,6 +87,8 @@ export function useFavorites() {
     error,
     addToFavorites,
     removeFromFavorites,
+    bulkRemoveFromFavorites,
     isFavorite,
+    refreshFavorites,
   };
 }

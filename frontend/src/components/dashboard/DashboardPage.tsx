@@ -1,9 +1,10 @@
 import { useAuth } from '@/shared/contexts/AuthContext';
 import { Layout } from '@/components/layout/Layout';
-import { useFavorites } from '@/shared/hooks/useFavorites';
+import { useFavorites } from '@/features/buyer/hooks/useFavorites';
 import { useState, useEffect } from 'react';
 import { api } from '@/shared/lib/api';
-import { BuyerDashboard, OwnerDashboard, AgentDashboard, BuilderDashboard } from './UserDashboard';
+import { BuyerDashboard } from '@/features/buyer/components';
+import { OwnerDashboard, AgentDashboard, BuilderDashboard } from './UserDashboard';
 
 interface Project {
   id: number;
@@ -135,15 +136,7 @@ export function DashboardPage() {
 
       case 'buyer':
       default:
-        return (
-          <BuyerDashboard
-            stats={{
-              savedProperties: stats.savedProperties,
-              savedSearches: stats.savedSearches,
-              messages: stats.messages
-            }}
-          />
-        );
+        return <BuyerDashboard />;
     }
   };
 

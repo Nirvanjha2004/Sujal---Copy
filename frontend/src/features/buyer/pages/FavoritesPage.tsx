@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Layout } from '@/components/layout/Layout';
 import { PropertyCard } from '@/components/property/PropertyCard';
-import { useFavorites } from '@/shared/hooks/useFavorites';
+import { useFavorites } from '../hooks/useFavorites';
 import { useNavigate } from 'react-router-dom';
 
 export function FavoritesPage() {

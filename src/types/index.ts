@@ -10,28 +10,8 @@ export interface ApiResponse<T = any> {
   timestamp: string;
 }
 
-// User related types
-export interface User {
-  id: number;
-  email: string;
-  role: UserRole;
-  firstName: string;
-  lastName: string;
-  phone?: string;
-  profileImage?: string;
-  isVerified: boolean;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export enum UserRole {
-  BUYER = 'buyer',
-  OWNER = 'owner',
-  AGENT = 'agent',
-  BUILDER = 'builder',
-  ADMIN = 'admin',
-}
+// Re-export shared auth types
+export * from '../shared/types/auth';
 
 // Property related types
 export interface Property {
@@ -96,17 +76,11 @@ export interface DatabaseConfig {
   database: string;
 }
 
-// JWT payload types
-export interface JwtPayload {
-  userId: number;
-  email: string;
-  role: UserRole;
-  iat?: number;
-  exp?: number;
-}
+// JWT payload types are now imported from shared auth types
 
 // Request types with user context
 import { Request } from 'express';
+import { JwtPayload } from '../shared/types/auth';
 
 export interface AuthenticatedRequest extends Request {
   user?: JwtPayload;

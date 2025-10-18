@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,46 +5,18 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Layout } from '@/components/layout/Layout';
 import { useNavigate } from 'react-router-dom';
-import { getSavedSearches, deleteSavedSearch, PropertyFilters, SavedSearch } from '@/shared/lib/api';
+import { useSavedSearches } from '../hooks/useSavedSearches';
+import { PropertyFilters } from '../types';
 
 export function SavedSearchesPage() {
-  const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { savedSearches, loading, error, deleteSavedSearch } = useSavedSearches();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchSearches = async () => {
-      try {
-        setLoading(true);
-        const response = await getSavedSearches();
-        // Map the API response to the expected frontend structure
-        const mappedSearches = response.data.savedSearches.map((item: any) => ({
-          id: item.id,
-          name: item.search_name, // Use search_name
-          created_at: item.created_at,
-          filters: item.search_criteria, // Use search_criteria
-        }));
-        setSavedSearches(mappedSearches || []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch saved searches');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchSearches();
-  }, []);
-
   const handleDeleteSearch = async (searchId: number) => {
-    // Optimistic deletion
-    const originalSearches = savedSearches;
-    setSavedSearches(prev => prev.filter(search => search.id !== searchId));
     try {
       await deleteSavedSearch(searchId);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete saved search');
-      // Revert on failure
-      setSavedSearches(originalSearches);
+      console.error('Failed to delete saved search:', err);
     }
   };
 

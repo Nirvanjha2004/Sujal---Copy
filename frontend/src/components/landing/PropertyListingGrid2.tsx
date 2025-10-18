@@ -8,7 +8,7 @@ import { PropertyGridSkeleton } from "@/components/ui/loading";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
 import { PropertyFilters } from "@/shared/lib/api";
-import { useAuth } from '@/shared/contexts/AuthContext';
+import { useAuth } from '@/features/auth';
 import { api } from '@/shared/lib/api';
 import {
   Dialog,

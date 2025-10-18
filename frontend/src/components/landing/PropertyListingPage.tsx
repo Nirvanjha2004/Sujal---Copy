@@ -11,7 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ImageGallery } from "@/components/property/ImageGallery";
 import { PropertyShare } from "@/components/property/PropertyShare";
 import { PropertyOwnerProfile } from "@/components/property/PropertyOwnerProfile";
-import { useAuth } from "@/shared/contexts/AuthContext";
+import { useAuth } from "@/features/auth";
 import { api } from "@/shared/lib/api"; // 1. Import api
 import { toast } from "sonner"; // 2. Import toast for notifications
 import { useState } from "react";

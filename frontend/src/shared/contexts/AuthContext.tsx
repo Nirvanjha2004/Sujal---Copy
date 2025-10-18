@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { loginUser, registerUser, logoutUser, updateUserProfile, loadUser, clearError } from '@/store/slices/authSlice';
-import { User } from '@/shared/lib/api';
-import { getValidToken } from '@/shared/utils/tokenUtils';
+import { User } from '@/features/auth/types';
+import { tokenService } from '@/features/auth/services/tokenService';
 
 interface AuthContextType {
   state: {
@@ -27,7 +27,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Check if user is authenticated on app load
   useEffect(() => {
-    const token = getValidToken();
+    const token = tokenService.getValidToken();
     if (token && !authState.isAuthenticated && !authState.isLoading) {
       dispatch(loadUser());
     }

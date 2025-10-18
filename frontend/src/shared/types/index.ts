@@ -1,5 +1,5 @@
-// Re-export auth types from dedicated auth module
-export * from './auth';
+// Re-export auth types from dedicated auth feature module
+export * from '@/features/auth/types';
 
 // Property Types
 export interface Property {

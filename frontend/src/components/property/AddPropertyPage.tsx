@@ -13,7 +13,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { api } from '@/shared/lib/api';
-import { useAuth } from '@/shared/contexts/AuthContext';
+import { useAuth } from '@/features/auth';
 
 interface PropertyFormData {
   title: string;

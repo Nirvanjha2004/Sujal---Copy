@@ -1,4 +1,4 @@
-import { getValidToken } from '@/shared/utils/tokenUtils';
+import { getValidToken } from '@/features/auth/utils';
 
 // Update the API_BASE_URL to match your backend port
 const API_BASE_URL = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3001/api/v1';

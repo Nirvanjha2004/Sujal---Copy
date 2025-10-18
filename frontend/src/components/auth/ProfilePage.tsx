@@ -1,27 +1,19 @@
 import { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useAuth } from '@/shared/contexts/AuthContext';
+import { useAuth } from '@/features/auth';
 import { Layout } from '@/components/layout/Layout';
 import { useFavorites } from '@/shared/hooks/useFavorites';
 import { api } from '@/shared/lib/api';
+import { ProfileForm } from '@/features/auth/components/forms/ProfileForm';
 
 export function ProfilePage() {
-  const { state, updateUser, clearError } = useAuth();
+  const { state } = useAuth();
   const { favorites } = useFavorites();
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    role: 'buyer' as 'buyer' | 'owner' | 'agent' | 'builder' | 'admin',
-  });
-  const [success, setSuccess] = useState('');
   const [savedSearchesCount, setSavedSearchesCount] = useState(0);
+  const [userRole, setUserRole] = useState<'buyer' | 'owner' | 'agent' | 'builder' | 'admin'>('buyer');
 
   useEffect(() => {
     const fetchSavedSearches = async () => {
@@ -40,46 +32,25 @@ export function ProfilePage() {
 
   useEffect(() => {
     if (state.user) {
-      setFormData({
-        firstName: state.user.firstName || '',
-        lastName: state.user.lastName || '',
-        email: state.user.email || '',
-        phone: state.user.phone || '',
-        role: state.user.role || 'buyer',
-      });
+      setUserRole(state.user.role || 'buyer');
     }
   }, [state.user]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    // Clear messages when user starts typing
-    if (state.error) clearError();
-    if (success) setSuccess('');
-  };
-
   const handleRoleChange = (value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      role: value as 'buyer' | 'owner' | 'agent' | 'builder' | 'admin'
-    }));
+    setUserRole(value as 'buyer' | 'owner' | 'agent' | 'builder' | 'admin');
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    clearError();
-    setSuccess('');
-
-    try {
-      await updateUser(formData);
-      setSuccess('Profile updated successfully!');
-    } catch (err) {
-      // Error is handled by Redux state
-    }
+  const handleProfileSuccess = () => {
+    console.log('Profile updated successfully');
   };
+
+  const handleProfileError = (error: string) => {
+    console.error('Profile update error:', error);
+  };
+
+  if (!state.user) {
+    return null;
+  }
 
   return (
     <Layout>
@@ -105,118 +76,45 @@ export function ProfilePage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  {state.error && (
-                    <Alert variant="destructive">
-                      <Icon icon="solar:danger-bold" className="size-4" />
-                      <AlertDescription>{state.error}</AlertDescription>
-                    </Alert>
-                  )}
+                <div className="space-y-4">
+                  <ProfileForm 
+                    user={state.user}
+                    onSuccess={handleProfileSuccess}
+                    onError={handleProfileError}
+                  />
 
-                  {success && (
-                    <Alert className="border-green-200 bg-green-50">
-                      <Icon icon="solar:check-circle-bold" className="size-4 text-green-600" />
-                      <AlertDescription className="text-green-800">{success}</AlertDescription>
-                    </Alert>
-                  )}
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label htmlFor="firstName" className="text-sm font-medium">
-                          First Name
-                        </label>
-                        <Input
-                          id="firstName"
-                          name="firstName"
-                          type="text"
-                          value={formData.firstName}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label htmlFor="lastName" className="text-sm font-medium">
-                          Last Name
-                        </label>
-                        <Input
-                          id="lastName"
-                          name="lastName"
-                          type="text"
-                          value={formData.lastName}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label htmlFor="email" className="text-sm font-medium">
-                        Email Address
-                      </label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        required
-                        disabled // Email usually shouldn't be changed
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label htmlFor="phone" className="text-sm font-medium">
-                        Phone Number
-                      </label>
-                      <Input
-                        id="phone"
-                        name="phone"
-                        type="tel"
-                        value={formData.phone}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label htmlFor="role" className="text-sm font-medium">
-                        Account Type
-                      </label>
-                      <Select value={formData.role} onValueChange={handleRoleChange}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="buyer">Property Buyer</SelectItem>
-                          <SelectItem value="owner">Property Owner</SelectItem>
-                          <SelectItem value="agent">Real Estate Agent</SelectItem>
-                          <SelectItem value="builder">Builder/Developer</SelectItem>
-                          <SelectItem value="admin">Administrator</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                  <div className="space-y-2">
+                    <label htmlFor="email" className="text-sm font-medium">
+                      Email Address
+                    </label>
+                    <input
+                      id="email"
+                      type="email"
+                      value={state.user.email}
+                      disabled
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500 cursor-not-allowed"
+                    />
+                    <p className="text-xs text-muted-foreground">Email cannot be changed</p>
                   </div>
 
-                  <div className="flex justify-end">
-                    <Button
-                      type="submit"
-                      disabled={state.isLoading}
-                      className="shadow-lg shadow-primary/20"
-                    >
-                      {state.isLoading ? (
-                        <>
-                          <Icon icon="solar:loading-bold" className="size-4 animate-spin mr-2" />
-                          Updating...
-                        </>
-                      ) : (
-                        <>
-                          <Icon icon="solar:diskette-bold" className="size-4 mr-2" />
-                          Save Changes
-                        </>
-                      )}
-                    </Button>
+                  <div className="space-y-2">
+                    <label htmlFor="role" className="text-sm font-medium">
+                      Account Type
+                    </label>
+                    <Select value={userRole} onValueChange={handleRoleChange}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="buyer">Property Buyer</SelectItem>
+                        <SelectItem value="owner">Property Owner</SelectItem>
+                        <SelectItem value="agent">Real Estate Agent</SelectItem>
+                        <SelectItem value="builder">Builder/Developer</SelectItem>
+                        <SelectItem value="admin">Administrator</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                </form>
+                </div>
               </CardContent>
             </Card>
 

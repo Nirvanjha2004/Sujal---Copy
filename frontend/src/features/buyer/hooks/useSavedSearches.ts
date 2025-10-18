@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/shared/contexts/AuthContext';
+import { useAuth } from '@/features/auth';
 import { savedSearchesService } from '../services/savedSearchesService';
 import type { SavedSearch, PropertyFilters } from '../types/savedSearches';
 

@@ -1,17 +1,5 @@
-// User Types
-export interface User {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: UserRole;
-  isVerified: boolean;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export type UserRole = 'buyer' | 'owner' | 'agent' | 'builder' | 'admin';
+// Re-export auth types from dedicated auth module
+export * from './auth';
 
 // Property Types
 export interface Property {

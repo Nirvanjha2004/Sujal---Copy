@@ -1,5 +1,4 @@
 // Re-export all hooks for easy importing
-export { default as useFavorites } from './useFavorites';
 export { default as useProperties } from './useProperties';
 export { default as useAuth } from './useAuth';
 export { default as useDashboard } from './useDashboard';

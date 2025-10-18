@@ -1,179 +1,252 @@
 # Implementation Plan
 
-- [ ] 1. Set up shared auth types and interfaces
+- [ ] 1. Set up auth feature directory structure and core types
 
 
 
 
-  - Create shared types directory structure for auth-related interfaces
-  - Define User, AuthState, TokenPair, and JwtPayload interfaces
-  - Create request/response type definitions for auth API
-  - _Requirements: 1.1, 4.1, 4.2, 4.3_
 
-- [ ] 2. Create frontend auth feature structure
-  - [ ] 2.1 Create auth feature directory structure
-    - Set up frontend/src/features/auth/ with subdirectories for components, pages, hooks, services, utils, types, constants, and config
-    - Create index.ts files for proper exports
-    - _Requirements: 2.1, 2.2, 2.3, 2.4_
+  - Create the complete directory structure for the auth feature module
+  - Set up index files for clean exports and module organization
+  - Define core TypeScript interfaces and types for auth functionality
+  - _Requirements: 1.1, 1.2, 7.1, 7.2, 7.3_
 
-  - [ ] 2.2 Create auth configuration and constants
-    - Move auth-related constants to dedicated constants file
-    - Create auth configuration module for frontend settings
-    - _Requirements: 5.1, 5.2_
+- [ ] 2. Create auth types and constants
 
-  - [ ] 2.3 Create auth types module
-    - Define frontend-specific auth types
-    - Import and re-export shared auth types
-    - _Requirements: 4.1, 4.2_
 
-- [ ] 3. Migrate auth utilities and services
-  - [ ] 3.1 Move token utilities to auth feature
-    - Migrate tokenUtils.ts to frontend/src/features/auth/utils/
-    - Update imports across the application
+
+
+
+
+  - [x] 2.1 Implement auth type definitions
+
+    - Create User, AuthState, and form data interfaces
+    - Define token-related types and validation interfaces
+    - Set up error types and authentication enums
+    - _Requirements: 7.1, 7.2, 7.3_
+
+  - [x] 2.2 Create auth constants
+
+
+    - Define authentication-related constants and configuration
+    - Set up error messages and validation rules
+    - Create role-based access control constants
+    - _Requirements: 1.4, 7.3_
+
+- [ ] 3. Implement auth services layer
+
+
+
+
+
+
+  - [x] 3.1 Create token service
+
+    - Move and enhance token utilities from shared/utils/tokenUtils.ts
+    - Implement token validation, storage, and expiration checking
+    - Add token refresh and cleanup functionality
     - _Requirements: 6.1, 6.2, 6.3_
 
-  - [ ] 3.2 Create centralized auth service
-    - Create auth API service in features/auth/services/
-    - Consolidate auth-related API calls
-    - Implement proper error handling and response formatting
-    - _Requirements: 2.3, 8.1, 8.2_
+  - [x] 3.2 Create auth service
 
-  - [ ] 3.3 Create auth validation utilities
-    - Move validation logic to auth utils
-    - Create reusable validation functions for forms
-    - _Requirements: 6.2, 6.3_
 
-- [ ] 4. Migrate auth state management
-  - [ ] 4.1 Move auth slice to auth feature
-    - Migrate authSlice.ts to features/auth/store/
-    - Update store configuration to import from new location
-    - _Requirements: 1.1, 1.2, 8.1_
+    - Extract auth API methods from shared/lib/api.ts
+    - Implement login, register, logout, and profile update services
+    - Add proper error handling and response formatting
+    - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-  - [ ] 4.2 Migrate auth context to auth feature
-    - Move AuthContext to features/auth/contexts/
-    - Update imports in components that use auth context
-    - _Requirements: 2.1, 2.2, 8.1_
+- [ ] 4. Create auth utilities and validation
 
-  - [ ] 4.3 Create auth hooks
-    - Create useAuth hook in features/auth/hooks/
-    - Create useAuthGuard hook for route protection
-    - Create useTokenRefresh hook for automatic token management
-    - _Requirements: 2.2, 6.1, 6.2_
 
-- [ ] 5. Migrate auth components
-  - [ ] 5.1 Move auth pages to auth feature
-    - Migrate LoginPage, RegisterPage, ProfilePage, OTPVerificationPage to features/auth/pages/
-    - Update routing imports in App.tsx
-    - _Requirements: 2.1, 1.1, 1.2_
 
-  - [ ] 5.2 Move ProtectedRoute to auth feature
-    - Migrate ProtectedRoute component to features/auth/components/
-    - Update imports in App.tsx and other files using ProtectedRoute
-    - _Requirements: 2.1, 8.1, 8.2_
 
-  - [ ] 5.3 Create reusable auth form components
-    - Extract common form components (LoginForm, RegisterForm, etc.)
-    - Create auth-specific UI components in features/auth/components/
-    - _Requirements: 2.1, 2.5, 6.3_
 
-- [ ] 6. Set up backend auth feature structure
-  - [ ] 6.1 Create backend auth feature directory
-    - Set up src/features/auth/ with subdirectories for controllers, services, middleware, utils, types, constants, and config
-    - Create index.ts files for proper exports
-    - _Requirements: 3.1, 3.2, 3.3, 3.4_
+  - [x] 4.1 Implement validation utilities
 
-  - [ ] 6.2 Create backend auth configuration
-    - Move auth-related config to dedicated auth config module
-    - Centralize JWT settings, bcrypt rounds, and other auth constants
-    - _Requirements: 5.1, 5.2, 5.3_
 
-- [ ] 7. Migrate backend auth services
-  - [ ] 7.1 Move auth controller to auth feature
-    - Migrate authController.ts to src/features/auth/controllers/
-    - Update route imports to use new location
-    - _Requirements: 3.1, 1.1, 1.2_
+    - Create form validation helpers for login and registration
+    - Add email, password, and phone validation functions
+    - Implement input sanitization utilities
+    - _Requirements: 6.4, 4.4_
 
-  - [ ] 7.2 Move auth service to auth feature
-    - Migrate authService.ts to src/features/auth/services/
-    - Update controller imports to use new location
-    - _Requirements: 3.2, 1.1, 1.2_
+  - [x] 4.2 Move token utilities to auth feature
 
-  - [ ] 7.3 Create token service
-    - Extract token-related logic into dedicated TokenService
-    - Implement token generation, validation, and refresh logic
-    - _Requirements: 3.2, 6.1, 6.2_
 
-  - [ ] 7.4 Create validation service
-    - Extract validation logic into dedicated ValidationService
-    - Implement email, password, and phone validation utilities
-    - _Requirements: 3.2, 6.2, 6.3_
+    - Migrate tokenUtils from shared/utils to auth feature
+    - Maintain backward compatibility with existing imports
+    - Enhance token management functionality
+    - _Requirements: 6.1, 6.2, 6.3_
 
-- [ ] 8. Migrate auth middleware
-  - [ ] 8.1 Move auth middleware to auth feature
-    - Migrate auth.ts middleware to src/features/auth/middleware/
-    - Update imports in route files
-    - _Requirements: 3.3, 1.1, 1.2_
+- [ ] 5. Implement auth hooks layer
 
-  - [ ] 8.2 Create role-based middleware utilities
-    - Extract role-based access control into separate utilities
-    - Create reusable middleware functions for different permission levels
-    - _Requirements: 3.3, 8.1, 8.2_
 
-- [ ] 9. Update routing and imports
-  - [ ] 9.1 Update frontend routing
-    - Update App.tsx to import auth pages from new locations
-    - Ensure all auth-related routes work correctly
-    - _Requirements: 1.1, 1.2, 2.1_
 
-  - [ ] 9.2 Update backend routing
-    - Update route files to import auth controllers and middleware from new locations
-    - Ensure all auth endpoints work correctly
-    - _Requirements: 1.1, 1.2, 3.1_
 
-  - [ ] 9.3 Update component imports
-    - Update all components that use auth functionality to import from new locations
-    - Fix any broken imports across the application
-    - _Requirements: 1.1, 1.2, 8.1_
 
-- [ ] 10. Create auth feature exports
-  - [ ] 10.1 Create frontend auth feature exports
-    - Set up comprehensive index.ts in features/auth/ to export all auth functionality
-    - Organize exports by category (components, hooks, services, types, utils)
-    - _Requirements: 2.5, 1.1, 1.2_
+  - [x] 5.1 Create core useAuth hook
 
-  - [ ] 10.2 Create backend auth feature exports
-    - Set up comprehensive index.ts in src/features/auth/ to export all auth functionality
-    - Organize exports by category (controllers, services, middleware, types, utils)
-    - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-- [ ]* 11. Add comprehensive testing
-  - [ ]* 11.1 Create auth component tests
-    - Write unit tests for all auth components
-    - Test form validation, user interactions, and error handling
-    - _Requirements: 7.1, 7.2_
+    - Wrap existing AuthContext functionality in a new hook
+    - Maintain compatibility with existing Redux auth slice
+    - Provide consistent auth state management interface
+    - _Requirements: 5.1, 5.2, 8.3_
 
-  - [ ]* 11.2 Create auth service tests
-    - Write unit tests for auth services and utilities
-    - Test API calls, token management, and validation logic
-    - _Requirements: 7.1, 7.2_
+  - [x] 5.2 Create specialized auth hooks
 
-  - [ ]* 11.3 Create auth integration tests
-    - Write integration tests for complete auth flows
-    - Test login, registration, and profile update workflows
-    - _Requirements: 7.1, 7.2_
 
-- [ ] 12. Clean up old auth files
-  - [ ] 12.1 Remove old frontend auth files
-    - Delete auth files from their original locations
-    - Ensure no broken imports remain
-    - _Requirements: 1.1, 1.2, 8.3_
+    - Implement useLogin hook for login-specific logic and state
+    - Create useRegister hook for registration flow management
+    - Add useProfile hook for profile management functionality
+    - _Requirements: 5.2, 5.3_
 
-  - [ ] 12.2 Remove old backend auth files
-    - Delete auth files from their original locations
-    - Ensure no broken imports remain
-    - _Requirements: 1.1, 1.2, 8.3_
+- [ ] 6. Create reusable auth components
 
-  - [ ] 12.3 Update documentation
-    - Update any documentation to reflect new auth module structure
-    - Create developer guide for working with the new auth architecture
-    - _Requirements: 7.3, 1.1, 1.2_
+
+
+
+
+  - [x] 6.1 Implement auth form components
+
+
+    - Create LoginForm component with extracted form logic
+    - Build RegisterForm component for user registration
+    - Implement ProfileForm for user profile management
+    - Add OTPVerificationForm for email/phone verification
+    - Create PasswordResetForm for password reset functionality
+    - _Requirements: 2.1, 2.2, 2.3, 2.4_
+
+  - [x] 6.2 Create auth UI components
+
+
+    - Build AuthCard wrapper component for consistent styling
+    - Implement AuthHeader component for auth page headers
+    - Create SocialLoginButtons component for social authentication
+    - _Requirements: 2.2, 2.3_
+
+  - [x] 6.3 Implement auth guard components
+
+
+    - Enhance ProtectedRoute with better error handling and role checking
+    - Create AuthGuard higher-order component for auth protection
+    - Build RoleGuard component for role-based access control
+    - _Requirements: 2.2, 8.4_
+
+- [ ] 7. Refactor and migrate auth pages
+
+
+
+
+
+  - [x] 7.1 Refactor existing auth pages
+
+
+    - Update LoginPage to use new LoginForm and UI components
+    - Refactor RegisterPage to use new RegisterForm component
+    - Enhance ProfilePage with new ProfileForm component
+    - Update OTPVerificationPage to use new form component
+    - _Requirements: 3.1, 3.2, 3.3, 8.1_
+
+  - [x] 7.2 Move pages to auth feature directory
+
+
+    - Migrate all auth pages from components/auth to features/auth/pages
+    - Update page components to use new hooks and services
+    - Maintain existing functionality and user experience
+    - _Requirements: 3.1, 3.2, 3.3_
+
+  - [x] 7.3 Create password reset page
+
+
+    - Implement PasswordResetPage for password reset flow
+    - Integrate with PasswordResetForm component
+    - Add proper routing and navigation handling
+    - _Requirements: 3.2_
+
+- [ ] 8. Update application integration points
+
+
+
+
+
+
+
+
+
+
+
+  - [x] 8.1 Update App.tsx routing
+
+
+    - Update import statements to use new auth feature structure
+    - Ensure all auth routes continue to work correctly
+    - Maintain existing routing functionality and navigation
+    - _Requirements: 8.1, 8.2_
+
+  - [x] 8.2 Update AuthContext integration
+
+
+    - Maintain backward compatibility for existing AuthContext usage
+    - Update context to use new auth services and hooks internally
+    - Ensure seamless integration with existing Redux store
+    - _Requirements: 5.1, 8.2, 8.3_
+
+  - [x] 8.3 Update shared type exports
+
+
+    - Fix auth type imports in shared/types/index.ts
+    - Create proper export structure for auth types
+    - Maintain compatibility with existing type usage
+    - _Requirements: 7.3, 8.3_
+
+- [ ] 9. Create auth feature exports and cleanup
+
+
+
+
+
+  - [x] 9.1 Set up feature index exports
+
+
+    - Create comprehensive index.ts files for clean imports
+    - Export all public components, hooks, services, and types
+    - Organize exports by category for better developer experience
+    - _Requirements: 1.2, 1.4_
+
+  - [x] 9.2 Update import statements across application
+
+
+    - Update all existing imports to use new auth feature structure
+    - Ensure no broken imports remain in the application
+    - Maintain backward compatibility where necessary
+    - _Requirements: 8.1, 8.2_
+
+  - [ ]* 9.3 Write comprehensive tests for auth feature
+    - Create unit tests for auth services and utilities
+    - Add component tests for forms and UI components
+    - Implement integration tests for auth flows
+    - Test route protection and role-based access control
+    - _Requirements: 1.3, 2.3, 4.3, 5.3_
+
+- [-] 10. Verify integration and functionality
+
+
+
+  - [ ] 10.1 Test complete authentication flows
+
+
+    - Verify login, registration, and logout functionality works correctly
+    - Test profile management and password reset flows
+    - Ensure OTP verification continues to work properly
+    - _Requirements: 8.4_
+
+  - [ ] 10.2 Validate route protection and role-based access
+    - Test ProtectedRoute functionality with different user roles
+    - Verify admin, agent, builder, and user role restrictions work
+    - Ensure proper error handling for unauthorized access attempts
+    - _Requirements: 8.4_
+
+  - [ ] 10.3 Confirm backward compatibility
+    - Verify existing components that use auth continue to work
+    - Test that Redux auth slice integration remains functional
+    - Ensure no breaking changes affect other features
+    - _Requirements: 8.2, 8.3, 8.4_

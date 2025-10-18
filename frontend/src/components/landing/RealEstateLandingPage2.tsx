@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useFeaturedProperties, useRecentProperties } from "@/shared/hooks/useProperties";
 import { PropertyCardSkeleton } from "@/components/ui/loading";
-import { useAuth } from "@/shared/contexts/AuthContext";
+import { useAuth } from "@/features/auth";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 

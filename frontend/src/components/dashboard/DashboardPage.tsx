@@ -1,4 +1,4 @@
-import { useAuth } from '@/shared/contexts/AuthContext';
+import { useAuth } from '@/features/auth';
 import { Layout } from '@/components/layout/Layout';
 import { useFavorites } from '@/features/buyer/hooks/useFavorites';
 import { useState, useEffect } from 'react';

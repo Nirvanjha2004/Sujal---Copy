@@ -2,93 +2,94 @@
 
 ## Introduction
 
-The current authentication system is spread across multiple files and directories in both frontend and backend, making it difficult to maintain, test, and extend. This feature aims to modularize all auth-related code into a cohesive, well-organized structure that follows modern software architecture patterns and improves maintainability.
+The current authentication system is spread across multiple files and directories in the frontend, making it difficult to maintain, test, and extend. Auth-related code is currently scattered in shared contexts, store slices, utilities, and API files without a clear modular structure. This feature aims to modularize all auth-related code into a cohesive, well-organized structure that follows the established feature-based architecture patterns used for agent, admin, and buyer features.
 
 ## Requirements
 
 ### Requirement 1
 
-**User Story:** As a developer, I want all authentication-related code to be organized in dedicated modules, so that I can easily locate, maintain, and extend auth functionality.
+**User Story:** As a developer, I want all authentication-related code to be organized in a dedicated auth feature module, so that I can easily locate, maintain, and extend auth functionality.
 
 #### Acceptance Criteria
 
-1. WHEN I need to modify authentication logic THEN I SHALL find all related code in dedicated auth modules
-2. WHEN I add new authentication features THEN I SHALL have clear patterns and structures to follow
-3. WHEN I need to test authentication functionality THEN I SHALL have isolated, testable modules
+1. WHEN organizing auth code THEN the system SHALL create a dedicated `frontend/src/features/auth/` directory structure
+2. WHEN structuring the auth feature THEN the system SHALL follow the established pattern with `components/`, `pages/`, `hooks/`, `services/`, `utils/`, `types/`, and `constants/` subdirectories
+3. WHEN moving existing auth code THEN the system SHALL preserve all existing functionality without breaking changes
+4. WHEN creating the new structure THEN the system SHALL maintain proper TypeScript interfaces and type definitions
 
 ### Requirement 2
 
-**User Story:** As a developer, I want the frontend auth code to be organized using feature-based architecture, so that auth components, hooks, services, and types are co-located and reusable.
+**User Story:** As a developer, I want auth-related components to be organized in a dedicated components directory, so that login, register, and profile components are easily discoverable and reusable.
 
 #### Acceptance Criteria
 
-1. WHEN I work on frontend auth features THEN I SHALL find all auth components in a dedicated auth feature module
-2. WHEN I need auth-related hooks THEN I SHALL find them in the auth feature's hooks directory
-3. WHEN I need auth services THEN I SHALL find them in the auth feature's services directory
-4. WHEN I need auth types THEN I SHALL find them in the auth feature's types directory
-5. WHEN I need to reuse auth components THEN I SHALL have proper exports from the auth feature module
+1. WHEN creating auth components THEN the system SHALL organize them in `frontend/src/features/auth/components/`
+2. WHEN structuring components THEN the system SHALL create separate components for login forms, registration forms, profile management, and auth guards
+3. WHEN implementing components THEN the system SHALL ensure each component has clear props interfaces and proper TypeScript typing
+4. WHEN organizing components THEN the system SHALL create reusable form components and validation utilities
 
 ### Requirement 3
 
-**User Story:** As a developer, I want the backend auth code to be organized in a layered architecture, so that controllers, services, middleware, and utilities are properly separated and maintainable.
+**User Story:** As a developer, I want auth-related pages to be organized in a dedicated pages directory, so that routing and navigation are clear and maintainable.
 
 #### Acceptance Criteria
 
-1. WHEN I need to modify auth endpoints THEN I SHALL find them in dedicated auth controllers
-2. WHEN I need to modify auth business logic THEN I SHALL find it in dedicated auth services
-3. WHEN I need to modify auth middleware THEN I SHALL find it in dedicated auth middleware modules
-4. WHEN I need auth utilities THEN I SHALL find them in dedicated auth utility modules
+1. WHEN organizing auth pages THEN the system SHALL create auth pages in `frontend/src/features/auth/pages/`
+2. WHEN creating page structure THEN the system SHALL include pages for login, registration, profile, password reset, and email verification
+3. WHEN refactoring pages THEN the system SHALL maintain existing routing functionality
+4. WHEN organizing pages THEN the system SHALL create an index file for easy imports
 
 ### Requirement 4
 
-**User Story:** As a developer, I want auth-related types and interfaces to be centralized and shared between frontend and backend, so that I maintain type consistency across the application.
+**User Story:** As a developer, I want auth-related services and API calls to be centralized, so that authentication logic is reusable and maintainable.
 
 #### Acceptance Criteria
 
-1. WHEN I define auth types THEN I SHALL have them in a shared types module
-2. WHEN I use auth types in frontend THEN I SHALL import them from the shared auth types
-3. WHEN I use auth types in backend THEN I SHALL import them from the shared auth types
-4. WHEN auth types change THEN I SHALL have compile-time errors if interfaces don't match
+1. WHEN creating auth services THEN the system SHALL extract all auth-related API calls into dedicated service files
+2. WHEN organizing services THEN the system SHALL create separate services for authentication, user profile, and token management
+3. WHEN implementing services THEN the system SHALL use consistent error handling and response formatting
+4. WHEN creating service interfaces THEN the system SHALL define proper TypeScript types for all API requests and responses
 
 ### Requirement 5
 
-**User Story:** As a developer, I want auth configuration and constants to be centralized, so that I can easily manage auth-related settings and avoid duplication.
+**User Story:** As a developer, I want auth-related hooks to be centralized, so that authentication state management is consistent across components.
 
 #### Acceptance Criteria
 
-1. WHEN I need to configure auth settings THEN I SHALL find them in dedicated auth config modules
-2. WHEN I need auth constants THEN I SHALL find them in dedicated auth constants modules
-3. WHEN I change auth configuration THEN I SHALL have it reflected across all auth modules
+1. WHEN creating auth hooks THEN the system SHALL move auth context and related hooks to the auth feature directory
+2. WHEN organizing hooks THEN the system SHALL create custom hooks for login, registration, profile management, and auth state
+3. WHEN implementing hooks THEN the system SHALL ensure proper error handling and loading states
+4. WHEN structuring hooks THEN the system SHALL maintain compatibility with existing Redux auth slice
 
 ### Requirement 6
 
-**User Story:** As a developer, I want auth utilities and helpers to be organized and reusable, so that common auth operations are not duplicated across the codebase.
+**User Story:** As a developer, I want auth-related utilities to be centralized, so that token management and validation logic is reusable across the auth feature.
 
 #### Acceptance Criteria
 
-1. WHEN I need token utilities THEN I SHALL find them in dedicated auth utility modules
-2. WHEN I need validation helpers THEN I SHALL find them in dedicated auth utility modules
-3. WHEN I need auth formatting functions THEN I SHALL find them in dedicated auth utility modules
-4. WHEN I use auth utilities THEN I SHALL import them from centralized locations
+1. WHEN organizing auth utilities THEN the system SHALL move token utilities to the auth feature directory
+2. WHEN creating utilities THEN the system SHALL include functions for token validation, storage, and expiration checking
+3. WHEN implementing utilities THEN the system SHALL maintain existing token management functionality
+4. WHEN structuring utilities THEN the system SHALL create validation helpers for forms and user input
 
 ### Requirement 7
 
-**User Story:** As a developer, I want auth components to be properly tested and documented, so that I can confidently modify and extend authentication functionality.
+**User Story:** As a developer, I want auth-related types to be centralized, so that type definitions are consistent and reusable across the auth feature.
 
 #### Acceptance Criteria
 
-1. WHEN I modify auth components THEN I SHALL have comprehensive test coverage
-2. WHEN I add new auth features THEN I SHALL follow established testing patterns
-3. WHEN I need to understand auth components THEN I SHALL have clear documentation and examples
-4. WHEN auth tests run THEN I SHALL have fast, reliable test execution
+1. WHEN creating auth types THEN the system SHALL consolidate all auth-related interfaces into the auth feature types directory
+2. WHEN defining types THEN the system SHALL include interfaces for user data, auth state, form data, and API responses
+3. WHEN organizing types THEN the system SHALL ensure proper export/import structure for type reusability
+4. WHEN creating type definitions THEN the system SHALL maintain compatibility with existing shared types
 
 ### Requirement 8
 
-**User Story:** As a developer, I want auth modules to have clear boundaries and minimal coupling, so that changes in one auth module don't unexpectedly affect other parts of the system.
+**User Story:** As a developer, I want the auth feature to integrate seamlessly with the existing application structure, so that the modularization doesn't break existing functionality.
 
 #### Acceptance Criteria
 
-1. WHEN I modify auth services THEN I SHALL not break unrelated functionality
-2. WHEN I change auth components THEN I SHALL have clear interfaces and contracts
-3. WHEN I refactor auth code THEN I SHALL maintain backward compatibility where needed
-4. WHEN I add auth dependencies THEN I SHALL follow dependency injection patterns
+1. WHEN integrating the auth feature THEN the system SHALL update all import statements to use the new modular structure
+2. WHEN updating imports THEN the system SHALL ensure the main App.tsx, store, and routing continue to work without changes
+3. WHEN refactoring THEN the system SHALL maintain backward compatibility for any external components that depend on auth functionality
+4. WHEN completing the modularization THEN the system SHALL verify that all existing auth features continue to work as expected

@@ -3,7 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '@/shared/contexts/AuthContext';
 import { UserRole } from '../../types';
 
 interface ProtectedRouteProps {
@@ -23,7 +23,7 @@ export function ProtectedRoute({
   fallbackPath = '/login',
   showAccessDenied = true
 }: ProtectedRouteProps) {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { state: { user, isAuthenticated, isLoading } } = useAuth();
   const location = useLocation();
 
   // Debug logging in development

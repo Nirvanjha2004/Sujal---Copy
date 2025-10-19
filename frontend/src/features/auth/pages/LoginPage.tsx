@@ -3,7 +3,7 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useAuth } from '@/features/auth';
+import { useAuth } from '@/shared/contexts/AuthContext';
 import { LoginForm } from '../components/forms/LoginForm';
 import { AuthCard } from '../components/ui/AuthCard';
 import { AuthHeader } from '../components/ui/AuthHeader';

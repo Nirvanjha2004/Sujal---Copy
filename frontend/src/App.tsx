@@ -8,11 +8,9 @@ import { LoginPage } from './features/auth/pages/LoginPage'
 import { RegisterPage } from './features/auth/pages/RegisterPage'
 import { OTPVerificationPage } from './features/auth/pages/OTPVerificationPage'
 import { ProfilePage } from './features/auth/pages/ProfilePage'
-import { DashboardPage } from './components/dashboard/DashboardPage'
+import { DashboardPage, UserActivityPage, AccountSettingsPage, MessagesPage } from '@/features/dashboard/pages'
 import { FavoritesPage } from '@/features/buyer/pages/FavoritesPage'
 import { SavedSearchesPage } from '@/features/buyer/pages/SavedSearchesPage'
-import { UserActivityPage } from './components/dashboard/UserActivityPage'
-import { AccountSettingsPage } from './components/dashboard/AccountSettingsPage'
 import { CalculatorsPage } from '@/features/calculators'
 import { AdminPanelPage } from '@/features/admin'
 import { AddPropertyPage } from './components/property/AddPropertyPage'
@@ -20,7 +18,7 @@ import { MyPropertiesPage } from './components/property/MyPropertiesPage'
 import { AgentPropertyDashboard } from './features/agent/components'
 import { PropertyListingSearchPage } from './components/landing/PropertyListingSearchPage'
 import { PropertySearchDashboard } from './components/landing/SearchViewedDashboard'
-import { Messages } from './components/dashboard/Messages'
+
 import { BulkUploadPage } from '@/pages/agent/BulkUploadPage'
 
 // Builder Pages
@@ -147,7 +145,7 @@ function App() {
                         path="/dashboard/messages/:conversationId?"
                         element={
                             <ProtectedRoute>
-                                <Messages />
+                                <MessagesPage />
                             </ProtectedRoute>
                         }
                     />

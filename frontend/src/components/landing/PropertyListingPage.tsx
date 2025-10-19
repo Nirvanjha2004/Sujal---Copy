@@ -4,14 +4,14 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useProperty } from "@/shared/hooks/useProperties";
-import { useFavorites } from "@/shared/hooks/useFavorites";
+import { useFavorites } from "@/features/buyer/hooks/useFavorites";
 import { useParams, useNavigate } from "react-router-dom";
 import { PropertyGridSkeleton } from "@/components/ui/loading";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ImageGallery } from "@/components/property/ImageGallery";
 import { PropertyShare } from "@/components/property/PropertyShare";
 import { PropertyOwnerProfile } from "@/components/property/PropertyOwnerProfile";
-import { useAuth } from "@/features/auth";
+import { useAuth } from "@/shared/contexts/AuthContext";
 import { api } from "@/shared/lib/api"; // 1. Import api
 import { toast } from "sonner"; // 2. Import toast for notifications
 import { useState } from "react";

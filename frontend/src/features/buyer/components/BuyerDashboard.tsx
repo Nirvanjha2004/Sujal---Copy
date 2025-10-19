@@ -1,4 +1,4 @@
-import { useAuth } from '@/features/auth';
+import { useAuth } from '@/shared/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { BuyerStatsCard } from './BuyerStatsCard';
 import { QuickActionCard } from './QuickActionCard';

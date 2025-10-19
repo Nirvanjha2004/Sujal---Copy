@@ -41,38 +41,8 @@ export interface PropertyImage {
   isPrimary: boolean;
 }
 
-// Dashboard Types
-export interface DashboardStats {
-  buyer: BuyerStats;
-  owner: OwnerStats;
-  agent: AgentStats;
-  builder: BuilderStats;
-}
-
-export interface BuyerStats {
-  savedProperties: number;
-  savedSearches: number;
-  messages: number;
-}
-
-export interface OwnerStats {
-  totalListings: number;
-  activeListings: number;
-  propertyViews: number;
-  inquiries: number;
-  messages: number;
-}
-
-export interface AgentStats extends OwnerStats {}
-
-export interface BuilderStats {
-  totalProjects: number;
-  activeProjects: number;
-  unitsListed: number;
-  unitsAvailable: number;
-  totalInquiries: number;
-  messages: number;
-}
+// Re-export dashboard types from dedicated dashboard feature module
+export * from '@/features/dashboard/types';
 
 // API Response Types
 export interface ApiResponse<T> {

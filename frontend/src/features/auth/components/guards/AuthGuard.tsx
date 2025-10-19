@@ -1,5 +1,5 @@
 import { ReactNode, ComponentType } from 'react';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '@/shared/contexts/AuthContext';
 import { UserRole } from '../../types';
 
 interface AuthGuardProps {
@@ -22,7 +22,7 @@ export function AuthGuard({
   fallback = null, 
   children 
 }: AuthGuardProps) {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { state: { user, isAuthenticated, isLoading } } = useAuth();
 
   // Show loading state
   if (isLoading) {

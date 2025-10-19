@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/features/auth';
+import { useAuth } from '@/shared/contexts/AuthContext';
 import { buyerService } from '../services/buyerService';
 import type { BuyerStats, BuyerActivity } from '../types/buyer';
 

@@ -7,18 +7,21 @@ export * from './validation';
 export * from './tokenUtils';
 
 // Convenience re-exports for commonly used utilities
-export { 
-  validateEmail, 
-  validatePassword, 
-  validateLoginForm, 
+export {
+  validateEmail,
+  validatePassword,
+  validateLoginForm,
   validateRegisterForm,
-  validationService 
+  validationService
 } from './validation';
 
-export { 
-  getToken, 
-  setToken, 
-  removeToken, 
-  isTokenValid,
-  tokenUtils 
+export {
+  validateToken,
+  getValidToken,
+  clearToken,
+  setToken,
+  getTokenTimeToExpiry,
+  isTokenExpiringSoon,
+  tokenService,
+  type TokenPayload
 } from './tokenUtils';

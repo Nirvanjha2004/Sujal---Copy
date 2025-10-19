@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '@/shared/contexts/AuthContext';
 import { UserRole } from '../../types';
 
 interface RoleGuardProps {
@@ -19,7 +19,7 @@ export function RoleGuard({
   fallback = null,
   requireAll = false 
 }: RoleGuardProps) {
-  const { user, isAuthenticated } = useAuth();
+  const { state: { user, isAuthenticated } } = useAuth();
 
   // Not authenticated - don't show content
   if (!isAuthenticated || !user) {

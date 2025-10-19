@@ -19,7 +19,7 @@ import { useProperties } from "@/shared/hooks/useProperties";
 import { PropertyFilters } from "@/shared/lib/api";
 import { PropertyGridSkeleton } from "@/components/ui/loading";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useAuth } from "@/features/auth";
+import { useAuth } from "@/shared/contexts/AuthContext";
 import {
   Dialog,
   DialogContent,

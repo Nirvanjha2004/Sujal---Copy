@@ -1,6 +1,6 @@
 import { Icon } from "@iconify/react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Select,
@@ -13,13 +13,13 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useFeaturedProperties, useRecentProperties } from "@/shared/hooks/useProperties";
 import { PropertyCardSkeleton } from "@/components/ui/loading";
-import { useAuth } from "@/features/auth";
+import { useAuth } from "@/shared/contexts/AuthContext";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export function RealEstateLandingPage() {
   const navigate = useNavigate();
-  const { state: authState } = useAuth();
+  const { state: { isAuthenticated } } = useAuth();
   const { properties: featuredProperties, loading: featuredLoading } = useFeaturedProperties(4);
   const { properties: recentProperties, loading: recentLoading } = useRecentProperties(8);
   const [searchQuery, setSearchQuery] = useState("");
@@ -90,7 +90,7 @@ export function RealEstateLandingPage() {
                 </nav>
               </div>
               <div className="flex items-center gap-3">
-                {authState.isAuthenticated ? (
+                {isAuthenticated ? (
                   <>
                     <Button
                       size="sm"

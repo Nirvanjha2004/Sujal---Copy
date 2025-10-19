@@ -1,10 +1,14 @@
 // Auth services exports
+import { authService } from './authService';
+import { tokenService } from './tokenService';
 
 // Core auth service - Authentication API operations
-export { authService, default as AuthService } from './authService';
+export { authService } from './authService';
+export { default as AuthServiceImpl } from './authService';
 
 // Token service - JWT token management and validation
-export { tokenService, default as TokenService } from './tokenService';
+export { tokenService } from './tokenService';
+export { default as TokenServiceImpl } from './tokenService';
 
 // Re-export types for convenience
 export type { AuthService, TokenService } from '../types';

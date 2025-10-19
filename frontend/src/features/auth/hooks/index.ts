@@ -1,4 +1,8 @@
 // Auth hooks exports
+import { useAuth } from './useAuth';
+import { useLogin } from './useLogin';
+import { useRegister } from './useRegister';
+import { useProfile } from './useProfile';
 
 // Core auth hook - Main authentication state and actions
 export { useAuth, default as useAuthDefault } from './useAuth';

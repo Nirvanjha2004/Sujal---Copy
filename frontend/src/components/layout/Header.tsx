@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Icon } from "@iconify/react";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/features/auth";
+import { useAuth } from "@/shared/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { MobileNav } from "./MobileNav";
 

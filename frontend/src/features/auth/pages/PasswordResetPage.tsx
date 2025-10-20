@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { Icon } from '@iconify/react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/components/ui/button';
 import { PasswordResetForm } from '../components/forms/PasswordResetForm';
 import { AuthCard } from '../components/ui/AuthCard';
 import { AuthHeader } from '../components/ui/AuthHeader';

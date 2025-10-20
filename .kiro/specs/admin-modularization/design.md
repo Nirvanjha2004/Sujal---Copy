@@ -229,7 +229,7 @@ export interface UserService {
 ### External Imports (from other parts of the app)
 ```typescript
 // Before
-import { AdminPanel } from '@/components/admin/AdminPanel';
+import { AdminPanel } from '@/shared/components/admin/AdminPanel';
 
 // After
 import { AdminPanelPage } from '@/features/admin';

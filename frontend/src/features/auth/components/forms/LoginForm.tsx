@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Icon } from '@iconify/react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/shared/components/ui/button';
+import { Input } from '@/shared/components/ui/input';
+import { Alert, AlertDescription } from '@/shared/components/ui/alert';
 import { useLogin } from '../../hooks/useLogin';
 import { LoginFormData } from '../../types';
 

@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Layout } from '@/components/layout/Layout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Progress } from '@/components/ui/progress';
+import { Layout } from '@/shared/components/layout/Layout';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { Button } from '@/shared/components/ui/button';
+import { Alert, AlertDescription } from '@/shared/components/ui/alert';
+import { Progress } from '@/shared/components/ui/progress';
 import { Icon } from '@iconify/react';
 import { api } from '@/shared/lib/api';
 import { useNavigate } from 'react-router-dom';

@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react";
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import { Layout } from "@/components/layout/Layout";
+import { Button } from "@/shared/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/shared/components/ui/card";
+import { Input } from "@/shared/components/ui/input";
+import { ScrollArea } from "@/shared/components/ui/scroll-area";
+import { Badge } from "@/shared/components/ui/badge";
+import { Layout } from "@/shared/components/layout/Layout";
 import { DashboardLayout } from "../components/common/DashboardLayout";
 import { useAuth } from "@/shared/contexts/AuthContext";
 import { toast } from "sonner";

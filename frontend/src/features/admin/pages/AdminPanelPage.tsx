@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Icon } from '@iconify/react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@/shared/components/ui/button';
+import { Badge } from '@/shared/components/ui/badge';
 import { AdminDashboardPage } from './AdminDashboardPage';
 import { UserManagementPage } from './UserManagementPage';
 import { PropertyModerationPage } from './PropertyModerationPage';
@@ -57,20 +57,20 @@ const navigationItems: NavItem[] = [
     badge: 'New',
     color: 'text-purple-600'
   },
-  {
-    id: 'content',
-    label: 'Content Management',
-    icon: 'solar:document-text-bold',
-    description: 'Manage website content',
-    color: 'text-orange-600'
-  },
-  {
-    id: 'banners',
-    label: 'Banners & Announcements',
-    icon: 'solar:megaphone-bold',
-    description: 'Site banners & notifications',
-    color: 'text-red-600'
-  },
+  // {
+  //   id: 'content',
+  //   label: 'Content Management',
+  //   icon: 'solar:document-text-bold',
+  //   description: 'Manage website content',
+  //   color: 'text-orange-600'
+  // },
+  // {
+  //   id: 'banners',
+  //   label: 'Banners & Announcements',
+  //   icon: 'solar:megaphone-bold',
+  //   description: 'Site banners & notifications',
+  //   color: 'text-red-600'
+  // },
   // {
   //   id: 'seo',
   //   label: 'SEO Management',
@@ -78,27 +78,27 @@ const navigationItems: NavItem[] = [
   //   description: 'Meta tags & search optimization',
   //   color: 'text-indigo-600'
   // },
-  {
-    id: 'analytics',
-    label: 'Analytics',
-    icon: 'solar:graph-up-bold',
-    description: 'Traffic, leads & performance',
-    color: 'text-teal-600'
-  },
-  {
-    id: 'reviews',
-    label: 'Review Moderation',
-    icon: 'solar:star-bold',
-    description: 'Moderate user reviews',
-    color: 'text-yellow-600'
-  },
-  {
-    id: 'redirects',
-    label: 'URL Management',
-    icon: 'solar:link-bold',
-    description: 'Manage redirects & URLs',
-    color: 'text-gray-600'
-  },
+  // {
+  //   id: 'analytics',
+  //   label: 'Analytics',
+  //   icon: 'solar:graph-up-bold',
+  //   description: 'Traffic, leads & performance',
+  //   color: 'text-teal-600'
+  // },
+  // {
+  //   id: 'reviews',
+  //   label: 'Review Moderation',
+  //   icon: 'solar:star-bold',
+  //   description: 'Moderate user reviews',
+  //   color: 'text-yellow-600'
+  // },
+  // {
+  //   id: 'redirects',
+  //   label: 'URL Management',
+  //   icon: 'solar:link-bold',
+  //   description: 'Manage redirects & URLs',
+  //   color: 'text-gray-600'
+  // },
   {
     id: 'roles',
     label: 'Role Assignment',

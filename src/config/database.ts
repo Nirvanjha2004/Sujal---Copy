@@ -85,10 +85,7 @@ export const connectDatabase = async (): Promise<void> => {
     console.log('🔗 Model associations defined successfully.');
     
     // Remove force: true and use alter: true instead
-    await sequelize.sync({ 
-      alter: true,  // Use alter instead of force
-      // force: true  // Remove this line - it drops all tables on restart
-    });
+    await sequelize.sync();
     console.log('🔄 Database synchronized successfully.');
   } catch (error) {
     console.error('❌ Unable to connect to the database:', error);

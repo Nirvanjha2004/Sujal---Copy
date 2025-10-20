@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Icon } from '@iconify/react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Layout } from '@/components/layout/Layout';
-import { PropertyCard } from '@/components/property/PropertyCard';
+import { Button } from '@/shared/components/ui/button';
+import { Card, CardContent } from '@/shared/components/ui/card';
+import { Alert, AlertDescription } from '@/shared/components/ui/alert';
+import { Layout } from '@/shared/components/layout/Layout';
+import { PropertyCard } from '@/features/property/components/common/PropertyCard';
 import { useFavorites } from '../hooks/useFavorites';
 import { useNavigate } from 'react-router-dom';
 

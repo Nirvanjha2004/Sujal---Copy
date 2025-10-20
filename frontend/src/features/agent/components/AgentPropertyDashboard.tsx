@@ -3,8 +3,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/ui
 import { Button } from '../../../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Layout } from '../../../components/layout/Layout';
-import BulkUpload from '../../../components/properties/BulkUpload';
-import ImageUpload from '../../../components/properties/ImageUpload';
+import { BulkUploadPage } from '../../../pages/agent/BulkUploadPage';
+import { PropertyImageUpload } from '@/features/property/components/common/PropertyImageUpload';
 import { PerformanceAnalytics, LeadManagement } from './';
 import { Icon } from '@iconify/react';
 import { useNavigate } from 'react-router-dom';
@@ -289,7 +289,7 @@ const AgentPropertyDashboard = () => {
               {/* Legacy tabs for backward compatibility */}
               <TabsContent value="bulk-upload" className="mt-8">
                 <div className="container mx-auto px-4">
-                  <BulkUpload />
+                  <BulkUploadPage />
                 </div>
               </TabsContent>
 
@@ -315,7 +315,7 @@ const AgentPropertyDashboard = () => {
                                   </CardDescription>
                                 </CardHeader>
                                 <CardContent>
-                                  <ImageUpload
+                                  <PropertyImageUpload
                                     propertyId={property.id}
                                     images={property.images || []}
                                     onImagesUpdated={(images) => {

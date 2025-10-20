@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card } from '@/shared/components/ui/card';
+import { Button } from '@/shared/components/ui/button';
+import { Badge } from '@/shared/components/ui/badge';
 import { Icon } from '@iconify/react';
 import { userService } from '../services/userService';
 import type { UserModerationData, UserFilters } from '../types/user';

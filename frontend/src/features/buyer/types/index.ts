@@ -4,4 +4,5 @@ export * from './favorites';
 export * from './savedSearches';
 
 // Re-export commonly used types from shared API
-export type { Property, PropertyImage, User } from '@/shared/lib/api';
+export type { User } from '@/shared/lib/api';
+export type { Property, PropertyImage } from '@/features/property/types';

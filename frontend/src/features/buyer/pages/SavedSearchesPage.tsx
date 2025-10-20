@@ -1,9 +1,9 @@
 import { Icon } from '@iconify/react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { Layout } from '@/components/layout/Layout';
+import { Button } from '@/shared/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { Alert, AlertDescription } from '@/shared/components/ui/alert';
+import { Badge } from '@/shared/components/ui/badge';
+import { Layout } from '@/shared/components/layout/Layout';
 import { useNavigate } from 'react-router-dom';
 import { useSavedSearches } from '../hooks/useSavedSearches';
 import { PropertyFilters } from '../types';

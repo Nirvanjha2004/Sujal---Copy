@@ -1,34 +1,33 @@
 import { Routes, Route } from 'react-router-dom'
-import { ErrorBoundary } from './components/layout/ErrorBoundary'
-import { ProtectedRoute } from './features/auth/components/guards/ProtectedRoute'
+import { ErrorBoundary } from '@/shared/components/layout/ErrorBoundary'
+import { ProtectedRoute } from '@/features/auth/components/guards/ProtectedRoute'
 import { RealEstateLandingPage } from './components/landing/RealEstateLandingPage2'
-import { PropertyListingPage } from './components/landing/PropertyListingPage'
-import { PropertyListingGrid } from './components/landing/PropertyListingGrid2'
-import { LoginPage } from './features/auth/pages/LoginPage'
-import { RegisterPage } from './features/auth/pages/RegisterPage'
-import { OTPVerificationPage } from './features/auth/pages/OTPVerificationPage'
-import { ProfilePage } from './features/auth/pages/ProfilePage'
+import { PropertyDetailsPage } from '@/features/property/pages'
+import { PropertyListingGrid } from '@/features/property/pages/PropertyListingGrid'
+import { LoginPage } from '@/features/auth/pages/LoginPage'
+import { RegisterPage } from '@/features/auth/pages/RegisterPage'
+import { OTPVerificationPage } from '@/features/auth/pages/OTPVerificationPage'
+import { ProfilePage } from '@/features/auth/pages/ProfilePage'
 import { DashboardPage, UserActivityPage, AccountSettingsPage, MessagesPage } from '@/features/dashboard/pages'
 import { FavoritesPage } from '@/features/buyer/pages/FavoritesPage'
 import { SavedSearchesPage } from '@/features/buyer/pages/SavedSearchesPage'
-import { CalculatorsPage } from '@/features/calculators'
+// import { CalculatorsPage } from '@/features/calculators'
 import { AdminPanelPage } from '@/features/admin'
-import { AddPropertyPage } from './components/property/AddPropertyPage'
-import { MyPropertiesPage } from './components/property/MyPropertiesPage'
-import { AgentPropertyDashboard } from './features/agent/components'
-import { PropertyListingSearchPage } from './components/landing/PropertyListingSearchPage'
+import { AddPropertyPage, MyPropertiesPage } from '@/features/property/pages'
+import { AgentPropertyDashboard } from '@/features/agent/components'
+import { PropertySearchPage } from '@/features/property/pages/PropertySearchPage'
 import { PropertySearchDashboard } from './components/landing/SearchViewedDashboard'
 
 import { BulkUploadPage } from '@/pages/agent/BulkUploadPage'
 
 // Builder Pages
-import { ProjectsPage } from './features/builder/pages/ProjectsPage'
-import { NewProjectPage } from './features/builder/pages/NewProjectPage'
-import { ProjectDetailsPage } from './features/builder/pages/ProjectDetailsPage'
-import { ProjectUnitsPage } from './features/builder/pages/ProjectUnitsPage'
-import { BulkUnitsPage } from './features/builder/pages/BulkUnitsPage'
-import { LeadManagementPage } from './features/agent/pages/LeadManagementPage'
-import { NewUnitPage } from './features/builder/pages/NewUnitPage'
+import { ProjectsPage } from '@/features/builder/pages/ProjectsPage'
+import { NewProjectPage } from '@/features/builder/pages/NewProjectPage'
+import { ProjectDetailsPage } from '@/features/builder/pages/ProjectDetailsPage'
+import { ProjectUnitsPage } from '@/features/builder/pages/ProjectUnitsPage'
+import { BulkUnitsPage } from '@/features/builder/pages/BulkUnitsPage'
+import { LeadManagementPage } from '@/features/agent/pages/LeadManagementPage'
+import { NewUnitPage } from '@/features/builder/pages/NewUnitPage'
 // import { BulkListingPage } from './pages/builder/BulkListingPage'
 
 
@@ -40,9 +39,9 @@ function App() {
                     {/* Public routes */}
                     <Route path="/" element={<RealEstateLandingPage />} />
                     <Route path="/properties" element={<PropertyListingGrid />} />
-                    <Route path="/search" element={<PropertyListingSearchPage />} />
-                    <Route path="/property/:id" element={<PropertyListingPage />} />
-                    <Route path="/calculators" element={<CalculatorsPage />} />
+                    <Route path="/search" element={<PropertySearchPage />} />
+                    <Route path="/property/:id" element={<PropertyDetailsPage />} />
+                    {/* <Route path="/calculators" element={<CalculatorsPage />} /> */}
 
                     {/* Search & Activity Dashboard - Can be accessed by both authenticated and unauthenticated users */}
                     <Route path="/search-dashboard" element={<PropertySearchDashboard />} />

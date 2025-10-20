@@ -10,7 +10,7 @@ This directory contains all the core layout components for the Real Estate Porta
 The main layout wrapper that provides the basic page structure with header and footer.
 
 ```tsx
-import { Layout } from '@/components/layout';
+import { Layout } from '@/shared/components/layout';
 
 <Layout 
   headerVariant="landing" // or "default"
@@ -27,7 +27,7 @@ import { Layout } from '@/components/layout';
 An enhanced layout component that includes page title, description, breadcrumbs, and action buttons.
 
 ```tsx
-import { PageLayout } from '@/components/layout';
+import { PageLayout } from '@/shared/components/layout';
 
 <PageLayout
   title="Page Title"
@@ -64,7 +64,7 @@ Slide-out mobile navigation menu with:
 Navigation breadcrumbs with predefined configurations.
 
 ```tsx
-import { Breadcrumb, breadcrumbConfigs } from '@/components/layout';
+import { Breadcrumb, breadcrumbConfigs } from '@/shared/components/layout';
 
 // Using predefined config
 <Breadcrumb items={breadcrumbConfigs.profile} />
@@ -93,7 +93,7 @@ User menu sidebar with profile information and account links.
 Responsive container with different size options.
 
 ```tsx
-import { Container } from '@/components/layout';
+import { Container } from '@/shared/components/layout';
 
 <Container size="lg"> // sm, md, lg, xl, full
   {children}
@@ -104,7 +104,7 @@ import { Container } from '@/components/layout';
 Page section wrapper with background variants.
 
 ```tsx
-import { Section } from '@/components/layout';
+import { Section } from '@/shared/components/layout';
 
 <Section background="muted"> // default, muted, accent
   {children}
@@ -115,7 +115,7 @@ import { Section } from '@/components/layout';
 Responsive grid layout with configurable columns and gaps.
 
 ```tsx
-import { Grid } from '@/components/layout';
+import { Grid } from '@/shared/components/layout';
 
 <Grid cols={4} gap="md"> // cols: 1-6, gap: sm, md, lg
   {children}
@@ -129,7 +129,7 @@ React error boundary with user-friendly error display and recovery options.
 
 ## Loading Components
 
-Located in `@/components/ui/loading`, these components provide consistent loading states:
+Located in `@/shared/components/ui/loading`, these components provide consistent loading states:
 
 - `LoadingSpinner`: Configurable spinner component
 - `PageLoading`: Full page loading state
@@ -145,7 +145,7 @@ Located in `@/components/ui/loading`, these components provide consistent loadin
 ### Basic Page Layout
 
 ```tsx
-import { PageLayout, breadcrumbConfigs } from '@/components/layout';
+import { PageLayout, breadcrumbConfigs } from '@/shared/components/layout';
 
 export function MyPage() {
   return (
@@ -163,7 +163,7 @@ export function MyPage() {
 ### Page with Sidebar
 
 ```tsx
-import { Layout, FilterSidebar, Container } from '@/components/layout';
+import { Layout, FilterSidebar, Container } from '@/shared/components/layout';
 
 export function SearchPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -190,7 +190,7 @@ export function SearchPage() {
 ### Grid Layout
 
 ```tsx
-import { PageLayout, Grid, Container } from '@/components/layout';
+import { PageLayout, Grid, Container } from '@/shared/components/layout';
 
 export function PropertiesPage() {
   return (

@@ -1,13 +1,13 @@
 import { Icon } from "@iconify/react";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
+import { Button } from "@/shared/components/ui/button";
+import { Alert, AlertDescription } from "@/shared/components/ui/alert";
+import { Badge } from "@/shared/components/ui/badge";
+import { Card } from "@/shared/components/ui/card";
 import { useProperties } from "@/shared/hooks/useProperties";
-import { PropertyGridSkeleton } from "@/components/ui/loading";
+import { PropertyGridSkeleton } from "@/shared/components/ui/loading";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
-import { PropertyFilters } from "@/shared/lib/api";
+import { PropertyFilters } from "@/features/property/types";
 import { useAuth } from '@/shared/contexts/AuthContext';
 import { api } from '@/shared/lib/api';
 import {
@@ -17,8 +17,8 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+} from '@/shared/components/ui/dialog';
+import { Input } from '@/shared/components/ui/input';
 import { toast } from 'sonner'; // Assuming you use a toast library like sonner
 
 export function PropertyListingGrid() {

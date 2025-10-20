@@ -1,6 +1,6 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { Icon } from '@iconify/react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/components/ui/button';
 import { RegisterForm } from '../components/forms/RegisterForm';
 import { AuthCard } from '../components/ui/AuthCard';
 import { AuthHeader } from '../components/ui/AuthHeader';

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Icon } from '@iconify/react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+import { Button } from '@/shared/components/ui/button';
+import { Badge } from '@/shared/components/ui/badge';
+import { Separator } from '@/shared/components/ui/separator';
 import { cn } from '@/shared/lib/utils';
 
 interface NavigationItem {

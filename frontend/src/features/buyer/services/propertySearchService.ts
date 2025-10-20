@@ -1,4 +1,5 @@
-import { api, Property } from '@/shared/lib/api';
+import { api } from '@/shared/lib/api';
+import { Property } from '@/features/property/types';
 import type { PropertyFilters } from '../types/savedSearches';
 
 export interface PropertySearchResponse {

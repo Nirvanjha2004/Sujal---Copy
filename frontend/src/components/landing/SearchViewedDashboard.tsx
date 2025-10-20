@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Icon } from "@iconify/react";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/shared/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/components/ui/tabs";
+import { Card, CardContent } from "@/shared/components/ui/card";
+import { Badge } from "@/shared/components/ui/badge";
 import { useAuth } from '@/shared/contexts/AuthContext';
 import { useFavorites } from '@/features/buyer/hooks/useFavorites';
-import { api, Property, SavedSearch } from '@/shared/lib/api';
+import { api, SavedSearch } from '@/shared/lib/api';
+import { Property } from '@/features/property/types';
 import { useNavigate } from 'react-router-dom';
-import { PropertyCard } from '@/components/property/PropertyCard';
+import { PropertyCard } from '@/features/property/components/common/PropertyCard';
 
 interface ActivityItem {
   id: number;

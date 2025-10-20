@@ -1,45 +1,29 @@
 // Re-export auth types from dedicated auth feature module
 export * from '@/features/auth/types';
 
-// Property Types
-export interface Property {
-  id: number;
-  title: string;
-  description: string;
-  propertyType: PropertyType;
-  listingType: ListingType;
-  price: number;
-  area: number;
-  bedrooms?: number;
-  bathrooms?: number;
-  location: LocationData;
-  amenities: string[];
-  images: PropertyImage[];
-  isActive: boolean;
-  isFeatured: boolean;
-  ownerId: number;
-  createdAt: string;
-  updatedAt: string;
-}
+// Re-export property types from dedicated property feature module
+export type {
+  Property,
+  PropertyType,
+  ListingType,
+  PropertyStatus,
+  PropertyImage,
+  PropertyImageType,
+  PropertyStats,
+  PropertyFeature,
+  LocationData,
+  PropertyFilters,
+  SearchCriteria,
+  SavedSearch,
+  PropertyAnalytics,
+  MarketInsights,
+  PerformanceMetrics,
+  PaginatedResponse as PropertyPaginatedResponse,
+  ApiResponse as PropertyApiResponse
+} from '@/features/property/types';
 
-export type PropertyType = 'apartment' | 'house' | 'villa' | 'plot' | 'commercial';
-export type ListingType = 'sale' | 'rent';
-
-export interface LocationData {
-  address: string;
-  city: string;
-  state: string;
-  pincode: string;
-  latitude?: number;
-  longitude?: number;
-}
-
-export interface PropertyImage {
-  id: number;
-  url: string;
-  alt: string;
-  isPrimary: boolean;
-}
+// Import LocationData for use in Project interface
+import type { LocationData } from '@/features/property/types';
 
 // Re-export dashboard types from dedicated dashboard feature module
 export * from '@/features/dashboard/types';
@@ -60,17 +44,7 @@ export interface PaginatedResponse<T> {
   totalPages: number;
 }
 
-// Form Types
-export interface PropertyFilters {
-  location?: string;
-  propertyType?: PropertyType;
-  listingType?: ListingType;
-  minPrice?: number;
-  maxPrice?: number;
-  bedrooms?: number;
-  bathrooms?: number;
-  amenities?: string[];
-}
+// PropertyFilters is now exported from property feature module
 
 // Visit Types
 export interface SiteVisit {

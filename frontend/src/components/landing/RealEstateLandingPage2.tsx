@@ -1,18 +1,18 @@
 import { Icon } from "@iconify/react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Button } from "@/shared/components/ui/button";
+import { Card, CardContent } from "@/shared/components/ui/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/components/ui/tabs";
 import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
   SelectItem,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+} from "@/shared/components/ui/select";
+import { Input } from "@/shared/components/ui/input";
+import { Badge } from "@/shared/components/ui/badge";
 import { useFeaturedProperties, useRecentProperties } from "@/shared/hooks/useProperties";
-import { PropertyCardSkeleton } from "@/components/ui/loading";
+import { PropertyCardSkeleton } from "@/shared/components/ui/loading";
 import { useAuth } from "@/shared/contexts/AuthContext";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";

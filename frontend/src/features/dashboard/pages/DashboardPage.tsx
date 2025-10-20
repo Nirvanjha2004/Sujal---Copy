@@ -1,5 +1,5 @@
 import { useAuth } from '@/shared/contexts/AuthContext';
-import { Layout } from '@/components/layout/Layout';
+import { Layout } from '@/shared/components/layout/Layout';
 import { useFavorites } from '@/features/buyer/hooks/useFavorites';
 import { useState, useEffect } from 'react';
 import { api } from '@/shared/lib/api';

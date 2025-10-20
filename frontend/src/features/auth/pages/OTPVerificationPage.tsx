@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Icon } from '@iconify/react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/components/ui/button';
 import { OTPVerificationForm } from '../components/forms/OTPVerificationForm';
 import { AuthCard } from '../components/ui/AuthCard';
 import { AuthHeader } from '../components/ui/AuthHeader';

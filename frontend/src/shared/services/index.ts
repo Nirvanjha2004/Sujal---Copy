@@ -1,11 +1,11 @@
-// Re-export all services for easy importing
-export { default as PropertyService } from './propertyService';
-export { default as UserService } from './userService';
-export { default as AuthService } from './authService';
-export { default as VisitService } from './visitService';
-export { default as ProjectService } from './projectService';
-export { default as AdminService } from './adminService';
-export { default as FileUploadService } from './fileUploadService';
+// Services are now organized by feature modules
+// PropertyService is available from: @/features/property/services
+// AuthService is available from: @/features/auth/services
+// Dashboard services are available from: @/features/dashboard/services
+// Admin services are available from: @/features/admin/services
+// Agent services are available from: @/features/agent/services
+// Builder services are available from: @/features/builder/services
+// Buyer services are available from: @/features/buyer/services
 
-// Dashboard services are now available from the dashboard feature module
-// Import from: @/features/dashboard/services
+// This file is kept for backward compatibility but services should be imported
+// directly from their respective feature modules

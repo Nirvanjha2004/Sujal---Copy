@@ -1,6 +1,6 @@
 
 import { Icon } from '@iconify/react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/components/ui/button';
 import { useAuth } from '@/shared/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/shared/lib/utils';

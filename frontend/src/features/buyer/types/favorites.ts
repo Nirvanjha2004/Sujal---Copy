@@ -1,5 +1,5 @@
 // Favorites-related types and interfaces
-import { Property } from '@/shared/lib/api';
+import { Property } from '@/features/property/types';
 
 export interface Favorite {
   id: number;

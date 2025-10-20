@@ -1,4 +1,4 @@
-import { Layout } from '@/components/layout/Layout';
+import { Layout } from '@/shared/components/layout/Layout';
 import { BuyerDashboard } from '../components/BuyerDashboard';
 
 export function BuyerDashboardPage() {

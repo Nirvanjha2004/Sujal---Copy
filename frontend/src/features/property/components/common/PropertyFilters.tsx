@@ -111,14 +111,14 @@ export function PropertyFilters({
                         <div className="min-w-[150px]">
                             <Label className="text-xs">Property Type</Label>
                             <Select
-                                value={Array.isArray(filters.propertyType) ? filters.propertyType[0] || "" : filters.propertyType || ""}
+                                value={Array.isArray(filters.propertyType) ? filters.propertyType[0] || undefined : filters.propertyType || undefined}
                                 onValueChange={(value) => updateFilter('propertyType', value ? [value as PropertyType] : [])}
                             >
                                 <SelectTrigger className="h-9">
                                     <SelectValue placeholder="Any Type" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="">Any Type</SelectItem>
+                                    <SelectItem value="all">Any Type</SelectItem>
                                     {PROPERTY_TYPES.map(type => (
                                         <SelectItem key={type.value} value={type.value}>
                                             {type.label}
@@ -132,14 +132,14 @@ export function PropertyFilters({
                         <div className="min-w-[120px]">
                             <Label className="text-xs">For</Label>
                             <Select
-                                value={filters.listingType || ""}
-                                onValueChange={(value) => updateFilter('listingType', value as ListingType)}
+                                value={filters.listingType || undefined}
+                                onValueChange={(value) => updateFilter('listingType', value === 'all' ? undefined : value as ListingType)}
                             >
                                 <SelectTrigger className="h-9">
                                     <SelectValue placeholder="Sale/Rent" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="">Any</SelectItem>
+                                    <SelectItem value="all">Any</SelectItem>
                                     {LISTING_TYPES.map(type => (
                                         <SelectItem key={type.value} value={type.value}>
                                             {type.label}
@@ -174,14 +174,14 @@ export function PropertyFilters({
                         <div className="min-w-[100px]">
                             <Label className="text-xs">Bedrooms</Label>
                             <Select
-                                value={filters.bedrooms?.toString() || ""}
-                                onValueChange={(value) => updateFilter('bedrooms', value ? Number(value) : undefined)}
+                                value={filters.bedrooms?.toString() || undefined}
+                                onValueChange={(value) => updateFilter('bedrooms', value === 'all' ? undefined : Number(value))}
                             >
                                 <SelectTrigger className="h-9">
                                     <SelectValue placeholder="Any" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="">Any</SelectItem>
+                                    <SelectItem value="all">Any</SelectItem>
                                     {[1, 2, 3, 4, 5].map(num => (
                                         <SelectItem key={num} value={num.toString()}>
                                             {num}+ BHK
@@ -263,14 +263,14 @@ export function PropertyFilters({
                         <div>
                             <Label className="text-sm font-medium mb-2 block">Listing Type</Label>
                             <Select
-                                value={filters.listingType || ""}
-                                onValueChange={(value) => updateFilter('listingType', value as ListingType)}
+                                value={filters.listingType || undefined}
+                                onValueChange={(value) => updateFilter('listingType', value === 'all' ? undefined : value as ListingType)}
                             >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select listing type" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="">Any</SelectItem>
+                                    <SelectItem value="all">Any</SelectItem>
                                     {LISTING_TYPES.map(type => (
                                         <SelectItem key={type.value} value={type.value}>
                                             {type.label}

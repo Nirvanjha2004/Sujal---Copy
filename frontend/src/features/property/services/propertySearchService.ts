@@ -23,8 +23,19 @@ class PropertySearchService {
     try {
       const apiFilters = this.transformFiltersToApi(filters);
       const response = await api.searchProperties(query, apiFilters);
-      return response.data.map(this.transformApiPropertyToProperty);
+      
+      // The API returns { data: Property[], total: number }
+      const properties = response.data || [];
+      
+      // Ensure we have an array to work with
+      if (!Array.isArray(properties)) {
+        console.warn('Expected properties array but got:', properties);
+        return [];
+      }
+      
+      return properties.map(this.transformApiPropertyToProperty);
     } catch (error: any) {
+      console.error('Property search error:', error);
       throw new Error(`Failed to search properties: ${error.message}`);
     }
   }

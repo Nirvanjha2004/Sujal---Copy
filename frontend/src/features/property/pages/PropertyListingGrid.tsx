@@ -75,6 +75,7 @@ export function PropertyListingGrid() {
         }
 
         try {
+            console.log("the filters are,", filters)
             await api.createSavedSearch(saveSearchName, filters);
             toast.success(`Search "${saveSearchName}" saved successfully!`);
             setIsSaveSearchModalOpen(false);

@@ -329,7 +329,7 @@ export const api = {
     }
 
     const response = await apiRequest(`/properties/search?${params.toString()}`) as any;
-    return response.data;
+    return { data: response.data, total: response.pagination?.total || response.data?.length || 0 };
   },
 
 
@@ -480,7 +480,7 @@ export const api = {
   },
 
   // Saved Searches
-  getSavedSearches: (): Promise<{ data: { searches: SavedSearch[] } }> => {
+  getSavedSearches: (): Promise<{ data: { savedSearches: SavedSearch[] } }> => {
     return apiRequest('/saved-searches');
   },
 

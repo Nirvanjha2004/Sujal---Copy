@@ -8,10 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui
 import { Search, Filter, X, MapPin, Bookmark, Share2 } from 'lucide-react';
 
 export interface SearchResultsProps {
-  properties: Property[];
-  totalResults: number;
-  currentPage: number;
-  totalPages: number;
+  properties?: Property[];
+  totalResults?: number;
+  currentPage?: number;
+  totalPages?: number;
   isLoading?: boolean;
   hasMore?: boolean;
   searchQuery?: string;
@@ -20,7 +20,7 @@ export interface SearchResultsProps {
   onPropertyClick?: (property: Property) => void;
   onFavoriteToggle?: (propertyId: number) => void;
   onSortChange?: (sortBy: string, sortOrder: 'asc' | 'desc') => void;
-  onFilterRemove?: (filterKey: keyof PropertyFilters, value?: any) => void;
+  onFilterRemove?: (filterKey: string, value?: any) => void;
   onClearAllFilters?: () => void;
   onSaveSearch?: () => void;
   onShareResults?: () => void;
@@ -32,10 +32,10 @@ export interface SearchResultsProps {
 }
 
 export const SearchResults: React.FC<SearchResultsProps> = ({
-  properties,
-  totalResults,
-  currentPage,
-  totalPages,
+  properties = [],
+  totalResults = 0,
+  currentPage = 1,
+  totalPages = 1,
   isLoading = false,
   hasMore = false,
   searchQuery,
@@ -142,7 +142,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
 
   const handleFilterRemove = (filterKey: string, value?: any) => {
     if (onFilterRemove) {
-      onFilterRemove(filterKey as keyof PropertyFilters, value);
+      onFilterRemove(filterKey, value);
     }
   };
 
@@ -297,7 +297,6 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
               hasMore={hasMore}
               onLoadMore={onLoadMore}
               onPropertyClick={onPropertyClick}
-              onFavoriteToggle={onFavoriteToggle}
               showFavoriteButton={true}
               showStats={false}
               showAgent={true}
@@ -310,7 +309,6 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
               hasMore={hasMore}
               onLoadMore={onLoadMore}
               onPropertyClick={onPropertyClick}
-              onFavoriteToggle={onFavoriteToggle}
               onSortChange={onSortChange}
               showFavoriteButton={true}
               showStats={false}

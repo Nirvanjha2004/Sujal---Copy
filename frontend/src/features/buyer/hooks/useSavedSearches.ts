@@ -117,7 +117,6 @@ export function useSavedSearches() {
     const searchParams = savedSearchesService.filtersToSearchParams(filters);
     
     // Navigate to search page with filters
-    // This would typically use router navigation
     const searchUrl = `/search?${searchParams.toString()}`;
     window.location.href = searchUrl;
   };

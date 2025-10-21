@@ -4,8 +4,10 @@ import { propertySearchService } from '../services';
 
 export interface UsePropertySearchReturn {
   properties: Property[];
+  loading: boolean;
   isLoading: boolean;
   error: string | null;
+  total: number;
   searchProperties: (query: string, filters?: PropertyFilters) => Promise<void>;
   clearSearch: () => void;
   hasMore: boolean;
@@ -17,9 +19,25 @@ export interface UsePropertySearchReturn {
 export interface UsePropertySearchOptions {
   pageSize?: number;
   enableCaching?: boolean;
+  filters?: PropertyFilters;
 }
 
-export const usePropertySearch = (options: UsePropertySearchOptions = {}): UsePropertySearchReturn => {
+export const usePropertySearch = (filtersOrOptions?: PropertyFilters | UsePropertySearchOptions): UsePropertySearchReturn => {
+  // Handle both old and new calling patterns
+  let options: UsePropertySearchOptions = {};
+  let initialFilters: PropertyFilters | undefined;
+  
+  if (filtersOrOptions) {
+    // Check if it's filters (has property-like keys) or options (has pageSize, enableCaching)
+    if ('pageSize' in filtersOrOptions || 'enableCaching' in filtersOrOptions) {
+      options = filtersOrOptions as UsePropertySearchOptions;
+      initialFilters = options.filters;
+    } else {
+      // It's filters
+      initialFilters = filtersOrOptions as PropertyFilters;
+      options = { pageSize: 20, enableCaching: true };
+    }
+  }
   const { pageSize = 20, enableCaching = true } = options;
   
   const [properties, setProperties] = useState<Property[]>([]);
@@ -29,7 +47,9 @@ export const usePropertySearch = (options: UsePropertySearchOptions = {}): UsePr
   const [totalResults, setTotalResults] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [currentQuery, setCurrentQuery] = useState<string>('');
-  const [currentFilters, setCurrentFilters] = useState<PropertyFilters | undefined>();
+  const [currentFilters, setCurrentFilters] = useState<PropertyFilters | undefined>(initialFilters);
+  
+  // Auto-search when initial filters are provided - moved after searchProperties definition
   
   // Cache for search results
   const [searchCache, setSearchCache] = useState<Map<string, Property[]>>(new Map());
@@ -77,6 +97,14 @@ export const usePropertySearch = (options: UsePropertySearchOptions = {}): UsePr
       setIsLoading(false);
     }
   }, [pageSize, enableCaching, searchCache, generateCacheKey]);
+
+  // Auto-search when initial filters are provided
+  useEffect(() => {
+    if (initialFilters && Object.keys(initialFilters).length > 0) {
+      const query = initialFilters.location || '';
+      searchProperties(query, initialFilters);
+    }
+  }, [initialFilters, searchProperties]);
 
   const loadMore = useCallback(async () => {
     if (!hasMore || isLoading || !currentQuery) return;
@@ -127,8 +155,10 @@ export const usePropertySearch = (options: UsePropertySearchOptions = {}): UsePr
 
   return {
     properties,
+    loading: isLoading,
     isLoading,
     error,
+    total: totalResults,
     searchProperties,
     clearSearch,
     hasMore,

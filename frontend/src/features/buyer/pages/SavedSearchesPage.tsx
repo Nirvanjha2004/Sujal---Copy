@@ -21,17 +21,43 @@ export function SavedSearchesPage() {
   };
 
   const handleRunSearch = (filters: PropertyFilters) => {
+    console.log('Running saved search with filters:', filters);
+    
     const params = new URLSearchParams();
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        // Use 'q' for the location parameter, as expected by the search page
-        if (key === 'location') {
-          params.append('q', value.toString());
-        } else {
-          params.append(key, value.toString());
-        }
-      }
-    });
+    
+    // Handle location - check multiple possible field names
+    const location = filters.location || 
+                    (Array.isArray(filters.city) ? filters.city[0] : filters.city) ||
+                    filters.keywords;
+    if (location) params.append('q', location);
+    
+    // Handle property_type - convert array to string if needed
+    const propertyType = Array.isArray(filters.property_type) ? filters.property_type[0] : filters.property_type;
+    if (propertyType) params.append('property_type', propertyType);
+    
+    // Handle listing_type
+    if (filters.listing_type) params.append('listing_type', filters.listing_type);
+    
+    // Handle price range
+    if (filters.min_price) params.append('min_price', filters.min_price.toString());
+    if (filters.max_price) params.append('max_price', filters.max_price.toString());
+    
+    // Handle area range
+    if (filters.min_area) params.append('min_area', filters.min_area.toString());
+    if (filters.max_area) params.append('max_area', filters.max_area.toString());
+    
+    // Handle bedrooms/bathrooms - convert array to string if needed
+    const bedrooms = Array.isArray(filters.bedrooms) ? filters.bedrooms[0] : filters.bedrooms;
+    if (bedrooms) params.append('bedrooms', bedrooms.toString());
+    
+    const bathrooms = Array.isArray(filters.bathrooms) ? filters.bathrooms[0] : filters.bathrooms;
+    if (bathrooms) params.append('bathrooms', bathrooms.toString());
+    
+    // Handle other filters
+    if (filters.status) params.append('status', filters.status);
+    if (filters.is_featured) params.append('is_featured', filters.is_featured.toString());
+    
+    console.log('Generated URL params:', params.toString());
     navigate(`/search?${params.toString()}`);
   };
 

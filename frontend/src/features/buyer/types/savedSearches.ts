@@ -2,12 +2,13 @@
 
 export interface PropertyFilters {
   location?: string;
-  property_type?: string;
+  city?: string | string[]; // Backend uses city field, can be string or array
+  property_type?: string | string[]; // Backend can send as array
   listing_type?: string;
   min_price?: number;
   max_price?: number;
-  bedrooms?: number;
-  bathrooms?: number;
+  bedrooms?: number | number[]; // Backend can send as array
+  bathrooms?: number | number[]; // Backend can send as array
   min_area?: number;
   max_area?: number;
   area_min?: number;

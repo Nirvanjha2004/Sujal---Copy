@@ -9,7 +9,7 @@ import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Badge } from "@/shared/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/shared/components/ui/avatar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
+import { Card, CardContent } from "@/shared/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 import { PropertyGridSkeleton } from "@/shared/components/ui/loading";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
@@ -38,16 +38,13 @@ export function PropertySearchPage() {
     const {
         filters,
         setFilters,
-        clearFilters,
-        applyFilters,
-        resetFilters,
-        activeFilterCount
+        clearFilters
     } = usePropertyFilters();
 
     // Extract filters from URL params on component mount
     useEffect(() => {
         const newFilters: PropertyFiltersType = {};
-        
+
         const query = searchParams.get('q');
         const propertyType = searchParams.get('property_type');
         const listingTypeParam = searchParams.get('listing_type');
@@ -57,82 +54,171 @@ export function PropertySearchPage() {
         const maxAreaParam = searchParams.get('max_area');
         const bedroomsParam = searchParams.get('bedrooms');
         const statusParam = searchParams.get('status');
-        
+
         if (query) {
             newFilters.location = query;
             setSearchQuery(query);
         }
         if (propertyType && propertyType !== 'all') {
-            newFilters.property_type = propertyType;
+            newFilters.propertyType = propertyType as any;
         }
         if (listingTypeParam) {
-            newFilters.listing_type = listingTypeParam;
+            newFilters.listingType = listingTypeParam as any;
             setListingType(listingTypeParam);
         }
         if (minPriceParam) {
-            newFilters.min_price = parseInt(minPriceParam);
+            newFilters.minPrice = parseInt(minPriceParam);
         }
         if (maxPriceParam) {
-            newFilters.max_price = parseInt(maxPriceParam);
+            newFilters.maxPrice = parseInt(maxPriceParam);
         }
         if (minAreaParam) {
-            newFilters.min_area = parseInt(minAreaParam);
+            newFilters.minArea = parseInt(minAreaParam);
         }
         if (maxAreaParam) {
-            newFilters.max_area = parseInt(maxAreaParam);
+            newFilters.maxArea = parseInt(maxAreaParam);
         }
         if (bedroomsParam) {
             newFilters.bedrooms = parseInt(bedroomsParam);
         }
         if (statusParam) {
-            newFilters.status = statusParam;
+            newFilters.status = statusParam as any;
         }
-        
+
         setFilters(newFilters);
     }, [searchParams, setFilters]);
 
     // Fetch properties based on current filters
-    const { properties, loading, error, total } = usePropertySearch(filters);
+    const { properties, loading, error, total, searchProperties } = usePropertySearch();
+
+    // Trigger search when filters change or on initial load
+    useEffect(() => {
+        const query = filters.location || searchQuery || '';
+        searchProperties(query, filters);
+    }, [filters, searchQuery, searchProperties]);
 
     // Update URL when filters change
     const updateSearchParams = (newFilters: PropertyFiltersType) => {
         const params = new URLSearchParams();
-        
+
         if (newFilters.location) params.set('q', newFilters.location);
-        if (newFilters.property_type) params.set('property_type', newFilters.property_type);
-        if (newFilters.listing_type) params.set('listing_type', newFilters.listing_type);
-        if (newFilters.min_price) params.set('min_price', newFilters.min_price.toString());
-        if (newFilters.max_price) params.set('max_price', newFilters.max_price.toString());
-        if (newFilters.min_area) params.set('min_area', newFilters.min_area.toString());
-        if (newFilters.max_area) params.set('max_area', newFilters.max_area.toString());
+        if (newFilters.propertyType) params.set('property_type', Array.isArray(newFilters.propertyType) ? newFilters.propertyType[0] : newFilters.propertyType);
+        if (newFilters.listingType) params.set('listing_type', newFilters.listingType);
+        if (newFilters.minPrice) params.set('min_price', newFilters.minPrice.toString());
+        if (newFilters.maxPrice) params.set('max_price', newFilters.maxPrice.toString());
+        if (newFilters.minArea) params.set('min_area', newFilters.minArea.toString());
+        if (newFilters.maxArea) params.set('max_area', newFilters.maxArea.toString());
         if (newFilters.bedrooms) params.set('bedrooms', newFilters.bedrooms.toString());
         if (newFilters.status) params.set('status', newFilters.status);
-        
+
         setSearchParams(params);
     };
 
     const handleSaveSearchClick = () => {
+        console.log("Save search button clicked!");
+        console.log("Auth state:", authState.isAuthenticated);
+        console.log("Filters:", filters);
+        console.log("Search query:", searchQuery);
+        console.log("Listing type:", listingType);
+
         if (!authState.isAuthenticated) {
             toast.error("Please log in to save your search.");
             navigate("/login");
             return;
         }
-        // Ensure there are filters to save
-        if (Object.keys(filters).length === 0) {
-            toast.info("Apply some filters before saving a search.");
+
+        // Check if there are any search criteria to save (filters, search query, or listing type)
+        const hasSearchCriteria = Object.keys(filters).length > 0 ||
+            searchQuery.trim() !== '' ||
+            listingType !== 'buy';
+
+        if (!hasSearchCriteria) {
+            toast.info("Apply some search filters or enter a search query before saving a search.");
             return;
         }
+
         setIsSaveSearchModalOpen(true);
     };
 
     const handleConfirmSaveSearch = async () => {
+        console.log("Confirm save search called!");
+        console.log("Save search name:", saveSearchName);
+
         if (!saveSearchName.trim()) {
             toast.error("Please enter a name for your search.");
             return;
         }
 
         try {
-            await api.createSavedSearch(saveSearchName, filters);
+            console.log("Current state before processing:");
+            console.log("- filters:", filters);
+            console.log("- searchQuery:", searchQuery);
+            console.log("- listingType:", listingType);
+
+            // Combine all current search state into a comprehensive filter object
+            const currentSearchState = {
+                ...filters,
+                // Include search query as location if not already set
+                location: filters.location || searchQuery || undefined,
+                // Include listing type if not already set
+                listingType: filters.listingType || (listingType !== 'buy' ? listingType : undefined)
+            };
+
+            console.log("Current search state after combining:", currentSearchState);
+
+            // Remove undefined values
+            const cleanFilters = Object.fromEntries(
+                Object.entries(currentSearchState).filter(([_, value]) => value !== undefined && value !== '')
+            );
+
+            console.log("Clean filters after removing undefined:", cleanFilters);
+
+            // Transform frontend filters to backend SearchCriteria format
+            const searchCriteria: any = {};
+
+            if (cleanFilters.propertyType) {
+                searchCriteria.property_type = Array.isArray(cleanFilters.propertyType)
+                    ? cleanFilters.propertyType
+                    : [cleanFilters.propertyType];
+            }
+            if (cleanFilters.listingType) {
+                searchCriteria.listing_type = cleanFilters.listingType;
+            }
+            if (cleanFilters.minPrice) {
+                searchCriteria.min_price = cleanFilters.minPrice;
+            }
+            if (cleanFilters.maxPrice) {
+                searchCriteria.max_price = cleanFilters.maxPrice;
+            }
+            if (cleanFilters.minArea) {
+                searchCriteria.min_area = cleanFilters.minArea;
+            }
+            if (cleanFilters.maxArea) {
+                searchCriteria.max_area = cleanFilters.maxArea;
+            }
+            if (cleanFilters.bedrooms) {
+                searchCriteria.bedrooms = [cleanFilters.bedrooms];
+            }
+            if (cleanFilters.bathrooms) {
+                searchCriteria.bathrooms = [cleanFilters.bathrooms];
+            }
+            if (cleanFilters.location) {
+                // Parse location to extract city if possible
+                searchCriteria.city = [cleanFilters.location];
+                searchCriteria.keywords = cleanFilters.location;
+            }
+            if (cleanFilters.amenities && Array.isArray(cleanFilters.amenities) && cleanFilters.amenities.length > 0) {
+                searchCriteria.amenities = cleanFilters.amenities;
+            }
+
+            // Ensure we have at least some search criteria
+            if (Object.keys(searchCriteria).length === 0) {
+                toast.error("Please apply some search filters before saving.");
+                return;
+            }
+
+            console.log("About to call API with:", { name: saveSearchName, criteria: searchCriteria });
+            await api.createSavedSearch(saveSearchName, searchCriteria);
             toast.success(`Search "${saveSearchName}" saved successfully!`);
             setIsSaveSearchModalOpen(false);
             setSaveSearchName("");
@@ -152,7 +238,7 @@ export function PropertySearchPage() {
     // Handle listing type change
     const handleListingTypeChange = (value: string) => {
         setListingType(value);
-        const newFilters = { ...filters, listing_type: value };
+        const newFilters = { ...filters, listingType: value as any };
         setFilters(newFilters);
         updateSearchParams(newFilters);
     };
@@ -171,7 +257,7 @@ export function PropertySearchPage() {
             {/* Header */}
             <header className="bg-primary py-4 px-3">
                 <div className="max-w-[1400px] mx-auto flex items-center gap-6">
-                    <h1 
+                    <h1
                         className="text-2xl font-bold text-primary-foreground cursor-pointer"
                         onClick={() => navigate('/')}
                     >
@@ -191,29 +277,29 @@ export function PropertySearchPage() {
                         {searchQuery && (
                             <div className="flex items-center gap-2 px-3 py-1 bg-secondary rounded">
                                 <span className="text-sm">{searchQuery}</span>
-                                <Icon 
-                                    icon="lucide:x" 
-                                    className="size-4 cursor-pointer" 
+                                <Icon
+                                    icon="lucide:x"
+                                    className="size-4 cursor-pointer"
                                     onClick={removeLocationFilter}
                                 />
                             </div>
                         )}
-                        <Input 
-                            placeholder="Add more" 
+                        <Input
+                            placeholder="Add more"
                             className="flex-1 border-0 shadow-none"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                         />
                         <Icon icon="lucide:mic" className="size-5 text-primary cursor-pointer" />
-                        <Icon 
-                            icon="lucide:search" 
+                        <Icon
+                            icon="lucide:search"
                             className="size-5 text-muted-foreground cursor-pointer"
                             onClick={handleSearch}
                         />
                     </div>
-                    <Button 
-                        variant="outline" 
+                    <Button
+                        variant="outline"
                         className="bg-background"
                         onClick={() => navigate('/dashboard')}
                     >
@@ -225,7 +311,7 @@ export function PropertySearchPage() {
                     {authState.isAuthenticated ? (
                         <Avatar className="cursor-pointer" onClick={() => navigate('/profile')}>
                             <AvatarFallback className="bg-green-500 text-white">
-                                {authState.user?.name?.charAt(0) || 'U'}
+                                {authState.user?.firstName?.charAt(0) || authState.user?.email?.charAt(0) || 'U'}
                             </AvatarFallback>
                         </Avatar>
                     ) : (
@@ -236,16 +322,16 @@ export function PropertySearchPage() {
                     <Icon icon="lucide:menu" className="size-6 text-primary-foreground cursor-pointer" />
                 </div>
             </header>
-            
+
             <div className="max-w-[1400px] mx-auto pl-2 pr-9 py-4">
                 <div className="text-sm text-muted-foreground mb-6">
                     Home › Property in {searchQuery || 'All Locations'} {listingType === 'rent' ? 'for Rent' : 'for Sale'}
                 </div>
-                
+
                 <div className="flex gap-6">
                     {/* Sidebar Filters */}
                     <aside className="w-80 shrink-0">
-                        <PropertyFilters 
+                        <PropertyFilters
                             filters={filters}
                             onFiltersChange={(newFilters) => {
                                 setFilters(newFilters);
@@ -257,7 +343,7 @@ export function PropertySearchPage() {
                             }}
                         />
                     </aside>
-                    
+
                     {/* Main Content */}
                     <main className="flex-1 mr-4">
                         <div className="flex items-center justify-between mb-4">
@@ -269,7 +355,7 @@ export function PropertySearchPage() {
                                 Save Search
                             </Button>
                         </div>
-                        
+
                         <Card className="mb-6">
                             <CardContent className="flex items-center gap-3 p-4">
                                 <Icon icon="lucide:map-pin" className="size-6 text-primary" />
@@ -279,7 +365,7 @@ export function PropertySearchPage() {
                                 </Button>
                             </CardContent>
                         </Card>
-                        
+
                         <div className="flex items-center gap-4 mb-6 overflow-x-auto pb-2">
                             <div className="flex items-center gap-2 px-4 py-2 bg-orange-50 border border-orange-200 rounded-full whitespace-nowrap">
                                 <Icon icon="solar:star-bold" className="size-5 text-orange-500" />
@@ -307,7 +393,7 @@ export function PropertySearchPage() {
                                 <Icon icon="lucide:chevron-down" className="size-4" />
                             </Button>
                         </div>
-                        
+
                         {loading ? (
                             <PropertyGridSkeleton />
                         ) : error ? (
@@ -318,10 +404,33 @@ export function PropertySearchPage() {
                                 </AlertDescription>
                             </Alert>
                         ) : (
-                            <SearchResults 
-                                properties={properties}
-                                loading={loading}
+                            <SearchResults
+                                properties={properties || []}
+                                totalResults={total || 0}
+                                currentPage={1}
+                                totalPages={Math.ceil((total || 0) / 20)}
+                                isLoading={loading}
+                                searchQuery={searchQuery}
+                                activeFilters={filters}
                                 onPropertyClick={(property) => navigate(`/property/${property.id}`)}
+                                onFilterRemove={(filterKey) => {
+                                    const newFilters = { ...filters };
+                                    // Handle special filter keys that map to multiple properties
+                                    if (filterKey === 'price') {
+                                        delete newFilters.minPrice;
+                                        delete newFilters.maxPrice;
+                                    } else if (filterKey === 'area') {
+                                        delete newFilters.minArea;
+                                        delete newFilters.maxArea;
+                                    } else {
+                                        // For direct property keys, delete them directly
+                                        delete (newFilters as any)[filterKey];
+                                    }
+                                    setFilters(newFilters);
+                                    updateSearchParams(newFilters);
+                                }}
+                                onClearAllFilters={() => setFilters({})}
+                                onSaveSearch={() => setIsSaveSearchModalOpen(true)}
                             />
                         )}
                     </main>

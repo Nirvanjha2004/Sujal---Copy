@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
-import { Button } from '../../../components/ui/button';
-import { Alert, AlertDescription, AlertTitle } from '../../../components/ui/alert';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { Button } from '@/shared/components/ui/button';
+import { Alert, AlertDescription, AlertTitle } from '@/shared/components/ui/alert';
 import { TrendingUp, TrendingDown, Eye, Star } from 'lucide-react';
 import { agentAnalyticsService } from '../services/agentAnalyticsService';
 import { PerformanceMetrics, UserAnalytics } from '../types';

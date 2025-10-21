@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/ui/tabs';
-import { Button } from '../../../components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
+import { Button } from '@/shared/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Layout } from '../../../components/layout/Layout';
 import { BulkUploadPage } from '../../../pages/agent/BulkUploadPage';
 import { PropertyImageUpload } from '@/features/property/components/common/PropertyImageUpload';
@@ -318,7 +318,7 @@ const AgentPropertyDashboard = () => {
                                   <PropertyImageUpload
                                     propertyId={property.id}
                                     images={property.images || []}
-                                    onImagesUpdated={(images) => {
+                                    onImagesUpdated={(images: any) => {
                                       setProperties(prev => prev.map(p =>
                                         p.id === property.id ? { ...p, images } : p
                                       ));

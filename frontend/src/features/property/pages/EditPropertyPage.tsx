@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/shared/contexts/AuthContext';
 import { useProperty } from '../hooks/useProperty';
-import { usePropertyForm } from '../hooks/usePropertyForm';
+
 import { EditPropertyForm } from '../components/forms/EditPropertyForm';
 import { Button } from '@/shared/components/ui/button';
 import { Alert, AlertDescription } from '@/shared/components/ui/alert';
@@ -14,8 +14,8 @@ export function EditPropertyPage() {
     const { state } = useAuth();
     const propertyId = id ? parseInt(id) : 0;
 
-    const { property, loading, error: propertyError } = useProperty(propertyId);
-    const { updateProperty, isSubmitting, error } = usePropertyForm();
+    const { property, isLoading: loading, error: propertyError } = useProperty({ propertyId });
+
 
     // Check if user has permission to edit properties
     const allowedRoles = ['owner', 'agent', 'builder'];
@@ -27,11 +27,11 @@ export function EditPropertyPage() {
         state.user?.role === 'admin'
     );
 
-    const handleSubmit = async (propertyData: any) => {
+    const handleSubmit = async () => {
         if (!property) return;
         
         try {
-            await updateProperty(property.id, propertyData);
+            await submitForm();
             // Navigate back to property details or my properties
             navigate(`/property/${property.id}`);
         } catch (error) {
@@ -148,10 +148,12 @@ export function EditPropertyPage() {
                 )}
 
                 <EditPropertyForm
-                    property={property}
-                    onSubmit={canEditThisProperty ? handleSubmit : undefined}
-                    isSubmitting={isSubmitting}
-                    disabled={!canEditThisProperty}
+                    propertyId={propertyId}
+                    initialProperty={property}
+                    onSuccess={canEditThisProperty ? (updatedProperty) => {
+                        console.log('Property updated:', updatedProperty);
+                        navigate(`/property/${updatedProperty.id}`);
+                    } : undefined}
                     onCancel={() => navigate(`/property/${property.id}`)}
                 />
             </div>

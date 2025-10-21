@@ -301,19 +301,6 @@ export function MessagesPage() {
                             {activeConversation.property?.title}
                           </p>
                         </div>
-                        <div className="text-right">
-                          <p className="text-sm font-semibold">
-                            {activeConversation.property ? formatPrice(activeConversation.property.price) : ''}
-                          </p>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => navigate(`/properties/${activeConversation.property_id}`)}
-                          >
-                            <Icon icon="solar:eye-bold" className="size-4 mr-1" />
-                            View Property
-                          </Button>
-                        </div>
                       </div>
                     </CardHeader>
 

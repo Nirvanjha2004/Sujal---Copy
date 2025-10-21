@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
 import { useProperty } from "../hooks/useProperty";
-import { useFavorites } from "../hooks/usePropertyFavorites";
+import { useFavorites } from "@/features/buyer/hooks/useFavorites";
 import { PropertyDetails } from "../components/details/PropertyDetails";
 import { PropertyOverview } from "../components/details/PropertyOverview";
 import { PropertyFeatures } from "../components/details/PropertyFeatures";
@@ -21,7 +21,7 @@ export function PropertyDetailsPage() {
     const navigate = useNavigate();
     const propertyId = id ? parseInt(id) : 0;
     
-    const { property, loading, error } = useProperty(propertyId);
+    const { property, isLoading: loading, error } = useProperty({ propertyId });
     const { isFavorite, addToFavorites, removeFromFavorites } = useFavorites();
     const [activeTab, setActiveTab] = useState('overview');
 

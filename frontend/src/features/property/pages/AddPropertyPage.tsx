@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/shared/contexts/AuthContext';
-import { usePropertyForm } from '../hooks/usePropertyForm';
+
 import { AddPropertyForm } from '../components/forms/AddPropertyForm';
 import { Button } from '@/shared/components/ui/button';
 import { Alert, AlertDescription } from '@/shared/components/ui/alert';
@@ -9,21 +9,9 @@ import { Icon } from '@iconify/react';
 export function AddPropertyPage() {
     const navigate = useNavigate();
     const { state } = useAuth();
-    const { submitProperty, isSubmitting, error } = usePropertyForm();
-
     // Check if user has permission to create properties
     const allowedRoles = ['owner', 'agent', 'builder'];
     const canCreateProperty = state.user && allowedRoles.includes(state.user.role);
-
-    const handleSubmit = async (propertyData: any) => {
-        try {
-            await submitProperty(propertyData);
-            // Navigate to my properties page to see the created property
-            navigate('/my-properties');
-        } catch (error) {
-            console.error('Error creating property:', error);
-        }
-    };
 
     return (
         <div className="min-h-screen bg-background">
@@ -53,19 +41,13 @@ export function AddPropertyPage() {
                     </Alert>
                 )}
 
-                {error && (
-                    <Alert className="mb-6 border-red-200 bg-red-50">
-                        <Icon icon="solar:danger-bold" className="size-5 text-red-500" />
-                        <AlertDescription className="text-red-700">
-                            {error}
-                        </AlertDescription>
-                    </Alert>
-                )}
+
 
                 <AddPropertyForm
-                    onSubmit={canCreateProperty ? handleSubmit : undefined}
-                    isSubmitting={isSubmitting}
-                    disabled={!canCreateProperty}
+                    onSuccess={canCreateProperty ? (property) => {
+                        console.log('Property created:', property);
+                        navigate('/my-properties');
+                    } : undefined}
                     onCancel={() => navigate('/dashboard')}
                 />
             </div>

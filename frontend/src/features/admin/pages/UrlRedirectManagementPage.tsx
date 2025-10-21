@@ -70,7 +70,7 @@ export function UrlRedirectManagementPage() {
 
   const updateRedirectStatus = async (redirectId: number, isActive: boolean) => {
     try {
-      const response = await contentService.updateUrlRedirect(redirectId, { isActive });
+      const response = await contentService.updateRedirect(redirectId, { isActive });
       if (response.success) {
         fetchRedirects();
       } else {
@@ -85,7 +85,7 @@ export function UrlRedirectManagementPage() {
     if (!confirm('Are you sure you want to delete this redirect?')) return;
 
     try {
-      const response = await contentService.deleteUrlRedirect(redirectId);
+      const response = await contentService.deleteRedirect(redirectId);
       if (response.success) {
         fetchRedirects();
       } else {

@@ -646,10 +646,11 @@ export const api = {
           ...(validToken && { Authorization: `Bearer ${validToken}` }),
         },
       }).then(res => {
+        console.log("The response from the backend is", res);
         if (!res.ok) {
           return res.json().then(err => { throw new Error(err.error?.message || 'Upload failed') });
         }
-        return res.json;
+        return res.json();
       });
     },
 
@@ -1851,7 +1852,7 @@ export const api = {
     };
   }> => {
     const queryParams = new URLSearchParams({ keywords: query });
-    
+
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {
@@ -1859,7 +1860,7 @@ export const api = {
         }
       });
     }
-    
+
     return apiRequest(`/public/projects/search?${queryParams.toString()}`);
   },
 };

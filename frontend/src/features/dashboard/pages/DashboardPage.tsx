@@ -44,7 +44,8 @@ export function DashboardPage() {
     // Owner/Agent stats
     totalListings: 0,
     activeListings: 0,
-    inquiries: 0
+    soldListings: 0,
+    rentedListings: 0
   });
 
   const [recentProjects] = useState<Project[]>([]);
@@ -68,15 +69,25 @@ export function DashboardPage() {
         } else if (['owner', 'agent'].includes(user?.role || '')) {
           // Fetch owner/agent specific data
           try {
-            const searchesResponse = await api.getSavedSearches();
+            const [searchesResponse, propertiesResponse] = await Promise.all([
+              api.getSavedSearches().catch(() => ({ data: { searches: [] } })),
+              api.getUserProperties().catch(() => ({ data: [] }))
+            ]);
+            
+            const properties = propertiesResponse.data || [];
+            const activeListings = properties.filter(p => p.status === 'ACTIVE').length;
+            const soldListings = properties.filter(p => p.status === 'SOLD').length;
+            const rentedListings = properties.filter(p => p.status === 'RENTED').length;
+            
             setStats(prev => ({
               ...prev,
               savedProperties: favorites.length,
               savedSearches: searchesResponse.data?.searches?.length || 0,
-              totalListings: 12,
-              activeListings: 8,
-              inquiries: 15,
-              messages: 6
+              totalListings: properties.length,
+              activeListings: activeListings,
+              soldListings: soldListings,
+              rentedListings: rentedListings,
+              messages: 0
             }));
           } catch (error) {
             // If API call fails, use default values
@@ -86,7 +97,8 @@ export function DashboardPage() {
               savedSearches: 0,
               totalListings: 0,
               activeListings: 0,
-              inquiries: 0,
+              soldListings: 0,
+              rentedListings: 0,
               messages: 0
             }));
           }
@@ -165,8 +177,8 @@ export function DashboardPage() {
         const agentStats = {
           totalListings: stats.totalListings,
           activeListings: stats.activeListings,
-          propertyViews: stats.propertyViews,
-          inquiries: stats.inquiries,
+          soldListings: stats.soldListings,
+          rentedListings: stats.rentedListings,
           messages: stats.messages
         };
         return <AgentDashboardContent stats={agentStats} />;
@@ -198,8 +210,8 @@ export function DashboardPage() {
         const ownerStats = {
           totalListings: stats.totalListings,
           activeListings: stats.activeListings,
-          propertyViews: stats.propertyViews,
-          inquiries: stats.inquiries,
+          soldListings: stats.soldListings,
+          rentedListings: stats.rentedListings,
           messages: stats.messages
         };
         return <AgentDashboardContent stats={ownerStats} />;

@@ -114,10 +114,13 @@ class PropertyService {
   async createProperty(propertyData: CreatePropertyRequest): Promise<Property> {
     try {
       // Transform frontend data to backend format
+      console.log('Original property data from form:', propertyData);
       const backendData = this.transformToBackendFormat(propertyData);
+      console.log('Transformed data being sent to backend:', backendData);
       const response = await api.createProperty(backendData);
       return this.transformApiPropertyToProperty(response.data);
     } catch (error: any) {
+      console.error('Property creation error:', error);
       if (error.status === 400) {
         throw this.createError(
           PropertyErrorType.PROPERTY_VALIDATION_ERROR,
@@ -295,39 +298,57 @@ class PropertyService {
   private transformToBackendFormat(data: any): any {
     const transformed: any = {};
 
-    // Map frontend fields to backend fields
-    if (data.title) transformed.title = data.title;
-    if (data.description) transformed.description = data.description;
-    if (data.propertyType) transformed.property_type = data.propertyType;
-    if (data.listingType) transformed.listing_type = data.listingType;
-    if (data.status) transformed.status = data.status;
-    if (data.price !== undefined) transformed.price = Number(data.price);
-    if (data.areaSqft !== undefined) transformed.area_sqft = Number(data.areaSqft);
-    if (data.area !== undefined) transformed.area_sqft = Number(data.area);
-    if (data.bedrooms !== undefined) transformed.bedrooms = Number(data.bedrooms);
-    if (data.bathrooms !== undefined) transformed.bathrooms = Number(data.bathrooms);
-    if (data.address) transformed.address = data.address;
-    if (data.city) transformed.city = data.city;
-    if (data.state) transformed.state = data.state;
-    if (data.postalCode) transformed.postal_code = data.postalCode;
-    if (data.latitude !== undefined) transformed.latitude = Number(data.latitude);
-    if (data.longitude !== undefined) transformed.longitude = Number(data.longitude);
+    // Required fields - ensure they are always present with meaningful defaults
+    transformed.title = data.title || 'Untitled Property';
+    transformed.description = data.description || '';
+    transformed.property_type = data.propertyType || 'apartment';
+    transformed.listing_type = data.listingType || 'sale';
+    transformed.status = data.status || 'ACTIVE';
+    transformed.price = Number(data.price) || 0;
+    transformed.area_sqft = Number(data.areaSqft || data.area) || 0;
+    transformed.address = data.address || 'Address not provided';
+    transformed.city = data.city || 'City not provided';
+    transformed.state = data.state || 'State not provided';
 
-    // Handle amenities - convert from object to array if needed
-    if (data.amenities) {
-      if (Array.isArray(data.amenities)) {
-        transformed.amenities = data.amenities;
-      } else if (typeof data.amenities === 'object') {
-        // Convert {amenity: true/false} to array of selected amenities
-        transformed.amenities = Object.entries(data.amenities)
-          .filter(([_, selected]) => selected)
-          .map(([amenity, _]) => amenity);
-      }
+    // Optional fields - only include if they have values
+    if (data.bedrooms !== undefined && data.bedrooms !== '') {
+      transformed.bedrooms = Number(data.bedrooms);
+    }
+    if (data.bathrooms !== undefined && data.bathrooms !== '') {
+      transformed.bathrooms = Number(data.bathrooms);
+    }
+    if (data.postalCode) {
+      transformed.postal_code = data.postalCode;
+    }
+    if (data.latitude !== undefined && data.latitude !== '') {
+      transformed.latitude = Number(data.latitude);
+    }
+    if (data.longitude !== undefined && data.longitude !== '') {
+      transformed.longitude = Number(data.longitude);
     }
 
-    // Handle boolean fields
-    if (data.isActive !== undefined) transformed.is_active = data.isActive;
-    if (data.isFeatured !== undefined) transformed.is_featured = data.isFeatured;
+    // Handle amenities - ensure it's always an object
+    if (data.amenities) {
+      if (typeof data.amenities === 'object' && !Array.isArray(data.amenities)) {
+        // Already in object format {amenity: true/false}
+        transformed.amenities = data.amenities;
+      } else if (Array.isArray(data.amenities)) {
+        // Convert array to object format
+        transformed.amenities = data.amenities.reduce((acc: Record<string, boolean>, amenity: string) => {
+          acc[amenity] = true;
+          return acc;
+        }, {});
+      } else {
+        transformed.amenities = {};
+      }
+    } else {
+      // Ensure amenities is always an object, even if empty
+      transformed.amenities = {};
+    }
+
+    // Handle boolean fields with defaults
+    transformed.is_active = data.isActive !== undefined ? data.isActive : true;
+    transformed.is_featured = data.isFeatured !== undefined ? data.isFeatured : false;
 
     return transformed;
   }

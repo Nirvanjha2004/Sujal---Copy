@@ -57,7 +57,7 @@ const getInitialFormData = (): PropertyFormData => ({
   description: '',
   property_type: '',
   listing_type: '',
-  status: 'active',
+  status: 'ACTIVE',
   price: '',
   area: '',
   bedrooms: '',
@@ -220,19 +220,19 @@ export const usePropertyForm = (options: UsePropertyFormOptions): UsePropertyFor
       
       if (mode === 'create') {
         const createData: CreatePropertyRequest = {
-          title: formData.title,
-          description: formData.description,
-          propertyType: formData.property_type as any,
-          listingType: formData.listing_type as any,
-          status: formData.status as any,
-          price: Number(formData.price),
-          areaSqft: Number(formData.area),
+          title: formData.title || 'Untitled Property',
+          description: formData.description || '',
+          propertyType: formData.property_type || 'apartment' as any,
+          listingType: formData.listing_type || 'sale' as any,
+          status: formData.status || 'ACTIVE' as any,
+          price: Number(formData.price) || 0,
+          areaSqft: Number(formData.area) || 0,
           bedrooms: Number(formData.bedrooms) || 0,
           bathrooms: Number(formData.bathrooms) || 0,
-          address: formData.address,
-          city: formData.city,
-          state: formData.state,
-          postalCode: formData.postal_code,
+          address: formData.address || 'Address not provided',
+          city: formData.city || 'City not provided',
+          state: formData.state || 'State not provided',
+          postalCode: formData.postal_code || '',
           amenities: formData.amenities.reduce((acc, amenity) => {
             acc[amenity] = true;
             return acc;
@@ -247,19 +247,19 @@ export const usePropertyForm = (options: UsePropertyFormOptions): UsePropertyFor
         
         const updateData: UpdatePropertyRequest = {
           id: propertyId,
-          title: formData.title,
-          description: formData.description,
-          propertyType: formData.property_type as any,
-          listingType: formData.listing_type as any,
-          status: formData.status as any,
-          price: Number(formData.price),
-          areaSqft: Number(formData.area),
+          title: formData.title || 'Untitled Property',
+          description: formData.description || '',
+          propertyType: formData.property_type || 'apartment' as any,
+          listingType: formData.listing_type || 'sale' as any,
+          status: formData.status || 'ACTIVE' as any,
+          price: Number(formData.price) || 0,
+          areaSqft: Number(formData.area) || 0,
           bedrooms: Number(formData.bedrooms) || 0,
           bathrooms: Number(formData.bathrooms) || 0,
-          address: formData.address,
-          city: formData.city,
-          state: formData.state,
-          postalCode: formData.postal_code,
+          address: formData.address || 'Address not provided',
+          city: formData.city || 'City not provided',
+          state: formData.state || 'State not provided',
+          postalCode: formData.postal_code || '',
           amenities: formData.amenities.reduce((acc, amenity) => {
             acc[amenity] = true;
             return acc;

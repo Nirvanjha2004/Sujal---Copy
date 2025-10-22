@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+
 import { Icon } from '@iconify/react';
 import { Layout } from '@/shared/components/layout/Layout';
 import { Button } from '@/shared/components/ui/button';
@@ -13,19 +12,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import  projectService  from '../services/projectService';
 import { toast } from 'sonner';
 
-// Updated schema with field names matching the backend expectations
-const unitSchema = z.object({
-  unitNumber: z.string().min(1, 'Unit number is required'),
-  unitType: z.string().min(1, 'Unit type is required'),
-  floorNumber: z.coerce.number().int().min(0, 'Floor number must be a positive integer'),
-  bedrooms: z.coerce.number().int().min(0, 'Bedrooms must be a non-negative integer'),
-  bathrooms: z.coerce.number().int().min(1, 'Bathrooms must be at least 1'),
-  areaSqft: z.coerce.number().positive('Area in sqft must be greater than 0'),
-  price: z.coerce.number().positive('Price must be greater than 0'),
-  status: z.string().default('available'),
-});
-
-type UnitFormData = z.infer<typeof unitSchema>;
+interface UnitFormData {
+  unitNumber: string;
+  unitType: string;
+  floorNumber: string;
+  bedrooms: string;
+  bathrooms: string;
+  areaSqft: string;
+  price: string;
+  status: string;
+}
 
 export function NewUnitPage() {
   const { id: projectId } = useParams<{ id: string }>();
@@ -37,14 +33,16 @@ export function NewUnitPage() {
     register,
     handleSubmit,
     setValue,
-    formState: { errors },
   } = useForm<UnitFormData>({
-    resolver: zodResolver(unitSchema),
     defaultValues: {
+      unitNumber: '',
+      unitType: '',
       status: 'available',
-      floorNumber: 1,
-      bedrooms: 2, // Add default value for bedrooms
-      bathrooms: 2,
+      floorNumber: '1',
+      bedrooms: '2',
+      bathrooms: '2',
+      areaSqft: '',
+      price: '',
     },
   });
 
@@ -54,36 +52,77 @@ export function NewUnitPage() {
       if (!projectId) return;
       
       try {
-        const response = await projectService.getProject(parseInt(projectId));
-        if (response.success) {
-          setProject(response.data.project);
+        console.log('NewUnitPage: Fetching project details for ID:', projectId);
+        const projectData = await projectService.getProjectById(projectId);
+        console.log('NewUnitPage: Received project data:', projectData);
+        
+        if (projectData) {
+          setProject(projectData);
         }
       } catch (error) {
-        console.error('Error fetching project:', error);
+        console.error('NewUnitPage: Error fetching project:', error);
       }
     };
     
     fetchProject();
   }, [projectId]);
 
-  const onSubmit = async (data: UnitFormData) => {
+  const onSubmit = async (formData: UnitFormData) => {
     if (!projectId) {
       toast.error('Project ID is missing.');
       return;
     }
 
+    // Basic validation
+    if (!formData.unitNumber?.trim()) {
+      toast.error('Unit number is required');
+      return;
+    }
+    if (!formData.unitType?.trim()) {
+      toast.error('Unit type is required');
+      return;
+    }
+    if (!formData.areaSqft || parseFloat(formData.areaSqft) <= 0) {
+      toast.error('Valid area is required');
+      return;
+    }
+    if (!formData.price || parseFloat(formData.price) <= 0) {
+      toast.error('Valid price is required');
+      return;
+    }
+
     try {
       setLoading(true);
-      const response = await projectService.createUnit(parseInt(projectId), data);
-
-      if (response.success) {
-        toast.success('Unit created successfully!');
-        navigate(`/builder/projects/${projectId}`);
-      } else {
-        toast.error(response.error?.message || 'Failed to create unit');
-      }
+      console.log('NewUnitPage: Creating unit with form data:', formData);
+      
+      // Transform the form data to match API expectations and ensure proper types
+      const unitData = {
+        unitNumber: formData.unitNumber.trim(),
+        unitType: formData.unitType.trim(),
+        floorNumber: parseInt(formData.floorNumber) || 0,
+        bedrooms: parseInt(formData.bedrooms) || 0,
+        bathrooms: parseInt(formData.bathrooms) || 1,
+        areaSqft: parseFloat(formData.areaSqft) || 0,
+        price: parseFloat(formData.price) || 0,
+        status: formData.status || 'available',
+        // Calculate price per sqft
+        pricePerSqft: Math.round((parseFloat(formData.price) || 0) / (parseFloat(formData.areaSqft) || 1)),
+        // Set default values for optional fields
+        parkingSpaces: 1,
+        balconies: 1,
+        isCornerUnit: false,
+        hasTerrace: false
+      };
+      
+      console.log('NewUnitPage: Transformed unit data:', unitData);
+      
+      const createdUnit = await projectService.addProjectUnit(projectId, unitData);
+      console.log('NewUnitPage: Unit created successfully:', createdUnit);
+      
+      toast.success('Unit created successfully!');
+      navigate(`/builder/projects/${projectId}`);
     } catch (error: any) {
-      console.error('Error creating unit:', error);
+      console.error('NewUnitPage: Error creating unit:', error);
       toast.error(error?.message || 'Failed to create unit. Please try again.');
     } finally {
       setLoading(false);
@@ -123,7 +162,6 @@ export function NewUnitPage() {
                 <div>
                   <Label htmlFor="unitNumber">Unit Number *</Label>
                   <Input id="unitNumber" {...register('unitNumber')} placeholder="e.g., A-101" />
-                  {errors.unitNumber && <p className="text-sm text-destructive mt-1">{errors.unitNumber.message}</p>}
                 </div>
                 <div>
                   <Label htmlFor="unitType">Unit Type *</Label>
@@ -142,7 +180,6 @@ export function NewUnitPage() {
                       <SelectItem value="Shop">Retail Shop</SelectItem>
                     </SelectContent>
                   </Select>
-                  {errors.unitType && <p className="text-sm text-destructive mt-1">{errors.unitType.message}</p>}
                 </div>
               </div>
 
@@ -150,22 +187,18 @@ export function NewUnitPage() {
                 <div>
                   <Label htmlFor="floorNumber">Floor Number *</Label>
                   <Input id="floorNumber" type="number" {...register('floorNumber')} placeholder="e.g., 3" />
-                  {errors.floorNumber && <p className="text-sm text-destructive mt-1">{errors.floorNumber.message}</p>}
                 </div>
                 <div>
                   <Label htmlFor="bedrooms">Bedrooms *</Label>
                   <Input id="bedrooms" type="number" {...register('bedrooms')} placeholder="e.g., 2" />
-                  {errors.bedrooms && <p className="text-sm text-destructive mt-1">{errors.bedrooms.message}</p>}
                 </div>
                 <div>
                   <Label htmlFor="bathrooms">Bathrooms *</Label>
                   <Input id="bathrooms" type="number" {...register('bathrooms')} placeholder="e.g., 2" />
-                  {errors.bathrooms && <p className="text-sm text-destructive mt-1">{errors.bathrooms.message}</p>}
                 </div>
                 <div>
                   <Label htmlFor="areaSqft">Area (sqft) *</Label>
                   <Input id="areaSqft" type="number" {...register('areaSqft')} placeholder="e.g., 1500" />
-                  {errors.areaSqft && <p className="text-sm text-destructive mt-1">{errors.areaSqft.message}</p>}
                 </div>
               </div>
 
@@ -173,7 +206,6 @@ export function NewUnitPage() {
                 <div>
                   <Label htmlFor="price">Price (INR) *</Label>
                   <Input id="price" type="number" {...register('price')} placeholder="e.g., 7500000" />
-                  {errors.price && <p className="text-sm text-destructive mt-1">{errors.price.message}</p>}
                 </div>
                 <div>
                   <Label htmlFor="status">Status</Label>
@@ -188,7 +220,6 @@ export function NewUnitPage() {
                       <SelectItem value="sold">Sold</SelectItem>
                     </SelectContent>
                   </Select>
-                  {errors.status && <p className="text-sm text-destructive mt-1">{errors.status.message}</p>}
                 </div>
               </div>
             </CardContent>

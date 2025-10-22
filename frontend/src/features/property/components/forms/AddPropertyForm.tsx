@@ -190,10 +190,13 @@ export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                    <SelectItem value="sold">Sold</SelectItem>
-                    <SelectItem value="rented">Rented</SelectItem>
+                    <SelectItem value="ACTIVE">Active</SelectItem>
+                    <SelectItem value="PENDING">Pending</SelectItem>
+                    <SelectItem value="SOLD">Sold</SelectItem>
+                    <SelectItem value="RENTED">Rented</SelectItem>
+                    <SelectItem value="new">New</SelectItem>
+                    <SelectItem value="resale">Resale</SelectItem>
+                    <SelectItem value="under_construction">Under Construction</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -394,7 +397,7 @@ export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({
               Cancel
             </Button>
           )}
-          
+
           <Button
             type="button"
             variant="outline"

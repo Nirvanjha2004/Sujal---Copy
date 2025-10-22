@@ -44,8 +44,8 @@ export interface BuyerDashboardStats {
 export interface AgentDashboardStats {
   totalListings: number;
   activeListings: number;
-  propertyViews: number;
-  inquiries: number;
+  soldListings?: number;
+  rentedListings?: number;
   messages: number;
 }
 

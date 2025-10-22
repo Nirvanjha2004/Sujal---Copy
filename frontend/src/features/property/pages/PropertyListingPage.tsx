@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/shared/contexts/AuthContext";
 import { useProperty } from "../hooks/useProperty";
-import { usePropertyFavorites } from "../hooks/usePropertyFavorites";
+import { useFavorites } from "../contexts/FavoritesContext";
 import { PropertyDetails } from "../components/details/PropertyDetails";
 import { PropertyGallery } from "../components/common/PropertyGallery";
 import { PropertyStats } from "../components/common/PropertyStats";
@@ -43,7 +43,7 @@ export function PropertyListingPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const { property, isLoading: loading, error } = useProperty({ propertyId });
-    const { isFavorite, toggleFavorite } = usePropertyFavorites();
+    const { isFavorite, toggleFavorite } = useFavorites();
 
     const formatPrice = (price: number) => {
         if (price >= 10000000) {

@@ -20,7 +20,7 @@ import {
   ArrowLeft,
   ExternalLink
 } from 'lucide-react';
-import { usePropertyFavorites } from '../../hooks/usePropertyFavorites';
+import { useFavorites } from '../../contexts/FavoritesContext';
 import { formatIndianNumber as formatPrice, formatArea, formatDate } from '../../utils/propertyFormatters';
 
 export interface PropertyDetailsProps {
@@ -47,7 +47,7 @@ export const PropertyDetails: React.FC<PropertyDetailsProps> = ({
   className = ''
 }) => {
   const [activeTab, setActiveTab] = useState('overview');
-  const { isFavorite, toggleFavorite, isLoading: favoriteLoading } = usePropertyFavorites();
+  const { isFavorite, toggleFavorite, isLoading: favoriteLoading } = useFavorites();
 
   const handleFavoriteToggle = async () => {
     try {

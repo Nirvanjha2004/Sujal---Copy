@@ -19,8 +19,8 @@ export function AgentDashboardContent({ stats, isLoading = false }: AgentDashboa
   const safeStats = {
     totalListings: stats?.totalListings || 0,
     activeListings: stats?.activeListings || 0,
-    propertyViews: stats?.propertyViews || 0,
-    inquiries: stats?.inquiries || 0,
+    soldListings: stats?.soldListings || 0,
+    rentedListings: stats?.rentedListings || 0,
     messages: stats?.messages || 0
   };
 
@@ -148,27 +148,23 @@ export function AgentDashboardContent({ stats, isLoading = false }: AgentDashboa
         
         <GridItem>
           <StatsCard
-            title="Property Views"
-            value={safeStats.propertyViews}
-            icon="solar:chart-2-bold"
+            title="Sold Properties"
+            value={safeStats.soldListings || 0}
+            icon="solar:check-circle-bold"
             color="bg-green-100 text-green-600"
-            subtitle="Total views"
-            trend={{
-              value: 12,
-              direction: 'up',
-              period: 'this week'
-            }}
+            subtitle="Successfully sold"
+            onClick={() => navigate('/my-properties?status=SOLD')}
           />
         </GridItem>
         
         <GridItem>
           <StatsCard
-            title="Inquiries"
-            value={safeStats.inquiries}
-            icon="solar:chat-round-dots-bold"
-            color="bg-orange-100 text-orange-600"
-            subtitle="New inquiries"
-            onClick={() => navigate('/leads')}
+            title="Rented Properties"
+            value={safeStats.rentedListings || 0}
+            icon="solar:key-bold"
+            color="bg-purple-100 text-purple-600"
+            subtitle="Successfully rented"
+            onClick={() => navigate('/my-properties?status=RENTED')}
           />
         </GridItem>
       </DashboardGrid>

@@ -34,23 +34,35 @@ export function ProjectsPage() {
   const fetchProjects = async () => {
     try {
       setLoading(true);
-      const response = await projectService.getBuilderProjects({
+      console.log('ProjectsPage: Starting to fetch projects...');
+      
+      const requestParams = {
         page: pagination.page,
         limit: pagination.limit,
         ...(filters.status !== 'all' && { status: filters.status }),
         ...(filters.project_type !== 'all' && { project_type: filters.project_type })
-      });
+      };
+      
+      console.log('ProjectsPage: Request params:', requestParams);
+      
+      const response = await projectService.getBuilderProjects(requestParams);
+      
+      console.log('ProjectsPage: Received response:', response);
 
       if (response.success) {
+        console.log('ProjectsPage: Setting projects:', response.data.projects);
         setProjects(response.data.projects);
         setPagination(prev => ({
           ...prev,
           total: response.data.pagination.total,
           totalPages: response.data.pagination.totalPages
         }));
+      } else {
+        console.error('ProjectsPage: API returned success=false:', response);
+        toast.error('Failed to load projects');
       }
     } catch (error) {
-      console.error('Error fetching projects:', error);
+      console.error('ProjectsPage: Error fetching projects:', error);
       toast.error('Failed to load projects');
     } finally {
       setLoading(false);

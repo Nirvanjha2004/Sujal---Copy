@@ -48,12 +48,15 @@ export function ProjectUnitsPage() {
 
   const fetchProjectDetails = async () => {
     try {
-      const response = await projectService.getProject(parseInt(id!));
-      if (response.success) {
-        setProject(response.data.project);
+      console.log('ProjectUnitsPage: Fetching project details for ID:', id);
+      const projectData = await projectService.getProjectById(id!);
+      console.log('ProjectUnitsPage: Received project data:', projectData);
+      
+      if (projectData) {
+        setProject(projectData);
       }
     } catch (error) {
-      console.error('Failed to fetch project:', error);
+      console.error('ProjectUnitsPage: Failed to fetch project:', error);
       toast.error('Failed to load project details');
     }
   };
@@ -61,23 +64,39 @@ export function ProjectUnitsPage() {
   const fetchUnits = async () => {
     try {
       setLoading(true);
-      const params: any = {};
+      console.log('ProjectUnitsPage: Fetching units for project ID:', id);
       
-      if (statusFilter && statusFilter !== 'all') {
-        params.status = statusFilter;
-      }
+      const unitsData = await projectService.getProjectUnits(id!);
+      console.log('ProjectUnitsPage: Received units data:', unitsData);
       
-      if (unitTypeFilter && unitTypeFilter !== 'all') {
-        params.unitType = unitTypeFilter;
-      }
-
-      const response = await projectService.getUnits(parseInt(id!), params);
-      if (response.success) {
-        setUnits(response.data.units);
+      if (unitsData && Array.isArray(unitsData)) {
+        // Convert string numbers to actual numbers for proper display
+        const normalizedUnits = unitsData.map((unit: any) => ({
+          ...unit,
+          area_sqft: typeof unit.area_sqft === 'string' ? parseFloat(unit.area_sqft) : unit.area_sqft,
+          price: typeof unit.price === 'string' ? parseFloat(unit.price) : unit.price,
+          price_per_sqft: typeof unit.price_per_sqft === 'string' ? parseFloat(unit.price_per_sqft) : unit.price_per_sqft,
+        }));
+        
+        // Apply filters
+        let filteredUnits = normalizedUnits;
+        
+        if (statusFilter && statusFilter !== 'all') {
+          filteredUnits = filteredUnits.filter((unit: any) => unit.status === statusFilter);
+        }
+        
+        if (unitTypeFilter && unitTypeFilter !== 'all') {
+          filteredUnits = filteredUnits.filter((unit: any) => unit.unit_type === unitTypeFilter);
+        }
+        
+        setUnits(filteredUnits);
+      } else {
+        setUnits([]);
       }
     } catch (error) {
-      console.error('Failed to fetch units:', error);
+      console.error('ProjectUnitsPage: Failed to fetch units:', error);
       toast.error('Failed to load units');
+      setUnits([]);
     } finally {
       setLoading(false);
     }
@@ -101,16 +120,20 @@ export function ProjectUnitsPage() {
     if (!selectedUnitId) return;
 
     try {
-      const response = await projectService.deleteUnit(parseInt(id!), selectedUnitId);
+      console.log('ProjectUnitsPage: Deleting unit:', selectedUnitId);
+      const response = await projectService.deleteUnit(id!, selectedUnitId);
+      console.log('ProjectUnitsPage: Delete response:', response);
       
       if (response.success) {
         toast.success('Unit deleted successfully');
         fetchUnits();
         fetchProjectDetails();
+      } else {
+        toast.error('Failed to delete unit');
       }
     } catch (error: any) {
-      console.error('Failed to delete unit:', error);
-      toast.error(error.response?.data?.error?.message || 'Failed to delete unit');
+      console.error('ProjectUnitsPage: Failed to delete unit:', error);
+      toast.error(error?.message || 'Failed to delete unit');
     } finally {
       setDeleteDialogOpen(false);
       setSelectedUnitId(null);

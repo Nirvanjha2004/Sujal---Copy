@@ -4,7 +4,7 @@ import { Badge } from "@/shared/components/ui/badge";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { Property, PropertyCardVariant } from "../../types";
-import { usePropertyFavorites } from "../../hooks/usePropertyFavorites";
+import { useFavorites } from "../../contexts/FavoritesContext";
 import { formatPrice, formatArea } from "../../utils/propertyHelpers";
 
 interface PropertyCardProps {
@@ -27,7 +27,8 @@ export function PropertyCard({
   onClick
 }: PropertyCardProps) {
   const navigate = useNavigate();
-  const { isFavorite, toggleFavorite, isLoading } = usePropertyFavorites();
+  const { isFavorite, toggleFavorite, isLoading } = useFavorites();
+  const isPropertyFavorite = isFavorite(property.id);
 
   const handleFavoriteToggle = async (e: React.MouseEvent) => {
     e.stopPropagation();

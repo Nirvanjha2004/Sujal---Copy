@@ -43,7 +43,7 @@ export const usePropertyFavorites = (options: UsePropertyFavoritesOptions = {}):
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, []); // Empty dependency array is correct here
 
   const refreshFavorites = useCallback(async () => {
     await fetchFavorites();
@@ -143,7 +143,7 @@ export const usePropertyFavorites = (options: UsePropertyFavoritesOptions = {}):
     if (autoFetch) {
       fetchFavorites();
     }
-  }, [autoFetch, fetchFavorites]);
+  }, [autoFetch]); // Remove fetchFavorites from dependencies to prevent infinite loop
 
   return {
     favorites,
@@ -206,8 +206,28 @@ export const usePropertyFavorite = (propertyId: number): UsePropertyFavoriteRetu
   }, [propertyId, isFavorite]);
 
   useEffect(() => {
-    checkFavoriteStatus();
-  }, [checkFavoriteStatus]);
+    let mounted = true;
+    
+    const fetchStatus = async () => {
+      try {
+        const favoriteProperties = await propertyService.getFavoriteProperties();
+        if (mounted) {
+          const isPropertyFavorite = favoriteProperties.some(property => property.id === propertyId);
+          setIsFavorite(isPropertyFavorite);
+        }
+      } catch (err) {
+        if (mounted) {
+          setIsFavorite(false);
+        }
+      }
+    };
+    
+    fetchStatus();
+    
+    return () => {
+      mounted = false;
+    };
+  }, [propertyId]); // Only depend on propertyId
 
   return {
     isFavorite,
@@ -274,7 +294,7 @@ export const useFavoriteStats = (): UseFavoriteStatsReturn => {
 
   useEffect(() => {
     calculateStats();
-  }, [calculateStats]);
+  }, []); // Empty dependency array to only run once on mount
 
   return {
     totalFavorites,

@@ -222,16 +222,18 @@ class PropertyController {
         return;
       }
 
+      console.log("The data coming from the frontend is :", req.body)
+
       const userId = req.user!.userId;
       const body = req.body as any;
       const propertyData: PropertyCreateData = {
         title: body.title,
         description: body.description,
-        propertyType: body.propertyType,
-        listingType: body.listingType,
+        propertyType: body.property_type,
+        listingType: body.listing_type,
         status: body.status,
         price: parseFloat(body.price),
-        areaSqft: body.areaSqft ? parseInt(body.areaSqft) : undefined,
+        areaSqft: body.area_sqft ? parseInt(body.area_sqft) : undefined,
         bedrooms: body.bedrooms ? parseInt(body.bedrooms) : undefined,
         bathrooms: body.bathrooms ? parseInt(body.bathrooms) : undefined,
         address: body.address,
@@ -241,7 +243,7 @@ class PropertyController {
         latitude: body.latitude ? parseFloat(body.latitude) : undefined,
         longitude: body.longitude ? parseFloat(body.longitude) : undefined,
         amenities: body.amenities,
-        isFeatured: body.isFeatured || false,
+        isFeatured: body.is_featured || false,
         expiresAt: body.expiresAt ? new Date(body.expiresAt) : undefined,
         autoRenew: body.autoRenew || false,
         renewalPeriodDays: body.renewalPeriodDays ? parseInt(body.renewalPeriodDays) : undefined,

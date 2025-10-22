@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui
 import { Badge } from '@/shared/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
-import  projectService  from '../services/projectService';
+import projectService from '../services/projectService';
 import { Project, ProjectUnit } from '../types';
 import { ProjectImageUpload } from '../components/ProjectImageUpload';
 import { toast } from 'sonner';
@@ -18,25 +18,49 @@ export function ProjectDetailsPage() {
   const [project, setProject] = useState<Project | null>(null);
   const [units, setUnits] = useState<ProjectUnit[]>([]);
   const [loading, setLoading] = useState(true);
-  const [unitsLoading, setUnitsLoading] = useState(false);
+
   const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
     if (id) {
       fetchProject();
-      fetchUnits();
+      // fetchUnits(); // Units are now fetched as part of project data
     }
   }, [id]);
 
   const fetchProject = async () => {
     try {
       setLoading(true);
-      const response = await projectService.getProjectById(parseInt(id!));
-      if (response.success) {
-        setProject(response.data.project);
+      console.log('ProjectDetailsPage: Fetching project with ID:', id);
+      const projectData = await projectService.getProjectById(id!);
+      console.log('ProjectDetailsPage: Received project data:', projectData);
+
+      if (projectData) {
+        // Extract units from project data if they exist
+        const projectUnits = (projectData as any).units;
+        if (projectUnits && Array.isArray(projectUnits)) {
+          // Convert string numbers to actual numbers for proper display
+          const normalizedUnits = projectUnits.map((unit: any) => ({
+            ...unit,
+            area_sqft: typeof unit.area_sqft === 'string' ? parseFloat(unit.area_sqft) : unit.area_sqft,
+            area_sqm: typeof unit.area_sqm === 'string' ? parseFloat(unit.area_sqm) : unit.area_sqm,
+            price: typeof unit.price === 'string' ? parseFloat(unit.price) : unit.price,
+            price_per_sqft: typeof unit.price_per_sqft === 'string' ? parseFloat(unit.price_per_sqft) : unit.price_per_sqft,
+            maintenance_charge: typeof unit.maintenance_charge === 'string' ? parseFloat(unit.maintenance_charge) : unit.maintenance_charge,
+          }));
+          setUnits(normalizedUnits.slice(0, 10)); // Set units from project data
+        }
+
+        // Remove units from project data before setting project
+        const { units: _, ...projectWithoutUnits } = projectData as any;
+        setProject(projectWithoutUnits);
+      } else {
+        console.error('ProjectDetailsPage: No project data received');
+        toast.error('Project not found');
+        navigate('/builder/projects');
       }
     } catch (error) {
-      console.error('Error fetching project:', error);
+      console.error('ProjectDetailsPage: Error fetching project:', error);
       toast.error('Failed to load project details');
       navigate('/builder/projects');
     } finally {
@@ -44,28 +68,16 @@ export function ProjectDetailsPage() {
     }
   };
 
-  const fetchUnits = async () => {
-    try {
-      setUnitsLoading(true);
-      const response = await projectService.getUnits(parseInt(id!), {
-        limit: 10
-      });
-      if (response.success) {
-        setUnits(response.data.units);
-      }
-    } catch (error) {
-      console.error('Error fetching units:', error);
-    } finally {
-      setUnitsLoading(false);
-    }
-  };
+
 
   const handleStatusUpdate = async (newStatus: string) => {
     try {
-      await projectService.updateProjectStatus(parseInt(id!), newStatus);
+      console.log('ProjectDetailsPage: Updating project status to:', newStatus);
+      await projectService.updateProject(id!, { status: newStatus });
       toast.success('Project status updated successfully');
       fetchProject();
     } catch (error) {
+      console.error('ProjectDetailsPage: Error updating project status:', error);
       toast.error('Failed to update project status');
     }
   };
@@ -382,13 +394,7 @@ export function ProjectDetailsPage() {
                   </Button>
                 </div>
 
-                {unitsLoading ? (
-                  <div className="space-y-4">
-                    {[...Array(3)].map((_, i) => (
-                      <div key={i} className="h-24 bg-muted animate-pulse rounded-lg"></div>
-                    ))}
-                  </div>
-                ) : units.length === 0 ? (
+                {units.length === 0 ? (
                   <Card>
                     <CardContent className="p-8 text-center">
                       <Icon icon="solar:home-2-bold" className="size-12 text-muted-foreground mx-auto mb-4" />
@@ -447,7 +453,7 @@ export function ProjectDetailsPage() {
                         </CardContent>
                       </Card>
                     ))}
-                    
+
                     <div className="text-center">
                       <Button
                         variant="outline"
@@ -545,13 +551,7 @@ export function ProjectDetailsPage() {
                   <Icon icon="solar:upload-bold" className="size-4 mr-2" />
                   Upload Images
                 </Button>
-                <Button
-                  className="w-full justify-start"
-                  variant="outline"
-                >
-                  <Icon icon="solar:document-bold" className="size-4 mr-2" />
-                  Generate Report
-                </Button>
+                {/*  */}
               </CardContent>
             </Card>
 

@@ -51,6 +51,10 @@ const csvFileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileF
 const uploadCsv = multer({ storage: csvStorage, fileFilter: csvFileFilter });
 
 
+// --- Public Project Routes (no authentication required) ---
+router.get('/public', projectController.getPublicProjects);
+router.get('/public/recent', projectController.getRecentProjects);
+
 // --- Project Routes ---
 router.get('/', authenticate, projectController.getBuilderProjects);
 router.post('/', authenticate, ProjectController.createProjectValidation, projectController.createProject);

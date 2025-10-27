@@ -14,8 +14,10 @@ import { Badge } from "@/shared/components/ui/badge";
 import { useFeaturedProperties, useRecentProperties } from "@/shared/hooks/useProperties";
 import { PropertyCardSkeleton } from "@/shared/components/ui/loading";
 import { useAuth } from "@/shared/contexts/AuthContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { PROPERTY_TYPES } from "@/features/property/constants";
+import { api } from "@/shared/lib/api";
 
 export function RealEstateLandingPage() {
   const navigate = useNavigate();
@@ -25,6 +27,28 @@ export function RealEstateLandingPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [propertyType, setPropertyType] = useState("all");
   const [listingType, setListingType] = useState("buy");
+  const [recentProjects, setRecentProjects] = useState<any[]>([]);
+  const [isLoadingProjects, setIsLoadingProjects] = useState(true);
+
+  useEffect(() => {
+    const fetchRecentProjects = async () => {
+      try {
+        setIsLoadingProjects(true);
+        const response = await api.getRecentProjects(6);
+        if (response.success) {
+          setRecentProjects(response.data);
+        }
+      } catch (error) {
+        console.error('Error fetching recent projects:', error);
+        // Keep empty array as fallback
+        setRecentProjects([]);
+      } finally {
+        setIsLoadingProjects(false);
+      }
+    };
+
+    fetchRecentProjects();
+  }, []);
 
   const handleSearch = () => {
     const params = new URLSearchParams();
@@ -398,71 +422,47 @@ export function RealEstateLandingPage() {
               <p className="text-muted-foreground">in South Kolkata</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/properties?propertyType=apartment')}>
-                <CardContent className="p-0">
-                  <img
-                    alt="Residential Apartment"
-                    src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/3.webp"
-                    className="w-full h-48 object-cover rounded-t-xl"
-                  />
-                  <div className="p-4">
-                    <h3 className="font-semibold text-lg mb-1">Residential Apartment</h3>
-                    <p className="text-sm text-muted-foreground">8400+ properties</p>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/properties?propertyType=house')}>
-                <CardContent className="p-0">
-                  <img
-                    alt="Independent/Builder Floor"
-                    src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/2.webp"
-                    className="w-full h-48 object-cover rounded-t-xl"
-                  />
-                  <div className="p-4">
-                    <h3 className="font-semibold text-lg mb-1">Independent/ Builder Floor</h3>
-                    <p className="text-sm text-muted-foreground">1400+ properties</p>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/properties?propertyType=villa')}>
-                <CardContent className="p-0">
-                  <img
-                    alt="Independent House/Villa"
-                    src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/1.webp"
-                    className="w-full h-48 object-cover rounded-t-xl"
-                  />
-                  <div className="p-4">
-                    <h3 className="font-semibold text-lg mb-1">Independent House/Villa</h3>
-                    <p className="text-sm text-muted-foreground">1200+ properties</p>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/properties?propertyType=land')}>
-                <CardContent className="p-0">
-                  <img
-                    alt="Residential Land"
-                    src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/4.webp"
-                    className="w-full h-48 object-cover rounded-t-xl"
-                  />
-                  <div className="p-4">
-                    <h3 className="font-semibold text-lg mb-1">Residential Land</h3>
-                    <p className="text-sm text-muted-foreground">1700+ properties</p>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/properties?bedrooms=1')}>
-                <CardContent className="p-0">
-                  <img
-                    alt="1 RK/Studio Apartment"
-                    src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/placeholder/square.png"
-                    className="w-full h-48 object-cover rounded-t-xl"
-                  />
-                  <div className="p-4">
-                    <h3 className="font-semibold text-lg mb-1">1 RK/Studio Apartment</h3>
-                    <p className="text-sm text-muted-foreground">10+ properties</p>
-                  </div>
-                </CardContent>
-              </Card>
+              {PROPERTY_TYPES.map((propertyType) => {
+                // Define images for each property type
+                const propertyImages = {
+                  apartment: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/3.webp",
+                  house: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/2.webp",
+                  villa: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/1.webp",
+                  plot: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/4.webp",
+                  commercial: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/5.webp",
+                  land: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/4.webp"
+                };
+
+                // Define property counts (you can make this dynamic by fetching from API later)
+                const propertyCounts = {
+                  apartment: "8400+",
+                  house: "1400+",
+                  villa: "1200+",
+                  plot: "1700+",
+                  commercial: "800+",
+                  land: "900+"
+                };
+
+                return (
+                  <Card 
+                    key={propertyType.value} 
+                    className="hover:shadow-lg transition-shadow cursor-pointer" 
+                    onClick={() => navigate(`/search?property_type=${propertyType.value}`)}
+                  >
+                    <CardContent className="p-0">
+                      <img
+                        alt={propertyType.label}
+                        src={propertyImages[propertyType.value] || "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/placeholder/square.png"}
+                        className="w-full h-48 object-cover rounded-t-xl"
+                      />
+                      <div className="p-4">
+                        <h3 className="font-semibold text-lg mb-1">{propertyType.label}</h3>
+                        <p className="text-sm text-muted-foreground">{propertyCounts[propertyType.value]} properties</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -567,7 +567,7 @@ export function RealEstateLandingPage() {
               </div>
               <p className="text-muted-foreground">Limited launch offers available</p>
             </div>
-            {recentLoading ? (
+            {isLoadingProjects ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {Array.from({ length: 4 }).map((_, index) => (
                   <PropertyCardSkeleton key={index} />
@@ -575,43 +575,60 @@ export function RealEstateLandingPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                {recentProperties && recentProperties.length > 0 ? (
-                  recentProperties.slice(0, 4).map((property) => (
-                    <Card key={property.id} className="hover:shadow-lg transition-shadow bg-white cursor-pointer" onClick={() => navigate(`/property/${property.id}`)}>
-                      <CardContent className="p-0">
-                        <img
-                          alt="Project"
-                          src={property.images?.[0]?.image_url || "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/1.webp"}
-                          className="w-full h-32 object-cover rounded-t-xl"
-                        />
-                        <div className="p-4">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Badge variant="destructive" className="text-xs">
-                              NEW LAUNCH
-                            </Badge>
+                {recentProjects && recentProjects.length > 0 ? (
+                  recentProjects.slice(0, 4).map((project) => {
+                    const formatPrice = (pricing: any) => {
+                      if (pricing?.min && pricing?.max) {
+                        const formatAmount = (amount: number) => {
+                          if (amount >= 10000000) return `₹${(amount / 10000000).toFixed(1)}Cr`;
+                          if (amount >= 100000) return `₹${(amount / 100000).toFixed(0)}L`;
+                          return `₹${amount.toLocaleString()}`;
+                        };
+                        return `${formatAmount(pricing.min)} - ${formatAmount(pricing.max)}`;
+                      }
+                      return 'Price on request';
+                    };
+
+                    return (
+                      <Card key={project.id} className="hover:shadow-lg transition-shadow bg-white cursor-pointer" onClick={() => navigate(`/projects/${project.id}`)}>
+                        <CardContent className="p-0">
+                          <img
+                            alt={project.name}
+                            src={project.images?.[0] || "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/1.webp"}
+                            className="w-full h-32 object-cover rounded-t-xl"
+                          />
+                          <div className="p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Badge variant="destructive" className="text-xs">
+                                NEW LAUNCH
+                              </Badge>
+                            </div>
+                            <h3 className="font-semibold text-sm mb-1">{project.name}</h3>
+                            <p className="text-xs text-muted-foreground mb-2">
+                              {project.total_units} units | {project.project_type}
+                            </p>
+                            <p className="text-xs text-muted-foreground mb-2">
+                              {project.location}, {project.city}
+                            </p>
+                            <p className="text-xs text-muted-foreground mb-2">
+                              {formatPrice(project.pricing)}
+                            </p>
+                            <div className="flex items-center gap-1 text-xs mb-2">
+                              <Icon icon="solar:heart-bold" className="size-3 text-red-500" />
+                              <span>by {project.builder?.first_name} {project.builder?.last_name}</span>
+                            </div>
+                            <div className="flex items-center gap-1 text-xs">
+                              <Icon icon="solar:eye-bold" className="size-3" />
+                              <span>{project.available_units} units available</span>
+                            </div>
+                            <Button size="sm" className="w-full mt-3 bg-black text-white hover:bg-gray-800">
+                              View Details
+                            </Button>
                           </div>
-                          <h3 className="font-semibold text-sm mb-1">{property.title}</h3>
-                          <p className="text-xs text-muted-foreground mb-2">
-                            {property.area} Sq Ft | {property.bedrooms}, {property.bathrooms} BHK {property.property_type}
-                          </p>
-                          <p className="text-xs text-muted-foreground mb-2">
-                            {property.address}
-                          </p>
-                          <div className="flex items-center gap-1 text-xs mb-2">
-                            <Icon icon="solar:heart-bold" className="size-3 text-red-500" />
-                            <span>Pre-preferred options</span>
-                          </div>
-                          <div className="flex items-center gap-1 text-xs">
-                            <Icon icon="solar:eye-bold" className="size-3" />
-                            <span>Aerial Photography</span>
-                          </div>
-                          <Button size="sm" className="w-full mt-3 bg-black text-white hover:bg-gray-800">
-                            View Details
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
+                        </CardContent>
+                      </Card>
+                    );
+                  })
                 ) : (
                   // Fallback to original static content
                   <>

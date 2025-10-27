@@ -11,7 +11,7 @@ import {
 } from "@/shared/components/ui/select";
 import { Input } from "@/shared/components/ui/input";
 import { Badge } from "@/shared/components/ui/badge";
-import { useFeaturedProperties, useRecentProperties } from "@/shared/hooks/useProperties";
+import { useFeaturedProperties, useRecentProperties, useRecommendedProperties } from "@/shared/hooks/useProperties";
 import { PropertyCardSkeleton } from "@/shared/components/ui/loading";
 import { useAuth } from "@/shared/contexts/AuthContext";
 import { useState, useEffect } from "react";
@@ -24,6 +24,7 @@ export function RealEstateLandingPage() {
   const { state: { isAuthenticated } } = useAuth();
   const { properties: featuredProperties, loading: featuredLoading } = useFeaturedProperties(4);
   const { properties: recentProperties, loading: recentLoading } = useRecentProperties(8);
+  const { properties: recommendedProperties, loading: recommendedLoading } = useRecommendedProperties(4);
   const [searchQuery, setSearchQuery] = useState("");
   const [propertyType, setPropertyType] = useState("all");
   const [listingType, setListingType] = useState("buy");
@@ -255,7 +256,7 @@ export function RealEstateLandingPage() {
                             <Icon icon="solar:map-point-bold" className="size-5 text-accent" />
                           </Button>
                         </div>
-                        <Button 
+                        <Button
                           className="shadow-lg shadow-primary/20 bg-gradient-to-br from-primary to-primary/90 md:w-32"
                           onClick={handleSearch}
                         >
@@ -266,24 +267,6 @@ export function RealEstateLandingPage() {
                   </Tabs>
                 </CardContent>
               </Card>
-              <div className="flex gap-4 mt-6">
-                <Button 
-                  variant="outline" 
-                  className="bg-white"
-                  onClick={() => navigate('/properties?city=Kolkata&listing_type=buy')}
-                >
-                  <Icon icon="solar:map-point-bold" className="size-4" />
-                  Buy in Kolkata
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="bg-white"
-                  onClick={() => navigate('/properties')}
-                >
-                  <Icon icon="solar:city-bold" className="size-4" />
-                  Explore new city
-                </Button>
-              </div>
             </div>
           </div>
         </section>
@@ -291,11 +274,11 @@ export function RealEstateLandingPage() {
           <div className="container mx-auto px-4">
             <div className="mb-8">
               <h2 className="font-heading text-3xl font-semibold tracking-tight mb-2">
-                Recommended Projects
+                Recommended Properties
               </h2>
-              <p className="text-muted-foreground">The most searched projects in Kolkata South</p>
+              <p className="text-muted-foreground">The most searched properties</p>
             </div>
-            {featuredLoading ? (
+            {recommendedLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {Array.from({ length: 4 }).map((_, index) => (
                   <PropertyCardSkeleton key={index} />
@@ -303,8 +286,8 @@ export function RealEstateLandingPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {featuredProperties && featuredProperties.length > 0 ? (
-                  featuredProperties.map((property) => (
+                {recommendedProperties && recommendedProperties.length > 0 ? (
+                  recommendedProperties.map((property) => (
                     <Card key={property.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/property/${property.id}`)}>
                       <CardContent className="p-0">
                         <img
@@ -444,9 +427,9 @@ export function RealEstateLandingPage() {
                 };
 
                 return (
-                  <Card 
-                    key={propertyType.value} 
-                    className="hover:shadow-lg transition-shadow cursor-pointer" 
+                  <Card
+                    key={propertyType.value}
+                    className="hover:shadow-lg transition-shadow cursor-pointer"
                     onClick={() => navigate(`/search?property_type=${propertyType.value}`)}
                   >
                     <CardContent className="p-0">
@@ -531,7 +514,7 @@ export function RealEstateLandingPage() {
                         <span>Interested in this project?</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Button 
+                        <Button
                           className="bg-red-500 hover:bg-red-600 text-white"
                           onClick={() => navigate('/contact')}
                         >
@@ -757,287 +740,8 @@ export function RealEstateLandingPage() {
             )}
           </div>
         </section>
-        <section className="py-16 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <Icon icon="solar:lightbulb-bold" className="size-8 text-blue-500" />
-                  <h2 className="font-heading text-3xl font-semibold tracking-tight">
-                    Insights & Tools
-                  </h2>
-                </div>
-                <Button 
-                  variant="outline" 
-                  className="text-red-500 border-red-500 hover:bg-red-50"
-                  onClick={() => navigate('/insights')}
-                >
-                  View all Insights
-                </Button>
-              </div>
-              <p className="text-muted-foreground">Go from browsing to buying</p>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-12">
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer text-center p-4" onClick={() => navigate('/insights')}>
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Icon icon="solar:chart-2-bold" className="size-6 text-blue-600" />
-                  </div>
-                  <h3 className="font-medium text-sm">Bangalore Overview</h3>
-                  <p className="text-xs text-muted-foreground">
-                    Know where growth & upcoming advantages
-                  </p>
-                </div>
-              </Card>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer text-center p-4" onClick={() => navigate('/insights')}>
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Icon icon="solar:graph-up-bold" className="size-6 text-blue-600" />
-                  </div>
-                  <h3 className="font-medium text-sm">Property Rates in Bangalore</h3>
-                  <p className="text-xs text-muted-foreground">
-                    Check property trends and price analysis
-                  </p>
-                </div>
-              </Card>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer text-center p-4" onClick={() => navigate('/insights')}>
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <Icon icon="solar:star-bold" className="size-6 text-orange-600" />
-                  </div>
-                  <h3 className="font-medium text-sm">Genuine reviews of Bangalore</h3>
-                  <p className="text-xs text-muted-foreground">
-                    Know what residents say about localities
-                  </p>
-                </div>
-              </Card>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer text-center p-4" onClick={() => navigate('/insights')}>
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <Icon icon="solar:map-point-bold" className="size-6 text-orange-600" />
-                  </div>
-                  <h3 className="font-medium text-sm">About My Property</h3>
-                  <p className="text-xs text-muted-foreground">
-                    Track prices & activities around properties
-                  </p>
-                </div>
-              </Card>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer text-center p-4" onClick={() => navigate('/insights')}>
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                    <Icon icon="solar:chart-square-bold" className="size-6 text-green-600" />
-                  </div>
-                  <h3 className="font-medium text-sm">Read Latest News</h3>
-                  <p className="text-xs text-muted-foreground">
-                    Around real estate and latest initiatives
-                  </p>
-                </div>
-              </Card>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer text-center p-4" onClick={() => navigate('/insights')}>
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Icon icon="solar:document-text-bold" className="size-6 text-blue-600" />
-                  </div>
-                  <h3 className="font-medium text-sm">Check Articles</h3>
-                  <p className="text-xs text-muted-foreground">
-                    On trending topics and policy updates
-                  </p>
-                </div>
-              </Card>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer text-center p-4" onClick={() => navigate('/insights')}>
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Icon icon="solar:book-bold" className="size-6 text-blue-600" />
-                  </div>
-                  <h3 className="font-medium text-sm">User Guide</h3>
-                  <p className="text-xs text-muted-foreground">
-                    To help home buyers navigate and search
-                  </p>
-                </div>
-              </Card>
-            </div>
-            <div className="grid md:grid-cols-2 gap-8 mb-12">
-              <div>
-                <h3 className="font-semibold text-xl mb-4">Offers for you</h3>
-                <p className="text-muted-foreground mb-6">
-                  Projects with ongoing offers in Bangalore East
-                </p>
-                <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/properties')}>
-                  <CardContent className="p-4">
-                    <div className="flex gap-4">
-                      <img
-                        alt="Isha HiLife"
-                        src="https://randomuser.me/api/portraits/men/32.jpg"
-                        className="w-16 h-16 rounded-full object-cover"
-                      />
-                      <div className="flex-1">
-                        <h4 className="font-semibold mb-1">Isha HiLife</h4>
-                        <p className="text-sm text-muted-foreground mb-1">Whitefield</p>
-                        <p className="text-sm mb-2">3 BHK Apartment</p>
-                        <p className="font-bold text-lg">₹ 1.14 - 1.25 Cr</p>
-                        <div className="flex items-center gap-2 mt-3 p-2 bg-blue-50 rounded">
-                          <Icon icon="solar:info-circle-bold" className="size-4 text-blue-600" />
-                          <span className="text-sm text-blue-600">No Pre-EMI Possession</span>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-              <div>
-                <h3 className="font-semibold text-xl mb-4">Offers for you</h3>
-                <p className="text-muted-foreground mb-6">
-                  Projects with ongoing offers in Bangalore East
-                </p>
-                <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/properties')}>
-                  <CardContent className="p-4">
-                    <div className="flex gap-4">
-                      <img
-                        alt="Isha HiLife"
-                        src="https://randomuser.me/api/portraits/women/28.jpg"
-                        className="w-16 h-16 rounded-full object-cover"
-                      />
-                      <div className="flex-1">
-                        <h4 className="font-semibold mb-1">Isha HiLife</h4>
-                        <p className="text-sm text-muted-foreground mb-1">Whitefield</p>
-                        <p className="text-sm mb-2">3 BHK Apartment</p>
-                        <p className="font-bold text-lg">₹ 1.14 - 1.25 Cr</p>
-                        <div className="flex items-center gap-2 mt-3 p-2 bg-blue-50 rounded">
-                          <Icon icon="solar:info-circle-bold" className="size-4 text-blue-600" />
-                          <span className="text-sm text-blue-600">No Pre-EMI Possession</span>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer text-center p-4" onClick={() => navigate('/properties')}>
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <Icon icon="solar:user-bold" className="size-6 text-gray-600" />
-                  </div>
-                  <h3 className="font-medium text-sm">Prestige Group</h3>
-                  <p className="text-xs text-muted-foreground">
-                    173 Total Projects | 50 in this city
-                  </p>
-                </div>
-              </Card>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer text-center p-4" onClick={() => navigate('/properties')}>
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Icon icon="solar:buildings-bold" className="size-6 text-blue-600" />
-                  </div>
-                  <h3 className="font-medium text-sm">Brigade Group</h3>
-                  <p className="text-xs text-muted-foreground">
-                    18 Total Projects | 8 in this city
-                  </p>
-                </div>
-              </Card>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer text-center p-4" onClick={() => navigate('/properties')}>
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                    <Icon icon="solar:home-bold" className="size-6 text-green-600" />
-                  </div>
-                  <h3 className="font-medium text-sm">Sumadhura Group</h3>
-                  <p className="text-xs text-muted-foreground">
-                    38 Total Projects | 25 in this city
-                  </p>
-                </div>
-              </Card>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer text-center p-4" onClick={() => navigate('/properties')}>
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                    <Icon icon="solar:buildings-2-bold" className="size-6 text-yellow-600" />
-                  </div>
-                  <h3 className="font-medium text-sm">Sobha</h3>
-                  <p className="text-xs text-muted-foreground">
-                    174 Total Projects | 39 in this city
-                  </p>
-                </div>
-              </Card>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer text-center p-4" onClick={() => navigate('/properties')}>
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <Icon icon="solar:city-bold" className="size-6 text-gray-600" />
-                  </div>
-                  <h3 className="font-medium text-sm">Godrej Properties</h3>
-                  <p className="text-xs text-muted-foreground">
-                    176 Total Projects | 12 in this city
-                  </p>
-                </div>
-              </Card>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer text-center p-4" onClick={() => navigate('/properties')}>
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Icon icon="solar:buildings-3-bold" className="size-6 text-blue-600" />
-                  </div>
-                  <h3 className="font-medium text-sm">Adarsh Group</h3>
-                  <p className="text-xs text-muted-foreground">
-                    41 Total Projects | 1 in this city
-                  </p>
-                </div>
-              </Card>
-            </div>
-            <div className="bg-pink-50 rounded-xl p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <Icon icon="solar:home-smile-bold" className="size-8 text-pink-600" />
-                <h3 className="font-semibold text-xl">BHK choice in mind?</h3>
-              </div>
-              <p className="text-muted-foreground mb-6">Browse by no of bedrooms in the house</p>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                <Card className="hover:shadow-lg transition-shadow cursor-pointer text-center p-4 bg-white" onClick={() => navigate('/properties?bedrooms=1')}>
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <Icon icon="solar:home-bold" className="size-6 text-blue-600" />
-                    </div>
-                    <h4 className="font-medium">1 RK/1 BHK</h4>
-                    <p className="text-sm text-muted-foreground">4400+ Properties</p>
-                  </div>
-                </Card>
-                <Card className="hover:shadow-lg transition-shadow cursor-pointer text-center p-4 bg-white" onClick={() => navigate('/properties?bedrooms=2')}>
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <Icon icon="solar:home-bold" className="size-6 text-blue-600" />
-                    </div>
-                    <h4 className="font-medium">2 BHK</h4>
-                    <p className="text-sm text-muted-foreground">26700+ Properties</p>
-                  </div>
-                </Card>
-                <Card className="hover:shadow-lg transition-shadow cursor-pointer text-center p-4 bg-white" onClick={() => navigate('/properties?bedrooms=3')}>
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <Icon icon="solar:home-bold" className="size-6 text-blue-600" />
-                    </div>
-                    <h4 className="font-medium">3 BHK</h4>
-                    <p className="text-sm text-muted-foreground">35500+ Properties</p>
-                  </div>
-                </Card>
-                <Card className="hover:shadow-lg transition-shadow cursor-pointer text-center p-4 bg-white" onClick={() => navigate('/properties?bedrooms=4')}>
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <Icon icon="solar:home-bold" className="size-6 text-blue-600" />
-                    </div>
-                    <h4 className="font-medium">4 BHK</h4>
-                    <p className="text-sm text-muted-foreground">16600+ Properties</p>
-                  </div>
-                </Card>
-                <Card className="hover:shadow-lg transition-shadow cursor-pointer text-center p-4 bg-white" onClick={() => navigate('/properties?bedrooms=5')}>
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <Icon icon="solar:home-bold" className="size-6 text-blue-600" />
-                    </div>
-                    <h4 className="font-medium">5 BHK</h4>
-                    <p className="text-sm text-muted-foreground">4800+ Properties</p>
-                  </div>
-                </Card>
-              </div>
-            </div>
-          </div>
-        </section>
       </div>
-      <section eid="new1" className="py-16">
+      {/* <section eid="new1" className="py-16">
         <div eid="new2" className="container mx-auto px-4">
           <div eid="new3" className="mb-8">
             <h2 eid="new4" className="font-heading text-3xl font-semibold tracking-tight mb-2">
@@ -1207,41 +911,10 @@ export function RealEstateLandingPage() {
                 </div>
               </CardContent>
             </Card>
-            <Card
-              eid="new61"
-              className="bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200"
-            >
-              <CardContent eid="new62" className="p-6">
-                <div eid="new63" className="flex items-center gap-4">
-                  <div
-                    eid="new64"
-                    className="w-16 h-16 bg-orange-200 rounded-lg flex items-center justify-center"
-                  >
-                    <Icon
-                      eid="new65"
-                      icon="solar:user-speak-bold"
-                      className="size-8 text-orange-600"
-                    />
-                  </div>
-                  <div eid="new66" className="flex-1">
-                    <h3 eid="new67" className="font-semibold text-lg mb-2">
-                      How would you rate your locality/society?
-                    </h3>
-                    <div eid="new68" className="flex gap-1 mt-3">
-                      <Icon eid="new69" icon="solar:star-bold" className="size-6 text-gray-300" />
-                      <Icon eid="new70" icon="solar:star-bold" className="size-6 text-gray-300" />
-                      <Icon eid="new71" icon="solar:star-bold" className="size-6 text-gray-300" />
-                      <Icon eid="new72" icon="solar:star-bold" className="size-6 text-gray-300" />
-                      <Icon eid="new73" icon="solar:star-bold" className="size-6 text-gray-300" />
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
-      </section>
-      <section eid="new74" className="py-16 bg-secondary/30">
+      </section> */}
+      {/* <section eid="new74" className="py-16 bg-secondary/30">
         <div eid="new75" className="container mx-auto px-4">
           <div eid="new76" className="mb-8">
             <h2 eid="new77" className="font-heading text-3xl font-semibold tracking-tight mb-2">
@@ -1379,7 +1052,7 @@ export function RealEstateLandingPage() {
             </Card>
           </div>
         </div>
-      </section>
+      </section> */}
       <section eid="new121" className="py-16 bg-gradient-to-br from-pink-50 to-pink-100">
         <div eid="new122" className="container mx-auto px-4">
           <Card eid="new123" className="overflow-hidden border-0 shadow-2xl">
@@ -1628,7 +1301,7 @@ export function RealEstateLandingPage() {
           </div>
         </div>
       </section>
-      <section eid="e672" className="py-16">
+      {/* <section eid="e672" className="py-16">
         <div eid="e673" className="container mx-auto px-4">
           <div eid="e674" className="mb-8">
             <h2 eid="e675" className="font-heading text-3xl font-semibold tracking-tight mb-2">
@@ -1755,7 +1428,7 @@ export function RealEstateLandingPage() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
       <footer className="bg-slate-900 text-white py-16">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-6 gap-8">

@@ -384,6 +384,13 @@ export const api = {
     return response;
   },
 
+  // Get recommended properties
+  getRecommendedProperties: async (limit?: number): Promise<{ success: boolean; data: any[]; total: number }> => {
+    const params = limit ? `?limit=${limit}` : '';
+    const response = await apiRequest(`/properties/recommended${params}`) as any;
+    return response;
+  },
+
   getPropertyImages: (propertyId: number): Promise<{ data: { images: PropertyImage[] } }> => {
     return apiRequest(`/upload/properties/${propertyId}/images`);
   },

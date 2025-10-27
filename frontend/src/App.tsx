@@ -17,6 +17,7 @@ import { AddPropertyPage, MyPropertiesPage } from '@/features/property/pages'
 import { AgentPropertyDashboard } from '@/features/agent/components'
 import { PropertySearchPage } from '@/features/property/pages/PropertySearchPage'
 import { PropertySearchDashboard } from './components/landing/SearchViewedDashboard'
+import { ProjectDetailsPage as PublicProjectDetailsPage } from './pages/ProjectDetailsPage'
 
 import { BulkUploadPage } from '@/pages/agent/BulkUploadPage'
 
@@ -41,6 +42,7 @@ function App() {
                     <Route path="/properties" element={<PropertyListingGrid />} />
                     <Route path="/search" element={<PropertySearchPage />} />
                     <Route path="/property/:id" element={<PropertyDetailsPage />} />
+                    <Route path="/project/:id" element={<PublicProjectDetailsPage />} />
                     {/* <Route path="/calculators" element={<CalculatorsPage />} /> */}
 
                     {/* Search & Activity Dashboard - Can be accessed by both authenticated and unauthenticated users */}

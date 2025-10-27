@@ -590,7 +590,7 @@ export function RealEstateLandingPage() {
                     };
 
                     return (
-                      <Card key={project.id} className="hover:shadow-lg transition-shadow bg-white cursor-pointer" onClick={() => navigate(`/projects/${project.id}`)}>
+                      <Card key={project.id} className="hover:shadow-lg transition-shadow bg-white cursor-pointer" onClick={() => navigate(`/project/${project.id}`)}>
                         <CardContent className="p-0">
                           <img
                             alt={project.name}

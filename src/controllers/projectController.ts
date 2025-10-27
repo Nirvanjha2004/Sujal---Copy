@@ -81,7 +81,7 @@ class ProjectController {
           });
 
           const projectData = project.toJSON() as any;
-          
+
           const stats = {
             total: units.length,
             available: units.filter((u: any) => u.status === UnitStatus.AVAILABLE).length,
@@ -179,7 +179,7 @@ class ProjectController {
 
       res.json({
         success: true,
-        data: { 
+        data: {
           project: {
             ...projectData,
             builder,
@@ -363,7 +363,7 @@ class ProjectController {
       }
 
       const projectId = parseInt(req.params.projectId);
-      
+
       if (!req.user || req.user.role !== 'builder') {
         res.status(403).json({
           success: false,
@@ -465,7 +465,7 @@ class ProjectController {
   async getProjectUnits(req: ProjectRequest, res: Response): Promise<void> {
     try {
       const projectId = parseInt(req.params.projectId);
-      
+
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
       const offset = (page - 1) * limit;
@@ -513,7 +513,7 @@ class ProjectController {
   async bulkCreateUnits(req: ProjectRequest, res: Response): Promise<void> {
     try {
       const projectId = parseInt(req.params.projectId);
-      
+
       if (!req.user || req.user.role !== 'builder') {
         res.status(403).json({
           success: false,
@@ -591,7 +591,7 @@ class ProjectController {
   async bulkCreateUnitsFromCSV(req: ProjectRequest, res: Response): Promise<void> {
     try {
       const projectId = parseInt(req.params.projectId);
-      
+
       if (!req.user || req.user.role !== 'builder') {
         res.status(403).json({
           success: false,
@@ -637,7 +637,7 @@ class ProjectController {
       const csvData = req.file.buffer.toString('utf-8');
       const lines = csvData.split('\n');
       const headers = lines[0].split(',').map(h => h.trim());
-      
+
       const unitsToCreate: any[] = [];
       const errors: string[] = [];
 
@@ -701,8 +701,8 @@ class ProjectController {
 
       res.status(201).json({
         success: true,
-        data: { 
-          units: createdUnits, 
+        data: {
+          units: createdUnits,
           count: createdUnits.length,
           errors: errors.length > 0 ? errors : undefined
         },
@@ -848,7 +848,7 @@ class ProjectController {
   async getRecentProjects(req: Request, res: Response): Promise<void> {
     try {
       const limit = parseInt(req.query.limit as string) || 6;
-      
+
       const projects = await Project.findAll({
         where: {
           is_active: true,
@@ -857,8 +857,6 @@ class ProjectController {
         order: [['created_at', 'DESC']], // Sort by creation date, not launch date
         limit,
       });
-
-      console.lo
 
       // Manually fetch images and builder data for each project
       const projectsWithImages = await Promise.all(
@@ -875,7 +873,7 @@ class ProjectController {
           ]);
 
           const projectData = project.toJSON() as any;
-          
+
           return {
             id: projectData.id,
             name: projectData.name,
@@ -918,13 +916,93 @@ class ProjectController {
     }
   }
 
+  // Get public project by ID
+  async getPublicProjectById(req: Request, res: Response): Promise<void> {
+    try {
+      const projectId = parseInt(req.params.id);
+
+      if (isNaN(projectId)) {
+        res.status(400).json({
+          success: false,
+          error: {
+            code: 'INVALID_ID',
+            message: 'Invalid project ID',
+          },
+        });
+        return;
+      }
+
+      const project = await Project.findOne({
+        where: {
+          id: projectId,
+          is_active: true,
+          approval_status: 'approved',
+        },
+      });
+
+      if (!project) {
+        res.status(404).json({
+          success: false,
+          error: {
+            code: 'NOT_FOUND',
+            message: 'Project not found',
+          },
+        });
+        return;
+      }
+
+      // Manually fetch related data
+      const [builder, images, units] = await Promise.all([
+        User.findByPk(project.builder_id, {
+          attributes: ['id', 'first_name', 'last_name', 'email'],
+        }),
+        ProjectImage.findAll({
+          where: { project_id: projectId },
+          order: [['is_primary', 'DESC'], ['display_order', 'ASC']],
+        }),
+        ProjectUnit.findAll({
+          where: { project_id: projectId },
+          order: [['floor_number', 'ASC'], ['unit_number', 'ASC']],
+        }),
+      ]);
+
+      const projectData = project.toJSON() as any;
+
+      res.json({
+        success: true,
+        data: {
+          project: {
+            ...projectData,
+            builder: builder ? {
+              id: builder.id,
+              first_name: builder.first_name,
+              last_name: builder.last_name,
+              email: builder.email,
+            } : null,
+            images: images.map(img => img.image_url),
+            units,
+          }
+        },
+      });
+    } catch (error) {
+      console.error('Get public project error:', error);
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'Failed to retrieve project',
+        },
+      });
+    }
+  }
+
   // Get all public projects with filtering
   async getPublicProjects(req: Request, res: Response): Promise<void> {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
       const offset = (page - 1) * limit;
-      
+
       const {
         location,
         city,
@@ -985,7 +1063,7 @@ class ProjectController {
           ]);
 
           const projectData = project.toJSON() as any;
-          
+
           return {
             id: projectData.id,
             name: projectData.name,
@@ -1097,7 +1175,7 @@ class ProjectController {
 
       const projectId = parseInt(req.params.projectId);
       const unitId = parseInt(req.params.unitId);
-      
+
       if (!req.user || req.user.role !== 'builder') {
         res.status(403).json({
           success: false,
@@ -1236,7 +1314,7 @@ class ProjectController {
     try {
       const projectId = parseInt(req.params.projectId);
       const unitId = parseInt(req.params.unitId);
-      
+
       if (!req.user || req.user.role !== 'builder') {
         res.status(403).json({
           success: false,
@@ -1440,13 +1518,13 @@ class ProjectController {
 
       const [totalProjects, activeProjects, totalUnits, soldUnits, availableUnits] = await Promise.all([
         Project.count({ where: { builder_id: builderId } }),
-        Project.count({ 
-          where: { 
-            builder_id: builderId, 
+        Project.count({
+          where: {
+            builder_id: builderId,
             status: {
               [Op.in]: [ProjectStatus.PRE_LAUNCH, ProjectStatus.UNDER_CONSTRUCTION]
             }
-          } 
+          }
         }),
         ProjectUnit.count({
           include: [{

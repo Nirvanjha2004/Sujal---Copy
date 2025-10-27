@@ -54,6 +54,7 @@ const uploadCsv = multer({ storage: csvStorage, fileFilter: csvFileFilter });
 // --- Public Project Routes (no authentication required) ---
 router.get('/public', projectController.getPublicProjects);
 router.get('/public/recent', projectController.getRecentProjects);
+router.get('/public/:id', projectController.getPublicProjectById);
 
 // --- Project Routes ---
 router.get('/', authenticate, projectController.getBuilderProjects);

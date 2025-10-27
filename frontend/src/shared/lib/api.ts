@@ -379,6 +379,11 @@ export const api = {
     return response;
   },
 
+  getProjectById: async (id: number): Promise<{ success: boolean; data: { project: any } }> => {
+    const response = await apiRequest(`/projects/public/${id}`) as any;
+    return response;
+  },
+
   getPropertyImages: (propertyId: number): Promise<{ data: { images: PropertyImage[] } }> => {
     return apiRequest(`/upload/properties/${propertyId}/images`);
   },

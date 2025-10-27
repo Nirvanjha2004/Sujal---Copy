@@ -10,6 +10,13 @@ const propertyController = new PropertyController();
 const cacheMiddleware = new CacheMiddleware();
 
 // Public routes with optional authentication for tracking
+// Get recommended properties
+router.get(
+  '/recommended',
+  optionalAuthenticate,
+  propertyController.getRecommendedProperties
+);
+
 // Base route to get all properties (with optional filters)
 router.get(
   '/',

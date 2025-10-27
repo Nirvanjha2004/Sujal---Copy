@@ -30,6 +30,35 @@ export function useFeaturedProperties(limit: number = 10) {
   return { properties, loading, error };
 }
 
+export function useRecommendedProperties(limit: number = 8) {
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        setLoading(true);
+        const response = await api.getRecommendedProperties(limit);
+        if (response.success) {
+          setProperties(response.data);
+        } else {
+          setProperties([]);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch recommended properties');
+        setProperties([]); // Fallback to empty array
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProperties();
+  }, [limit]);
+
+  return { properties, loading, error };
+}
+
 export function useRecentProperties(limit: number = 10) {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);

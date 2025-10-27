@@ -7,22 +7,21 @@ import { UserManagementPage } from './UserManagementPage';
 import { PropertyModerationPage } from './PropertyModerationPage';
 import { ContentManagementPage } from './ContentManagementPage';
 import { BannerManagementPage } from './BannerManagementPage';
-import { SeoManagementPage } from './SeoManagementPage';
 import { AnalyticsDashboardPage } from './AnalyticsDashboardPage';
 import { ReviewModerationPage } from './ReviewModerationPage';
 import { UrlRedirectManagementPage } from './UrlRedirectManagementPage';
 import { RoleAssignmentPage } from './RoleAssignmentPage';
 
-type AdminTab = 
-  | 'dashboard' 
-  | 'users' 
-  | 'properties' 
-  | 'content' 
-  | 'banners' 
-  | 'seo' 
-  | 'analytics' 
-  | 'reviews' 
-  | 'redirects' 
+type AdminTab =
+  | 'dashboard'
+  | 'users'
+  | 'properties'
+  | 'content'
+  | 'banners'
+  | 'seo'
+  | 'analytics'
+  | 'reviews'
+  | 'redirects'
   | 'roles';
 
 interface NavItem {
@@ -159,9 +158,9 @@ export function AdminPanelPage() {
               size="sm"
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
             >
-              <Icon 
-                icon={sidebarCollapsed ? 'solar:hamburger-menu-bold' : 'solar:sidebar-minimalistic-bold'} 
-                className="size-5" 
+              <Icon
+                icon={sidebarCollapsed ? 'solar:hamburger-menu-bold' : 'solar:sidebar-minimalistic-bold'}
+                className="size-5"
               />
             </Button>
           </div>
@@ -172,15 +171,14 @@ export function AdminPanelPage() {
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-left transition-all duration-200 ${
-                  activeTab === item.id
-                    ? 'bg-blue-50 border-l-4 border-blue-500 text-blue-700'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
+                className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-left transition-all duration-200 ${activeTab === item.id
+                  ? 'bg-blue-50 border-l-4 border-blue-500 text-blue-700'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  }`}
               >
-                <Icon 
-                  icon={item.icon} 
-                  className={`size-5 ${activeTab === item.id ? 'text-blue-600' : item.color}`} 
+                <Icon
+                  icon={item.icon}
+                  className={`size-5 ${activeTab === item.id ? 'text-blue-600' : item.color}`}
                 />
                 {!sidebarCollapsed && (
                   <>

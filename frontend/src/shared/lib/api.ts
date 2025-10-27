@@ -314,14 +314,14 @@ export const api = {
 
           // Map other frontend parameter names to backend parameter names
           let backendKey = key;
-          if (key === 'property_type') backendKey = 'propertyType';
-          if (key === 'listing_type') backendKey = 'listingType';
-          if (key === 'min_price') backendKey = 'minPrice';
-          if (key === 'max_price') backendKey = 'maxPrice';
-          if (key === 'min_area') backendKey = 'minArea';
-          if (key === 'max_area') backendKey = 'maxArea';
-          if (key === 'sort_by') backendKey = 'sortBy';
-          if (key === 'sort_order') backendKey = 'sortOrder';
+          if (key === 'property_type') backendKey = 'property_type';
+          if (key === 'listing_type') backendKey = 'listing_type';
+          if (key === 'min_price') backendKey = 'min_price';
+          if (key === 'max_price') backendKey = 'max_price';
+          if (key === 'min_area') backendKey = 'min_area';
+          if (key === 'max_area') backendKey = 'max_area';
+          if (key === 'sort_by') backendKey = 'sort_by';
+          if (key === 'sort_order') backendKey = 'sort_order';
 
           params.append(backendKey, value.toString());
         }
@@ -345,6 +345,38 @@ export const api = {
     return apiRequest(`/properties/${id}`, {
       method: 'DELETE',
     });
+  },
+
+  // Public Projects (for landing page and public views)
+  getPublicProjects: async (params?: {
+    location?: string;
+    city?: string;
+    project_type?: string;
+    min_price?: number;
+    max_price?: number;
+    status?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+    limit?: number;
+    page?: number;
+  }): Promise<{ success: boolean; data: any[]; pagination: { page: number; limit: number; total: number; totalPages: number } }> => {
+    const searchParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          searchParams.append(key, value.toString());
+        }
+      });
+    }
+    
+    const response = await apiRequest(`/projects/public?${searchParams.toString()}`) as any;
+    return response;
+  },
+
+  getRecentProjects: async (limit?: number): Promise<{ success: boolean; data: any[]; total: number }> => {
+    const params = limit ? `?limit=${limit}` : '';
+    const response = await apiRequest(`/projects/public/recent${params}`) as any;
+    return response;
   },
 
   getPropertyImages: (propertyId: number): Promise<{ data: { images: PropertyImage[] } }> => {

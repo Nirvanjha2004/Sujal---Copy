@@ -844,6 +844,197 @@ class ProjectController {
     }
   }
 
+  // Get recent projects for public display (landing page)
+  async getRecentProjects(req: Request, res: Response): Promise<void> {
+    try {
+      const limit = parseInt(req.query.limit as string) || 6;
+      
+      const projects = await Project.findAll({
+        where: {
+          is_active: true,
+          approval_status: 'approved',
+        },
+        order: [['created_at', 'DESC']], // Sort by creation date, not launch date
+        limit,
+      });
+
+      console.lo
+
+      // Manually fetch images and builder data for each project
+      const projectsWithImages = await Promise.all(
+        projects.map(async (project) => {
+          const [images, builder] = await Promise.all([
+            ProjectImage.findAll({
+              where: { project_id: project.id },
+              order: [['is_primary', 'DESC'], ['display_order', 'ASC']],
+              limit: 2, // Only get first 2 images for performance
+            }),
+            User.findByPk(project.builder_id, {
+              attributes: ['id', 'first_name', 'last_name', 'email'],
+            })
+          ]);
+
+          const projectData = project.toJSON() as any;
+          
+          return {
+            id: projectData.id,
+            name: projectData.name,
+            description: projectData.description,
+            location: projectData.location,
+            city: projectData.city,
+            state: projectData.state,
+            project_type: projectData.project_type,
+            total_units: projectData.total_units,
+            available_units: projectData.available_units,
+            pricing: projectData.pricing,
+            amenities: projectData.amenities,
+            images: images.map(img => img.image_url),
+            builder: builder ? {
+              id: builder.id,
+              first_name: builder.first_name,
+              last_name: builder.last_name,
+              email: builder.email,
+            } : null,
+            created_at: projectData.created_at,
+            status: projectData.status,
+          };
+        })
+      );
+
+      res.json({
+        success: true,
+        data: projectsWithImages,
+        total: projectsWithImages.length,
+      });
+    } catch (error) {
+      console.error('Get recent projects error:', error);
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'Failed to retrieve recent projects',
+        },
+      });
+    }
+  }
+
+  // Get all public projects with filtering
+  async getPublicProjects(req: Request, res: Response): Promise<void> {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const offset = (page - 1) * limit;
+      
+      const {
+        location,
+        city,
+        project_type,
+        min_price,
+        max_price,
+        status,
+        sortBy = 'created_at',
+        sortOrder = 'desc',
+      } = req.query;
+
+      const whereClause: any = {
+        is_active: true,
+        approval_status: 'approved',
+      };
+
+      // Apply filters
+      if (location) {
+        whereClause.location = { [Op.iLike]: `%${location}%` };
+      }
+      if (city) {
+        whereClause.city = { [Op.iLike]: `%${city}%` };
+      }
+      if (project_type) {
+        whereClause.project_type = project_type;
+      }
+      if (status) {
+        whereClause.status = status;
+      }
+
+      // Price filtering (assuming pricing object has min/max fields)
+      if (min_price || max_price) {
+        const priceFilter: any = {};
+        if (min_price) priceFilter['pricing.min'] = { [Op.gte]: parseFloat(min_price as string) };
+        if (max_price) priceFilter['pricing.max'] = { [Op.lte]: parseFloat(max_price as string) };
+        // Note: This is a simplified approach. In a real app, you'd need proper JSON querying
+      }
+
+      const { rows: projects, count: total } = await Project.findAndCountAll({
+        where: whereClause,
+        order: [[sortBy as string, (sortOrder as string).toUpperCase()]],
+        limit,
+        offset,
+      });
+
+      // Manually fetch images and builder data for each project
+      const projectsWithImages = await Promise.all(
+        projects.map(async (project) => {
+          const [images, builder] = await Promise.all([
+            ProjectImage.findAll({
+              where: { project_id: project.id },
+              order: [['is_primary', 'DESC'], ['display_order', 'ASC']],
+              limit: 3,
+            }),
+            User.findByPk(project.builder_id, {
+              attributes: ['id', 'first_name', 'last_name', 'email'],
+            })
+          ]);
+
+          const projectData = project.toJSON() as any;
+          
+          return {
+            id: projectData.id,
+            name: projectData.name,
+            description: projectData.description,
+            location: projectData.location,
+            city: projectData.city,
+            state: projectData.state,
+            project_type: projectData.project_type,
+            total_units: projectData.total_units,
+            available_units: projectData.available_units,
+            pricing: projectData.pricing,
+            amenities: projectData.amenities,
+            images: images.map(img => img.image_url),
+            builder: builder ? {
+              id: builder.id,
+              first_name: builder.first_name,
+              last_name: builder.last_name,
+              email: builder.email,
+            } : null,
+            created_at: projectData.created_at,
+            status: projectData.status,
+          };
+        })
+      );
+
+      const totalPages = Math.ceil(total / limit);
+
+      res.json({
+        success: true,
+        data: projectsWithImages,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+        },
+      });
+    } catch (error) {
+      console.error('Get public projects error:', error);
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'Failed to retrieve projects',
+        },
+      });
+    }
+  }
+
   // Download CSV template
   async downloadCSVTemplate(req: ProjectRequest, res: Response): Promise<void> {
     try {

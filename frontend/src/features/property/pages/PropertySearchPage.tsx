@@ -60,7 +60,7 @@ export function PropertySearchPage() {
             setSearchQuery(query);
         }
         if (propertyType && propertyType !== 'all') {
-            newFilters.propertyType = propertyType as any;
+            newFilters.propertyType = [propertyType as any];
         }
         if (listingTypeParam) {
             newFilters.listingType = listingTypeParam as any;
@@ -102,7 +102,7 @@ export function PropertySearchPage() {
         const params = new URLSearchParams();
 
         if (newFilters.location) params.set('q', newFilters.location);
-        if (newFilters.propertyType) params.set('property_type', Array.isArray(newFilters.propertyType) ? newFilters.propertyType[0] : newFilters.propertyType);
+        if (newFilters.propertyType && newFilters.propertyType.length > 0) params.set('property_type', Array.isArray(newFilters.propertyType) ? newFilters.propertyType[0] : newFilters.propertyType);
         if (newFilters.listingType) params.set('listing_type', newFilters.listingType);
         if (newFilters.minPrice) params.set('min_price', newFilters.minPrice.toString());
         if (newFilters.maxPrice) params.set('max_price', newFilters.maxPrice.toString());

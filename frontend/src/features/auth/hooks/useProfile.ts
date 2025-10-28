@@ -116,12 +116,15 @@ export function useProfile(): UseProfileReturn {
   /**
    * Check if profile data has changed from current user data
    */
-  const hasChanges = useCallback((userData: ProfileUpdateData): boolean => {
+  const hasChanges = useCallback((userData: any): boolean => {
     if (!user) return false;
     
+    const currentFirstName = user.first_name || user.firstName;
+    const currentLastName = user.last_name || user.lastName;
+    
     return (
-      (userData.firstName !== undefined && userData.firstName !== user.firstName) ||
-      (userData.lastName !== undefined && userData.lastName !== user.lastName) ||
+      (userData.first_name !== undefined && userData.first_name !== currentFirstName) ||
+      (userData.last_name !== undefined && userData.last_name !== currentLastName) ||
       (userData.phone !== undefined && userData.phone !== user.phone) ||
       (userData.avatar !== undefined && userData.avatar !== user.avatar)
     );
@@ -130,7 +133,7 @@ export function useProfile(): UseProfileReturn {
   /**
    * Update user profile with validation and error handling
    */
-  const updateProfile = useCallback(async (userData: ProfileUpdateData): Promise<boolean> => {
+  const updateProfile = useCallback(async (userData: any): Promise<boolean> => {
     // Clear previous errors
     setState(prev => ({ ...prev, error: null, fieldErrors: {}, isSuccess: false }));
     authClearError();

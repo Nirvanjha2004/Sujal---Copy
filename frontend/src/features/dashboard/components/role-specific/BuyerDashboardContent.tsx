@@ -4,6 +4,7 @@ import { WelcomeSection } from '../common/WelcomeSection';
 import { StatsCard } from '../common/StatsCard';
 import { QuickActions } from '../common/QuickActions';
 import { DashboardGrid, GridItem } from '../common/DashboardGrid';
+import { ActivityFeed } from '../common/ActivityFeed';
 import type { BuyerDashboardStats, QuickAction } from '@/features/dashboard/types/dashboard';
 
 interface BuyerDashboardContentProps {
@@ -19,7 +20,9 @@ export function BuyerDashboardContent({ stats, isLoading = false }: BuyerDashboa
   const safeStats = {
     savedProperties: stats?.savedProperties || 0,
     savedSearches: stats?.savedSearches || 0,
-    messages: stats?.messages || 0
+    messages: stats?.messages || 0,
+    recentViews: stats?.recentViews || 0,
+    totalInquiries: stats?.totalInquiries || 0
   };
 
   const quickActions: QuickAction[] = [
@@ -120,16 +123,22 @@ export function BuyerDashboardContent({ stats, isLoading = false }: BuyerDashboa
         }}
       />
 
-      {/* Stats Cards */}
-      <DashboardGrid columns={3} gap="md">
+      {/* Enhanced Stats Cards with Modern Design */}
+      <DashboardGrid columns={4} gap="lg" className="mb-8">
         <GridItem>
           <StatsCard
             title="Saved Properties"
             value={safeStats.savedProperties}
             icon="solar:heart-bold"
-            color="bg-red-100 text-red-600"
+            color="bg-gradient-to-br from-red-50 to-red-100 text-red-600 border-red-200"
             subtitle="Favorites"
+            trend={{
+              value: 2,
+              direction: 'up',
+              period: 'this week'
+            }}
             onClick={() => navigate('/favorites')}
+            className="hover:shadow-lg hover:scale-105 transition-all duration-200"
           />
         </GridItem>
         
@@ -138,9 +147,32 @@ export function BuyerDashboardContent({ stats, isLoading = false }: BuyerDashboa
             title="Saved Searches"
             value={safeStats.savedSearches}
             icon="solar:bookmark-bold"
-            color="bg-accent/10 text-accent"
+            color="bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 border-blue-200"
             subtitle="Active searches"
+            trend={{
+              value: 1,
+              direction: 'up',
+              period: 'this month'
+            }}
             onClick={() => navigate('/saved-searches')}
+            className="hover:shadow-lg hover:scale-105 transition-all duration-200"
+          />
+        </GridItem>
+        
+        <GridItem>
+          <StatsCard
+            title="Recent Views"
+            value={safeStats.recentViews}
+            icon="solar:eye-bold"
+            color="bg-gradient-to-br from-purple-50 to-purple-100 text-purple-600 border-purple-200"
+            subtitle="Properties viewed"
+            trend={{
+              value: 5,
+              direction: 'up',
+              period: 'today'
+            }}
+            onClick={() => navigate('/recent-views')}
+            className="hover:shadow-lg hover:scale-105 transition-all duration-200"
           />
         </GridItem>
         
@@ -149,9 +181,10 @@ export function BuyerDashboardContent({ stats, isLoading = false }: BuyerDashboa
             title="Messages"
             value={safeStats.messages}
             icon="solar:letter-bold"
-            color="bg-green-100 text-green-600"
+            color="bg-gradient-to-br from-green-50 to-green-100 text-green-600 border-green-200"
             subtitle="Conversations"
             onClick={() => navigate('/dashboard/messages')}
+            className="hover:shadow-lg hover:scale-105 transition-all duration-200"
           />
         </GridItem>
       </DashboardGrid>

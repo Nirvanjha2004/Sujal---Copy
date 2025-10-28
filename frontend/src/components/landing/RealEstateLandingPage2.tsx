@@ -14,7 +14,7 @@ import { Badge } from "@/shared/components/ui/badge";
 import { useFeaturedProperties, useRecentProperties, useRecommendedProperties } from "@/shared/hooks/useProperties";
 import { PropertyCardSkeleton } from "@/shared/components/ui/loading";
 import { useAuth } from "@/shared/contexts/AuthContext";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { PROPERTY_TYPES } from "@/features/property/constants";
 import { api } from "@/shared/lib/api";
@@ -30,6 +30,12 @@ export function RealEstateLandingPage() {
   const [listingType, setListingType] = useState("buy");
   const [recentProjects, setRecentProjects] = useState<any[]>([]);
   const [isLoadingProjects, setIsLoadingProjects] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [recommendedSlide, setRecommendedSlide] = useState(0);
+  const [projectsSlide, setProjectsSlide] = useState(0);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const recommendedCarouselRef = useRef<HTMLDivElement>(null);
+  const projectsCarouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchRecentProjects = async () => {
@@ -51,6 +57,36 @@ export function RealEstateLandingPage() {
     fetchRecentProjects();
   }, []);
 
+  // Handle window resize for responsive carousel
+  useEffect(() => {
+    const handleResize = () => {
+      const visibleCards = getVisibleCards();
+      
+      // Reset property types carousel
+      const maxSlide = Math.max(0, PROPERTY_TYPES.length - visibleCards);
+      if (currentSlide > maxSlide) {
+        setCurrentSlide(maxSlide);
+      }
+      
+      // Reset recommended properties carousel
+      const totalRecommended = recommendedProperties?.length || 4;
+      const maxRecommendedSlide = Math.max(0, totalRecommended - visibleCards);
+      if (recommendedSlide > maxRecommendedSlide) {
+        setRecommendedSlide(maxRecommendedSlide);
+      }
+      
+      // Reset projects carousel
+      const totalProjects = recentProjects?.length || 4;
+      const maxProjectsSlide = Math.max(0, totalProjects - visibleCards);
+      if (projectsSlide > maxProjectsSlide) {
+        setProjectsSlide(maxProjectsSlide);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [currentSlide, recommendedSlide, projectsSlide, recommendedProperties, recentProjects]);
+
   const handleSearch = () => {
     const params = new URLSearchParams();
     if (searchQuery) params.set('q', searchQuery);
@@ -58,6 +94,76 @@ export function RealEstateLandingPage() {
     if (listingType !== 'buy') params.set('listing_type', listingType);
 
     navigate(`/search?${params.toString()}`);
+  };
+
+  // Carousel navigation functions
+  const getVisibleCards = () => {
+    if (window.innerWidth >= 1024) return 4; // lg screens
+    if (window.innerWidth >= 768) return 3;  // md screens
+    return 1; // mobile
+  };
+
+  const nextSlide = () => {
+    const visibleCards = getVisibleCards();
+    const maxSlide = Math.max(0, PROPERTY_TYPES.length - visibleCards);
+    setCurrentSlide(prev => Math.min(prev + 1, maxSlide));
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide(prev => Math.max(prev - 1, 0));
+  };
+
+  const canGoNext = () => {
+    const visibleCards = getVisibleCards();
+    return currentSlide < PROPERTY_TYPES.length - visibleCards;
+  };
+
+  const canGoPrev = () => {
+    return currentSlide > 0;
+  };
+
+  // Recommended Properties Carousel Functions
+  const nextRecommendedSlide = () => {
+    const visibleCards = getVisibleCards();
+    const totalItems = recommendedProperties?.length || 4; // fallback to 4 static cards
+    const maxSlide = Math.max(0, totalItems - visibleCards);
+    setRecommendedSlide(prev => Math.min(prev + 1, maxSlide));
+  };
+
+  const prevRecommendedSlide = () => {
+    setRecommendedSlide(prev => Math.max(prev - 1, 0));
+  };
+
+  const canGoNextRecommended = () => {
+    const visibleCards = getVisibleCards();
+    const totalItems = recommendedProperties?.length || 4;
+    return recommendedSlide < totalItems - visibleCards;
+  };
+
+  const canGoPrevRecommended = () => {
+    return recommendedSlide > 0;
+  };
+
+  // Projects Carousel Functions
+  const nextProjectsSlide = () => {
+    const visibleCards = getVisibleCards();
+    const totalItems = recentProjects?.length || 4; // fallback to 4 static cards
+    const maxSlide = Math.max(0, totalItems - visibleCards);
+    setProjectsSlide(prev => Math.min(prev + 1, maxSlide));
+  };
+
+  const prevProjectsSlide = () => {
+    setProjectsSlide(prev => Math.max(prev - 1, 0));
+  };
+
+  const canGoNextProjects = () => {
+    const visibleCards = getVisibleCards();
+    const totalItems = recentProjects?.length || 4;
+    return projectsSlide < totalItems - visibleCards;
+  };
+
+  const canGoPrevProjects = () => {
+    return projectsSlide > 0;
   };
 
   const formatPrice = (price: number) => {
@@ -81,38 +187,6 @@ export function RealEstateLandingPage() {
                   <Icon icon="solar:home-smile-bold" className="size-8" />
                   <span className="text-xl font-bold">99acres</span>
                 </div>
-                <nav className="hidden md:flex items-center gap-6 text-sm">
-                  <button
-                    onClick={() => navigate('/properties?listing_type=sale')}
-                    className="hover:underline"
-                  >
-                    For Buyers
-                  </button>
-                  <button
-                    onClick={() => navigate('/properties?listing_type=rent')}
-                    className="hover:underline"
-                  >
-                    For Tenants
-                  </button>
-                  <button
-                    onClick={() => navigate('/dashboard')}
-                    className="hover:underline"
-                  >
-                    For Owners
-                  </button>
-                  <button
-                    onClick={() => navigate('/dashboard')}
-                    className="hover:underline"
-                  >
-                    For Dealers/Builders
-                  </button>
-                  <button
-                    onClick={() => navigate('/insights')}
-                    className="hover:underline"
-                  >
-                    Insights
-                  </button>
-                </nav>
               </div>
               <div className="flex items-center gap-3">
                 {isAuthenticated ? (
@@ -173,43 +247,7 @@ export function RealEstateLandingPage() {
               <Card className="shadow-2xl">
                 <CardContent className="p-0">
                   <Tabs className="w-full" defaultValue="buy">
-                    <TabsList className="w-full justify-start rounded-none border-b bg-transparent h-auto p-0">
-                      <TabsTrigger
-                        value="buy"
-                        className="rounded-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary px-6 py-3"
-                        onClick={() => setListingType("buy")}
-                      >
-                        Buy
-                      </TabsTrigger>
-                      <TabsTrigger
-                        value="rent"
-                        className="rounded-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary px-6 py-3"
-                        onClick={() => setListingType("rent")}
-                      >
-                        Rent
-                      </TabsTrigger>
-                      <TabsTrigger
-                        value="pg"
-                        className="rounded-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary px-6 py-3"
-                        onClick={() => setListingType("pg")}
-                      >
-                        PG/Co-living
-                      </TabsTrigger>
-                      <TabsTrigger
-                        value="commercial"
-                        className="rounded-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary px-6 py-3"
-                        onClick={() => setListingType("commercial")}
-                      >
-                        Commercial
-                      </TabsTrigger>
-                      <TabsTrigger
-                        value="projects"
-                        className="rounded-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary px-6 py-3"
-                        onClick={() => setListingType("projects")}
-                      >
-                        Projects
-                      </TabsTrigger>
-                    </TabsList>
+
                     <TabsContent value="buy" className="p-6">
                       <div className="flex flex-col md:flex-row gap-3">
                         <Select value={listingType} onValueChange={setListingType}>
@@ -272,11 +310,33 @@ export function RealEstateLandingPage() {
         </section>
         <section className="py-16 bg-secondary/30">
           <div className="container mx-auto px-4">
-            <div className="mb-8">
-              <h2 className="font-heading text-3xl font-semibold tracking-tight mb-2">
-                Recommended Properties
-              </h2>
-              <p className="text-muted-foreground">The most searched properties</p>
+            <div className="mb-8 flex items-center justify-between">
+              <div>
+                <h2 className="font-heading text-3xl font-semibold tracking-tight mb-2">
+                  Recommended Properties
+                </h2>
+                <p className="text-muted-foreground">The most searched properties</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={prevRecommendedSlide}
+                  disabled={!canGoPrevRecommended()}
+                  className="rounded-full"
+                >
+                  <Icon icon="solar:arrow-left-bold" className="size-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={nextRecommendedSlide}
+                  disabled={!canGoNextRecommended()}
+                  className="rounded-full"
+                >
+                  <Icon icon="solar:arrow-right-bold" className="size-4" />
+                </Button>
+              </div>
             </div>
             {recommendedLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -285,167 +345,223 @@ export function RealEstateLandingPage() {
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {recommendedProperties && recommendedProperties.length > 0 ? (
-                  recommendedProperties.map((property) => (
-                    <Card key={property.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/property/${property.id}`)}>
-                      <CardContent className="p-0">
-                        <img
-                          alt="Project"
-                          src={property.images?.[0]?.image_url || "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/landscape/4.webp"}
-                          className="w-full h-48 object-cover rounded-t-xl"
-                        />
-                        <div className="p-4">
-                          <h3 className="font-semibold text-lg mb-1">{property.title}</h3>
-                          <p className="text-sm text-muted-foreground mb-2">
-                            {property.address}, {property.city}
-                          </p>
-                          <div className="flex items-center gap-2 text-sm mb-2">
-                            <Icon icon="solar:home-bold" className="size-4 text-muted-foreground" />
-                            <span>{property.bedrooms} BHK {property.property_type}</span>
+              <div className="relative overflow-hidden">
+                <div 
+                  ref={recommendedCarouselRef}
+                  className="flex transition-transform duration-300 ease-in-out gap-6"
+                  style={{
+                    transform: `translateX(-${recommendedSlide * (100 / getVisibleCards())}%)`
+                  }}
+                >
+                  {recommendedProperties && recommendedProperties.length > 0 ? (
+                    recommendedProperties.map((property) => (
+                      <Card 
+                        key={property.id} 
+                        className="hover:shadow-lg transition-shadow cursor-pointer flex-shrink-0" 
+                        style={{ width: `calc(${100 / getVisibleCards()}% - ${(getVisibleCards() - 1) * 1.5}rem / ${getVisibleCards()})` }}
+                        onClick={() => navigate(`/property/${property.id}`)}
+                      >
+                        <CardContent className="p-0">
+                          <img
+                            alt="Project"
+                            src={property.images?.[0]?.image_url || "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/landscape/4.webp"}
+                            className="w-full h-48 object-cover rounded-t-xl"
+                          />
+                          <div className="p-4">
+                            <h3 className="font-semibold text-lg mb-1">{property.title}</h3>
+                            <p className="text-sm text-muted-foreground mb-2">
+                              {property.address}, {property.city}
+                            </p>
+                            <div className="flex items-center gap-2 text-sm mb-2">
+                              <Icon icon="solar:home-bold" className="size-4 text-muted-foreground" />
+                              <span>{property.bedrooms} BHK {property.property_type}</span>
+                            </div>
+                            <p className="font-bold text-lg">{formatPrice(property.price)}</p>
                           </div>
-                          <p className="font-bold text-lg">{formatPrice(property.price)}</p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
-                ) : (
-                  // Fallback to original static content if no properties available
-                  <>
-                    <Card className="hover:shadow-lg transition-shadow">
-                      <CardContent className="p-0">
-                        <img
-                          alt="Project"
-                          src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/landscape/4.webp"
-                          className="w-full h-48 object-cover rounded-t-xl"
-                        />
-                        <div className="p-4">
-                          <h3 className="font-semibold text-lg mb-1">PANDITIA</h3>
-                          <p className="text-sm text-muted-foreground mb-2">
-                            3 BHK Apartment Sett Lake Mahadananda Ring Road
-                          </p>
-                          <div className="flex items-center gap-2 text-sm mb-2">
-                            <Icon icon="solar:home-bold" className="size-4 text-muted-foreground" />
-                            <span>3 BHK Apartment</span>
+                        </CardContent>
+                      </Card>
+                    ))
+                  ) : (
+                    // Fallback to original static content if no properties available
+                    <>
+                      <Card 
+                        className="hover:shadow-lg transition-shadow flex-shrink-0"
+                        style={{ width: `calc(${100 / getVisibleCards()}% - ${(getVisibleCards() - 1) * 1.5}rem / ${getVisibleCards()})` }}
+                      >
+                        <CardContent className="p-0">
+                          <img
+                            alt="Project"
+                            src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/landscape/4.webp"
+                            className="w-full h-48 object-cover rounded-t-xl"
+                          />
+                          <div className="p-4">
+                            <h3 className="font-semibold text-lg mb-1">PANDITIA</h3>
+                            <p className="text-sm text-muted-foreground mb-2">
+                              3 BHK Apartment Sett Lake Mahadananda Ring Road
+                            </p>
+                            <div className="flex items-center gap-2 text-sm mb-2">
+                              <Icon icon="solar:home-bold" className="size-4 text-muted-foreground" />
+                              <span>3 BHK Apartment</span>
+                            </div>
+                            <p className="font-bold text-lg">₹ 1.55 - 1.60 CRORE / 1.46 CRORE</p>
                           </div>
-                          <p className="font-bold text-lg">₹ 1.55 - 1.60 CRORE / 1.46 CRORE</p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    <Card className="hover:shadow-lg transition-shadow">
-                      <CardContent className="p-0">
-                        <img
-                          alt="Project"
-                          src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/landscape/2.webp"
-                          className="w-full h-48 object-cover rounded-t-xl"
-                        />
-                        <div className="p-4">
-                          <h3 className="font-semibold text-lg mb-1">IBL NANDAN ROAD</h3>
-                          <p className="text-sm text-muted-foreground mb-2">NEAR TOLLYGUNGE</p>
-                          <div className="flex items-center gap-2 text-sm mb-2">
-                            <Icon icon="solar:home-bold" className="size-4 text-muted-foreground" />
-                            <span>3 BHK Apartment</span>
+                        </CardContent>
+                      </Card>
+                      <Card 
+                        className="hover:shadow-lg transition-shadow flex-shrink-0"
+                        style={{ width: `calc(${100 / getVisibleCards()}% - ${(getVisibleCards() - 1) * 1.5}rem / ${getVisibleCards()})` }}
+                      >
+                        <CardContent className="p-0">
+                          <img
+                            alt="Project"
+                            src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/landscape/2.webp"
+                            className="w-full h-48 object-cover rounded-t-xl"
+                          />
+                          <div className="p-4">
+                            <h3 className="font-semibold text-lg mb-1">IBL NANDAN ROAD</h3>
+                            <p className="text-sm text-muted-foreground mb-2">NEAR TOLLYGUNGE</p>
+                            <div className="flex items-center gap-2 text-sm mb-2">
+                              <Icon icon="solar:home-bold" className="size-4 text-muted-foreground" />
+                              <span>3 BHK Apartment</span>
+                            </div>
+                            <p className="font-bold text-lg">₹ 2 Cr</p>
                           </div>
-                          <p className="font-bold text-lg">₹ 2 Cr</p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    <Card className="hover:shadow-lg transition-shadow">
-                      <CardContent className="p-0">
-                        <img
-                          alt="Project"
-                          src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/landscape/5.webp"
-                          className="w-full h-48 object-cover rounded-t-xl"
-                        />
-                        <div className="p-4">
-                          <h3 className="font-semibold text-lg mb-1">BIRLA MANDIR</h3>
-                          <p className="text-sm text-muted-foreground mb-2">
-                            4 BHK Apartment NO.5, QUEENS PARK
-                          </p>
-                          <div className="flex items-center gap-2 text-sm mb-2">
-                            <Icon icon="solar:home-bold" className="size-4 text-muted-foreground" />
-                            <span>4 BHK Apartment</span>
+                        </CardContent>
+                      </Card>
+                      <Card 
+                        className="hover:shadow-lg transition-shadow flex-shrink-0"
+                        style={{ width: `calc(${100 / getVisibleCards()}% - ${(getVisibleCards() - 1) * 1.5}rem / ${getVisibleCards()})` }}
+                      >
+                        <CardContent className="p-0">
+                          <img
+                            alt="Project"
+                            src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/landscape/5.webp"
+                            className="w-full h-48 object-cover rounded-t-xl"
+                          />
+                          <div className="p-4">
+                            <h3 className="font-semibold text-lg mb-1">BIRLA MANDIR</h3>
+                            <p className="text-sm text-muted-foreground mb-2">
+                              4 BHK Apartment NO.5, QUEENS PARK
+                            </p>
+                            <div className="flex items-center gap-2 text-sm mb-2">
+                              <Icon icon="solar:home-bold" className="size-4 text-muted-foreground" />
+                              <span>4 BHK Apartment</span>
+                            </div>
+                            <p className="font-bold text-lg">₹ 9.25 Cr</p>
                           </div>
-                          <p className="font-bold text-lg">₹ 9.25 Cr</p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    <Card className="hover:shadow-lg transition-shadow">
-                      <CardContent className="p-0">
-                        <img
-                          alt="Project"
-                          src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/landscape/1.webp"
-                          className="w-full h-48 object-cover rounded-t-xl"
-                        />
-                        <div className="p-4">
-                          <h3 className="font-semibold text-lg mb-1">IBC, FERN ROAD</h3>
-                          <p className="text-sm text-muted-foreground mb-2">
-                            2 BHK Apartment (BALLYGUNGE MOTOR TRAINING SCHOOL)
-                          </p>
-                          <div className="flex items-center gap-2 text-sm mb-2">
-                            <Icon icon="solar:home-bold" className="size-4 text-muted-foreground" />
-                            <span>2 BHK Apartment</span>
+                        </CardContent>
+                      </Card>
+                      <Card 
+                        className="hover:shadow-lg transition-shadow flex-shrink-0"
+                        style={{ width: `calc(${100 / getVisibleCards()}% - ${(getVisibleCards() - 1) * 1.5}rem / ${getVisibleCards()})` }}
+                      >
+                        <CardContent className="p-0">
+                          <img
+                            alt="Project"
+                            src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/landscape/1.webp"
+                            className="w-full h-48 object-cover rounded-t-xl"
+                          />
+                          <div className="p-4">
+                            <h3 className="font-semibold text-lg mb-1">IBC, FERN ROAD</h3>
+                            <p className="text-sm text-muted-foreground mb-2">
+                              2 BHK Apartment (BALLYGUNGE MOTOR TRAINING SCHOOL)
+                            </p>
+                            <div className="flex items-center gap-2 text-sm mb-2">
+                              <Icon icon="solar:home-bold" className="size-4 text-muted-foreground" />
+                              <span>2 BHK Apartment</span>
+                            </div>
+                            <p className="font-bold text-lg">₹ 85 Lakh</p>
                           </div>
-                          <p className="font-bold text-lg">₹ 85 Lakh</p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </>
-                )}
+                        </CardContent>
+                      </Card>
+                    </>
+                  )}
+                </div>
               </div>
             )}
           </div>
         </section>
         <section className="py-16">
           <div className="container mx-auto px-4">
-            <div className="mb-8">
-              <h2 className="font-heading text-3xl font-semibold tracking-tight mb-2">
-                Apartments, Villas and more
-              </h2>
-              <p className="text-muted-foreground">in South Kolkata</p>
+            <div className="mb-8 flex items-center justify-between">
+              <div>
+                <h2 className="font-heading text-3xl font-semibold tracking-tight mb-2">
+                  Apartments, Villas and more
+                </h2>
+                <p className="text-muted-foreground">in South Kolkata</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={prevSlide}
+                  disabled={!canGoPrev()}
+                  className="rounded-full"
+                >
+                  <Icon icon="solar:arrow-left-bold" className="size-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={nextSlide}
+                  disabled={!canGoNext()}
+                  className="rounded-full"
+                >
+                  <Icon icon="solar:arrow-right-bold" className="size-4" />
+                </Button>
+              </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
-              {PROPERTY_TYPES.map((propertyType) => {
-                // Define images for each property type
-                const propertyImages = {
-                  apartment: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/3.webp",
-                  house: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/2.webp",
-                  villa: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/1.webp",
-                  plot: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/4.webp",
-                  commercial: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/5.webp",
-                  land: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/4.webp"
-                };
+            <div className="relative overflow-hidden">
+              <div 
+                ref={carouselRef}
+                className="flex transition-transform duration-300 ease-in-out gap-6"
+                style={{
+                  transform: `translateX(-${currentSlide * (100 / getVisibleCards())}%)`
+                }}
+              >
+                {PROPERTY_TYPES.map((propertyType) => {
+                  // Define images for each property type
+                  const propertyImages = {
+                    apartment: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/3.webp",
+                    house: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/2.webp",
+                    villa: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/1.webp",
+                    plot: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/4.webp",
+                    commercial: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/5.webp",
+                    land: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/4.webp"
+                  };
 
-                // Define property counts (you can make this dynamic by fetching from API later)
-                const propertyCounts = {
-                  apartment: "8400+",
-                  house: "1400+",
-                  villa: "1200+",
-                  plot: "1700+",
-                  commercial: "800+",
-                  land: "900+"
-                };
+                  // Define property counts (you can make this dynamic by fetching from API later)
+                  const propertyCounts = {
+                    apartment: "8400+",
+                    house: "1400+",
+                    villa: "1200+",
+                    plot: "1700+",
+                    commercial: "800+",
+                    land: "900+"
+                  };
 
-                return (
-                  <Card
-                    key={propertyType.value}
-                    className="hover:shadow-lg transition-shadow cursor-pointer"
-                    onClick={() => navigate(`/search?property_type=${propertyType.value}`)}
-                  >
-                    <CardContent className="p-0">
-                      <img
-                        alt={propertyType.label}
-                        src={propertyImages[propertyType.value] || "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/placeholder/square.png"}
-                        className="w-full h-48 object-cover rounded-t-xl"
-                      />
-                      <div className="p-4">
-                        <h3 className="font-semibold text-lg mb-1">{propertyType.label}</h3>
-                        <p className="text-sm text-muted-foreground">{propertyCounts[propertyType.value]} properties</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+                  return (
+                    <Card
+                      key={propertyType.value}
+                      className="hover:shadow-lg transition-shadow cursor-pointer flex-shrink-0"
+                      style={{ width: `calc(${100 / getVisibleCards()}% - ${(getVisibleCards() - 1) * 1.5}rem / ${getVisibleCards()})` }}
+                      onClick={() => navigate(`/search?property_type=${propertyType.value}`)}
+                    >
+                      <CardContent className="p-0">
+                        <img
+                          alt={propertyType.label}
+                          src={propertyImages[propertyType.value] || "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/placeholder/square.png"}
+                          className="w-full h-48 object-cover rounded-t-xl"
+                        />
+                        <div className="p-4">
+                          <h3 className="font-semibold text-lg mb-1">{propertyType.label}</h3>
+                          <p className="text-sm text-muted-foreground">{propertyCounts[propertyType.value]} properties</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </section>
@@ -541,14 +657,36 @@ export function RealEstateLandingPage() {
         </section>
         <section className="py-16 bg-gradient-to-br from-red-50 to-red-100">
           <div className="container mx-auto px-4">
-            <div className="mb-8">
-              <div className="flex items-center gap-3 mb-4">
-                <Icon icon="solar:home-smile-bold" className="size-8 text-red-500" />
-                <h2 className="font-heading text-3xl font-semibold tracking-tight text-red-600">
-                  Newly Launched Projects
-                </h2>
+            <div className="mb-8 flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <Icon icon="solar:home-smile-bold" className="size-8 text-red-500" />
+                  <h2 className="font-heading text-3xl font-semibold tracking-tight text-red-600">
+                    Newly Launched Projects
+                  </h2>
+                </div>
+                <p className="text-muted-foreground">Limited launch offers available</p>
               </div>
-              <p className="text-muted-foreground">Limited launch offers available</p>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={prevProjectsSlide}
+                  disabled={!canGoPrevProjects()}
+                  className="rounded-full"
+                >
+                  <Icon icon="solar:arrow-left-bold" className="size-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={nextProjectsSlide}
+                  disabled={!canGoNextProjects()}
+                  className="rounded-full"
+                >
+                  <Icon icon="solar:arrow-right-bold" className="size-4" />
+                </Button>
+              </div>
             </div>
             {isLoadingProjects ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -557,27 +695,84 @@ export function RealEstateLandingPage() {
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                {recentProjects && recentProjects.length > 0 ? (
-                  recentProjects.slice(0, 4).map((project) => {
-                    const formatPrice = (pricing: any) => {
-                      if (pricing?.min && pricing?.max) {
-                        const formatAmount = (amount: number) => {
-                          if (amount >= 10000000) return `₹${(amount / 10000000).toFixed(1)}Cr`;
-                          if (amount >= 100000) return `₹${(amount / 100000).toFixed(0)}L`;
-                          return `₹${amount.toLocaleString()}`;
-                        };
-                        return `${formatAmount(pricing.min)} - ${formatAmount(pricing.max)}`;
-                      }
-                      return 'Price on request';
-                    };
+              <div className="relative overflow-hidden mb-8">
+                <div 
+                  ref={projectsCarouselRef}
+                  className="flex transition-transform duration-300 ease-in-out gap-6"
+                  style={{
+                    transform: `translateX(-${projectsSlide * (100 / getVisibleCards())}%)`
+                  }}
+                >
+                  {recentProjects && recentProjects.length > 0 ? (
+                    recentProjects.map((project) => {
+                      const formatPrice = (pricing: any) => {
+                        if (pricing?.min && pricing?.max) {
+                          const formatAmount = (amount: number) => {
+                            if (amount >= 10000000) return `₹${(amount / 10000000).toFixed(1)}Cr`;
+                            if (amount >= 100000) return `₹${(amount / 100000).toFixed(0)}L`;
+                            return `₹${amount.toLocaleString()}`;
+                          };
+                          return `${formatAmount(pricing.min)} - ${formatAmount(pricing.max)}`;
+                        }
+                        return 'Price on request';
+                      };
 
-                    return (
-                      <Card key={project.id} className="hover:shadow-lg transition-shadow bg-white cursor-pointer" onClick={() => navigate(`/project/${project.id}`)}>
+                      return (
+                        <Card 
+                          key={project.id} 
+                          className="hover:shadow-lg transition-shadow bg-white cursor-pointer flex-shrink-0" 
+                          style={{ width: `calc(${100 / getVisibleCards()}% - ${(getVisibleCards() - 1) * 1.5}rem / ${getVisibleCards()})` }}
+                          onClick={() => navigate(`/project/${project.id}`)}
+                        >
+                          <CardContent className="p-0">
+                            <img
+                              alt={project.name}
+                              src={project.images?.[0] || "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/1.webp"}
+                              className="w-full h-32 object-cover rounded-t-xl"
+                            />
+                            <div className="p-4">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Badge variant="destructive" className="text-xs">
+                                  NEW LAUNCH
+                                </Badge>
+                              </div>
+                              <h3 className="font-semibold text-sm mb-1">{project.name}</h3>
+                              <p className="text-xs text-muted-foreground mb-2">
+                                {project.total_units} units | {project.project_type}
+                              </p>
+                              <p className="text-xs text-muted-foreground mb-2">
+                                {project.location}, {project.city}
+                              </p>
+                              <p className="text-xs text-muted-foreground mb-2">
+                                {formatPrice(project.pricing)}
+                              </p>
+                              <div className="flex items-center gap-1 text-xs mb-2">
+                                <Icon icon="solar:heart-bold" className="size-3 text-red-500" />
+                                <span>by {project.builder?.first_name} {project.builder?.last_name}</span>
+                              </div>
+                              <div className="flex items-center gap-1 text-xs">
+                                <Icon icon="solar:eye-bold" className="size-3" />
+                                <span>{project.available_units} units available</span>
+                              </div>
+                              <Button size="sm" className="w-full mt-3 bg-black text-white hover:bg-gray-800">
+                                View Details
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })
+                  ) : (
+                    // Fallback to original static content
+                    <>
+                      <Card 
+                        className="hover:shadow-lg transition-shadow bg-white flex-shrink-0"
+                        style={{ width: `calc(${100 / getVisibleCards()}% - ${(getVisibleCards() - 1) * 1.5}rem / ${getVisibleCards()})` }}
+                      >
                         <CardContent className="p-0">
                           <img
-                            alt={project.name}
-                            src={project.images?.[0] || "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/1.webp"}
+                            alt="Project"
+                            src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/1.webp"
                             className="w-full h-32 object-cover rounded-t-xl"
                           />
                           <div className="p-4">
@@ -586,156 +781,124 @@ export function RealEstateLandingPage() {
                                 NEW LAUNCH
                               </Badge>
                             </div>
-                            <h3 className="font-semibold text-sm mb-1">{project.name}</h3>
+                            <h3 className="font-semibold text-sm mb-1">3A, MIRAGE VISTA AVENUE</h3>
                             <p className="text-xs text-muted-foreground mb-2">
-                              {project.total_units} units | {project.project_type}
+                              2500 Sq Ft | 3, 4 BHK Apartment
                             </p>
                             <p className="text-xs text-muted-foreground mb-2">
-                              {project.location}, {project.city}
-                            </p>
-                            <p className="text-xs text-muted-foreground mb-2">
-                              {formatPrice(project.pricing)}
+                              Ready to move | Luxurious living
                             </p>
                             <div className="flex items-center gap-1 text-xs mb-2">
                               <Icon icon="solar:heart-bold" className="size-3 text-red-500" />
-                              <span>by {project.builder?.first_name} {project.builder?.last_name}</span>
+                              <span>Pre-preferred options</span>
                             </div>
                             <div className="flex items-center gap-1 text-xs">
                               <Icon icon="solar:eye-bold" className="size-3" />
-                              <span>{project.available_units} units available</span>
+                              <span>Aerial Photography</span>
                             </div>
                             <Button size="sm" className="w-full mt-3 bg-black text-white hover:bg-gray-800">
-                              View Details
+                              View Brochure
                             </Button>
                           </div>
                         </CardContent>
                       </Card>
-                    );
-                  })
-                ) : (
-                  // Fallback to original static content
-                  <>
-                    <Card className="hover:shadow-lg transition-shadow bg-white">
-                      <CardContent className="p-0">
-                        <img
-                          alt="Project"
-                          src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/1.webp"
-                          className="w-full h-32 object-cover rounded-t-xl"
-                        />
-                        <div className="p-4">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Badge variant="destructive" className="text-xs">
-                              NEW LAUNCH
-                            </Badge>
+                      <Card 
+                        className="hover:shadow-lg transition-shadow bg-white flex-shrink-0"
+                        style={{ width: `calc(${100 / getVisibleCards()}% - ${(getVisibleCards() - 1) * 1.5}rem / ${getVisibleCards()})` }}
+                      >
+                        <CardContent className="p-0">
+                          <img
+                            alt="Project"
+                            src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/2.webp"
+                            className="w-full h-32 object-cover rounded-t-xl"
+                          />
+                          <div className="p-4">
+                            <h3 className="font-semibold text-sm mb-1">3A, MIRAGE VISTA AVENUE</h3>
+                            <p className="text-xs text-muted-foreground mb-2">Luxury Real Bangalore</p>
+                            <p className="text-xs text-muted-foreground mb-2">
+                              ₹7500 Sq Ft | 2, 3 BHK Apartment
+                            </p>
+                            <div className="flex items-center gap-1 text-xs mb-2">
+                              <Icon icon="solar:heart-bold" className="size-3 text-red-500" />
+                              <span>Pre-preferred options</span>
+                            </div>
+                            <div className="flex items-center gap-1 text-xs">
+                              <Icon icon="solar:eye-bold" className="size-3" />
+                              <span>Aerial Photography</span>
+                            </div>
+                            <Button size="sm" className="w-full mt-3 bg-black text-white hover:bg-gray-800">
+                              View Brochure
+                            </Button>
                           </div>
-                          <h3 className="font-semibold text-sm mb-1">3A, MIRAGE VISTA AVENUE</h3>
-                          <p className="text-xs text-muted-foreground mb-2">
-                            2500 Sq Ft | 3, 4 BHK Apartment
-                          </p>
-                          <p className="text-xs text-muted-foreground mb-2">
-                            Ready to move | Luxurious living
-                          </p>
-                          <div className="flex items-center gap-1 text-xs mb-2">
-                            <Icon icon="solar:heart-bold" className="size-3 text-red-500" />
-                            <span>Pre-preferred options</span>
+                        </CardContent>
+                      </Card>
+                      <Card 
+                        className="hover:shadow-lg transition-shadow bg-white flex-shrink-0"
+                        style={{ width: `calc(${100 / getVisibleCards()}% - ${(getVisibleCards() - 1) * 1.5}rem / ${getVisibleCards()})` }}
+                      >
+                        <CardContent className="p-0">
+                          <img
+                            alt="Project"
+                            src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/3.webp"
+                            className="w-full h-32 object-cover rounded-t-xl"
+                          />
+                          <div className="p-4">
+                            <h3 className="font-semibold text-sm mb-1">3A, ISWAR GANGULY STREET</h3>
+                            <p className="text-xs text-muted-foreground mb-2">
+                              ₹3500 Sq Ft | 3, 4 BHK Apartment
+                            </p>
+                            <p className="text-xs text-muted-foreground mb-2">
+                              1725 price increase in last 3 months
+                            </p>
+                            <div className="flex items-center gap-1 text-xs mb-2">
+                              <Icon icon="solar:heart-bold" className="size-3 text-red-500" />
+                              <span>Pre-preferred options</span>
+                            </div>
+                            <div className="flex items-center gap-1 text-xs">
+                              <Icon icon="solar:eye-bold" className="size-3" />
+                              <span>Aerial Photography</span>
+                            </div>
+                            <Button size="sm" className="w-full mt-3 bg-black text-white hover:bg-gray-800">
+                              View Brochure
+                            </Button>
                           </div>
-                          <div className="flex items-center gap-1 text-xs">
-                            <Icon icon="solar:eye-bold" className="size-3" />
-                            <span>Aerial Photography</span>
+                        </CardContent>
+                      </Card>
+                      <Card 
+                        className="hover:shadow-lg transition-shadow bg-white flex-shrink-0"
+                        style={{ width: `calc(${100 / getVisibleCards()}% - ${(getVisibleCards() - 1) * 1.5}rem / ${getVisibleCards()})` }}
+                      >
+                        <CardContent className="p-0">
+                          <img
+                            alt="Project"
+                            src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/4.webp"
+                            className="w-full h-32 object-cover rounded-t-xl"
+                          />
+                          <div className="p-4">
+                            <h3 className="font-semibold text-sm mb-1">Swapnalaya Royale</h3>
+                            <p className="text-xs text-muted-foreground mb-2">
+                              ₹2500 Sq Ft | 2, 3 BHK Apartment
+                            </p>
+                            <p className="text-xs text-muted-foreground mb-2">
+                              1810 price increase in last 3 months
+                            </p>
+                            <div className="flex items-center gap-1 text-xs mb-2">
+                              <Icon icon="solar:heart-bold" className="size-3 text-red-500" />
+                              <span>Pre-preferred options</span>
+                            </div>
+                            <div className="flex items-center gap-1 text-xs">
+                              <Icon icon="solar:eye-bold" className="size-3" />
+                              <span>Aerial Photography</span>
+                            </div>
+                            <Button size="sm" className="w-full mt-3 bg-black text-white hover:bg-gray-800">
+                              View Brochure
+                            </Button>
                           </div>
-                          <Button size="sm" className="w-full mt-3 bg-black text-white hover:bg-gray-800">
-                            View Brochure
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    <Card className="hover:shadow-lg transition-shadow bg-white">
-                      <CardContent className="p-0">
-                        <img
-                          alt="Project"
-                          src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/2.webp"
-                          className="w-full h-32 object-cover rounded-t-xl"
-                        />
-                        <div className="p-4">
-                          <h3 className="font-semibold text-sm mb-1">3A, MIRAGE VISTA AVENUE</h3>
-                          <p className="text-xs text-muted-foreground mb-2">Luxury Real Bangalore</p>
-                          <p className="text-xs text-muted-foreground mb-2">
-                            ₹7500 Sq Ft | 2, 3 BHK Apartment
-                          </p>
-                          <div className="flex items-center gap-1 text-xs mb-2">
-                            <Icon icon="solar:heart-bold" className="size-3 text-red-500" />
-                            <span>Pre-preferred options</span>
-                          </div>
-                          <div className="flex items-center gap-1 text-xs">
-                            <Icon icon="solar:eye-bold" className="size-3" />
-                            <span>Aerial Photography</span>
-                          </div>
-                          <Button size="sm" className="w-full mt-3 bg-black text-white hover:bg-gray-800">
-                            View Brochure
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    <Card className="hover:shadow-lg transition-shadow bg-white">
-                      <CardContent className="p-0">
-                        <img
-                          alt="Project"
-                          src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/3.webp"
-                          className="w-full h-32 object-cover rounded-t-xl"
-                        />
-                        <div className="p-4">
-                          <h3 className="font-semibold text-sm mb-1">3A, ISWAR GANGULY STREET</h3>
-                          <p className="text-xs text-muted-foreground mb-2">
-                            ₹3500 Sq Ft | 3, 4 BHK Apartment
-                          </p>
-                          <p className="text-xs text-muted-foreground mb-2">
-                            1725 price increase in last 3 months
-                          </p>
-                          <div className="flex items-center gap-1 text-xs mb-2">
-                            <Icon icon="solar:heart-bold" className="size-3 text-red-500" />
-                            <span>Pre-preferred options</span>
-                          </div>
-                          <div className="flex items-center gap-1 text-xs">
-                            <Icon icon="solar:eye-bold" className="size-3" />
-                            <span>Aerial Photography</span>
-                          </div>
-                          <Button size="sm" className="w-full mt-3 bg-black text-white hover:bg-gray-800">
-                            View Brochure
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    <Card className="hover:shadow-lg transition-shadow bg-white">
-                      <CardContent className="p-0">
-                        <img
-                          alt="Project"
-                          src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/4.webp"
-                          className="w-full h-32 object-cover rounded-t-xl"
-                        />
-                        <div className="p-4">
-                          <h3 className="font-semibold text-sm mb-1">Swapnalaya Royale</h3>
-                          <p className="text-xs text-muted-foreground mb-2">
-                            ₹2500 Sq Ft | 2, 3 BHK Apartment
-                          </p>
-                          <p className="text-xs text-muted-foreground mb-2">
-                            1810 price increase in last 3 months
-                          </p>
-                          <div className="flex items-center gap-1 text-xs mb-2">
-                            <Icon icon="solar:heart-bold" className="size-3 text-red-500" />
-                            <span>Pre-preferred options</span>
-                          </div>
-                          <div className="flex items-center gap-1 text-xs">
-                            <Icon icon="solar:eye-bold" className="size-3" />
-                            <span>Aerial Photography</span>
-                          </div>
-                          <Button size="sm" className="w-full mt-3 bg-black text-white hover:bg-gray-800">
-                            View Brochure
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </>
-                )}
+                        </CardContent>
+                      </Card>
+                    </>
+                  )}
+                </div>
               </div>
             )}
           </div>

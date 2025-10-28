@@ -8,3 +8,4 @@ export { DashboardLayout } from './DashboardLayout';
 export { DashboardGrid, GridItem } from './DashboardGrid';
 export { DashboardNavigation } from './DashboardNavigation';
 export { DashboardSidebar } from './DashboardSidebar';
+export { Breadcrumb, useBreadcrumbs, generateBreadcrumbs } from './Breadcrumb';

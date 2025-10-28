@@ -365,35 +365,6 @@ export function PropertySearchPage() {
                                 </Button>
                             </CardContent>
                         </Card>
-
-                        <div className="flex items-center gap-4 mb-6 overflow-x-auto pb-2">
-                            <div className="flex items-center gap-2 px-4 py-2 bg-orange-50 border border-orange-200 rounded-full whitespace-nowrap">
-                                <Icon icon="solar:star-bold" className="size-5 text-orange-500" />
-                                <span className="text-sm font-medium">NEW LAUNCH</span>
-                                <sup className="text-xs text-orange-500">*</sup>
-                            </div>
-                            <Button variant="outline" size="sm" className="rounded-full whitespace-nowrap">
-                                Owner
-                            </Button>
-                            <Button variant="outline" size="sm" className="rounded-full whitespace-nowrap">
-                                Verified
-                            </Button>
-                            <Button variant="outline" size="sm" className="rounded-full whitespace-nowrap">
-                                Under construction
-                            </Button>
-                            <Button variant="outline" size="sm" className="rounded-full whitespace-nowrap">
-                                Ready To Move
-                            </Button>
-                            <Button variant="outline" size="sm" className="rounded-full whitespace-nowrap">
-                                With Photos <Icon icon="lucide:chevron-right" className="size-4" />
-                            </Button>
-                            <Button variant="outline" size="sm" className="rounded-full">
-                                <Icon icon="lucide:sliders-horizontal" className="size-4" />
-                                Sort By
-                                <Icon icon="lucide:chevron-down" className="size-4" />
-                            </Button>
-                        </div>
-
                         {loading ? (
                             <PropertyGridSkeleton />
                         ) : error ? (

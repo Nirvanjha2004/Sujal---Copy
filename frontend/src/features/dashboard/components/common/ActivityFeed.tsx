@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
 import { ScrollArea } from '@/shared/components/ui/scroll-area';
-import { formatDistanceToNow } from 'date-fns';
+import { cn } from '@/shared/lib/utils';
+import { formatDistanceToNow, format, isToday, isYesterday, isThisWeek } from 'date-fns';
 import type { Activity } from '@/features/dashboard/types/activity';
 
 interface ActivityFeedProps {
@@ -16,6 +17,51 @@ interface ActivityFeedProps {
   onLoadMore?: () => void;
   onActivityClick?: (activity: Activity) => void;
   className?: string;
+}
+
+// Loading skeleton component
+function ActivitySkeleton() {
+  return (
+    <div className="space-y-4">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div key={i} className="flex items-start gap-4 p-4 animate-pulse">
+          <div className="w-10 h-10 bg-muted rounded-full shrink-0" />
+          <div className="flex-1 space-y-2">
+            <div className="h-4 bg-muted rounded w-3/4" />
+            <div className="h-3 bg-muted rounded w-1/2" />
+            <div className="h-3 bg-muted rounded w-1/4" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Empty state component
+function EmptyActivityFeed({ title }: { title: string }) {
+  return (
+    <Card className="border-0 shadow-sm">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center gap-3 text-lg font-semibold">
+          <div className="p-2 rounded-lg bg-primary/10">
+            <Icon icon="solar:clock-circle-bold" className="size-5 text-primary" />
+          </div>
+          {title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="text-center py-12">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted/50 flex items-center justify-center">
+            <Icon icon="solar:inbox-bold" className="size-8 text-muted-foreground" />
+          </div>
+          <h3 className="text-lg font-semibold text-foreground mb-2">No Recent Activity</h3>
+          <p className="text-muted-foreground max-w-sm mx-auto leading-relaxed">
+            Your recent activities will appear here once you start using the platform.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
 }
 
 export function ActivityFeed({
@@ -31,181 +77,257 @@ export function ActivityFeed({
   const [showAll, setShowAll] = useState(false);
 
   const getActivityIcon = (type: string) => {
-    switch (type) {
-      case 'login':
-        return 'solar:login-3-bold';
-      case 'profile_update':
-        return 'solar:user-bold';
-      case 'property_view':
-        return 'solar:eye-bold';
-      case 'favorite_add':
-        return 'solar:heart-bold';
-      case 'search_save':
-        return 'solar:bookmark-bold';
-      case 'message_send':
-        return 'solar:letter-bold';
-      case 'property_create':
-        return 'solar:home-add-bold';
-      case 'lead_contact':
-        return 'solar:phone-bold';
-      case 'inquiry_received':
-        return 'solar:chat-round-dots-bold';
-      case 'document_upload':
-        return 'solar:document-add-bold';
-      default:
-        return 'solar:info-circle-bold';
-    }
-  };
-
-  const getActivityColor = (type: string) => {
-    switch (type) {
-      case 'login':
-        return 'text-green-600 bg-green-100';
-      case 'profile_update':
-        return 'text-blue-600 bg-blue-100';
-      case 'property_view':
-        return 'text-purple-600 bg-purple-100';
-      case 'favorite_add':
-        return 'text-red-600 bg-red-100';
-      case 'search_save':
-        return 'text-orange-600 bg-orange-100';
-      case 'message_send':
-        return 'text-indigo-600 bg-indigo-100';
-      case 'property_create':
-        return 'text-emerald-600 bg-emerald-100';
-      case 'lead_contact':
-        return 'text-cyan-600 bg-cyan-100';
-      case 'inquiry_received':
-        return 'text-yellow-600 bg-yellow-100';
-      case 'document_upload':
-        return 'text-teal-600 bg-teal-100';
-      default:
-        return 'text-gray-600 bg-gray-100';
-    }
-  };
-
-  const getPriorityBadge = (priority?: string) => {
-    if (!priority || priority === 'normal') return null;
-    
-    const variants = {
-      high: 'bg-red-100 text-red-800',
-      medium: 'bg-yellow-100 text-yellow-800',
-      low: 'bg-gray-100 text-gray-800'
+    const icons = {
+      login: 'solar:login-3-bold',
+      logout: 'solar:logout-3-bold',
+      profile_update: 'solar:user-bold',
+      property_view: 'solar:eye-bold',
+      favorite_add: 'solar:heart-bold',
+      favorite_remove: 'solar:heart-broken-bold',
+      search_save: 'solar:bookmark-bold',
+      message_send: 'solar:letter-bold',
+      message_receive: 'solar:letter-unread-bold',
+      property_create: 'solar:home-add-bold',
+      property_update: 'solar:home-bold',
+      property_delete: 'solar:home-minus-bold',
+      lead_contact: 'solar:phone-bold',
+      inquiry_received: 'solar:chat-round-dots-bold',
+      inquiry_sent: 'solar:chat-round-line-bold',
+      document_upload: 'solar:document-add-bold',
+      document_download: 'solar:download-bold',
+      payment_success: 'solar:card-bold',
+      payment_failed: 'solar:card-2-bold',
+      notification: 'solar:bell-bold',
+      system: 'solar:settings-bold'
     };
+    return icons[type as keyof typeof icons] || 'solar:info-circle-bold';
+  };
 
-    return (
-      <Badge variant="secondary" className={variants[priority as keyof typeof variants]}>
-        {priority}
-      </Badge>
-    );
+  const getActivityConfig = (type: string) => {
+    const configs = {
+      login: { color: 'text-success bg-success/10 border-success/20', priority: 'low' },
+      logout: { color: 'text-muted-foreground bg-muted/50 border-muted', priority: 'low' },
+      profile_update: { color: 'text-primary bg-primary/10 border-primary/20', priority: 'medium' },
+      property_view: { color: 'text-purple-600 bg-purple-500/10 border-purple-500/20', priority: 'low' },
+      favorite_add: { color: 'text-red-600 bg-red-500/10 border-red-500/20', priority: 'medium' },
+      favorite_remove: { color: 'text-red-400 bg-red-400/10 border-red-400/20', priority: 'low' },
+      search_save: { color: 'text-orange-600 bg-orange-500/10 border-orange-500/20', priority: 'medium' },
+      message_send: { color: 'text-blue-600 bg-blue-500/10 border-blue-500/20', priority: 'medium' },
+      message_receive: { color: 'text-blue-700 bg-blue-600/10 border-blue-600/20', priority: 'high' },
+      property_create: { color: 'text-emerald-600 bg-emerald-500/10 border-emerald-500/20', priority: 'high' },
+      property_update: { color: 'text-emerald-500 bg-emerald-400/10 border-emerald-400/20', priority: 'medium' },
+      property_delete: { color: 'text-red-700 bg-red-600/10 border-red-600/20', priority: 'high' },
+      lead_contact: { color: 'text-cyan-600 bg-cyan-500/10 border-cyan-500/20', priority: 'high' },
+      inquiry_received: { color: 'text-yellow-600 bg-yellow-500/10 border-yellow-500/20', priority: 'high' },
+      inquiry_sent: { color: 'text-yellow-500 bg-yellow-400/10 border-yellow-400/20', priority: 'medium' },
+      document_upload: { color: 'text-teal-600 bg-teal-500/10 border-teal-500/20', priority: 'medium' },
+      document_download: { color: 'text-teal-500 bg-teal-400/10 border-teal-400/20', priority: 'low' },
+      payment_success: { color: 'text-green-600 bg-green-500/10 border-green-500/20', priority: 'high' },
+      payment_failed: { color: 'text-destructive bg-destructive/10 border-destructive/20', priority: 'high' },
+      notification: { color: 'text-indigo-600 bg-indigo-500/10 border-indigo-500/20', priority: 'medium' },
+      system: { color: 'text-muted-foreground bg-muted/50 border-muted', priority: 'low' }
+    };
+    return configs[type as keyof typeof configs] || { color: 'text-muted-foreground bg-muted/50 border-muted', priority: 'low' };
+  };
+
+  const formatTimestamp = (timestamp: string | Date) => {
+    const date = new Date(timestamp);
+    
+    if (isToday(date)) {
+      return format(date, 'h:mm a');
+    } else if (isYesterday(date)) {
+      return `Yesterday, ${format(date, 'h:mm a')}`;
+    } else if (isThisWeek(date)) {
+      return format(date, 'EEEE, h:mm a');
+    } else {
+      return format(date, 'MMM d, h:mm a');
+    }
+  };
+
+  const getRelativeTime = (timestamp: string | Date) => {
+    return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
+  };
+
+  const getPriorityIndicator = (priority: string) => {
+    const indicators = {
+      high: 'w-1 h-full bg-destructive rounded-full',
+      medium: 'w-1 h-full bg-warning rounded-full',
+      low: 'w-1 h-full bg-muted rounded-full'
+    };
+    return indicators[priority as keyof typeof indicators] || indicators.low;
   };
 
   const displayedActivities = showAll ? activities : activities.slice(0, maxItems);
 
-  if (activities.length === 0) {
+  if (isLoading && activities.length === 0) {
     return (
-      <Card className={className}>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Icon icon="solar:clock-circle-bold" className="size-5" />
+      <Card className={cn("border-0 shadow-sm", className)}>
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-3 text-lg font-semibold">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Icon icon="solar:clock-circle-bold" className="size-5 text-primary" />
+            </div>
             {title}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8">
-            <Icon icon="solar:inbox-bold" className="size-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No Recent Activity</h3>
-            <p className="text-gray-600">
-              Your recent activities will appear here once you start using the platform.
-            </p>
-          </div>
+          <ActivitySkeleton />
         </CardContent>
       </Card>
     );
   }
 
+  if (activities.length === 0) {
+    return <EmptyActivityFeed title={title} />;
+  }
+
   return (
-    <Card className={className}>
-      <CardHeader>
+    <Card className={cn("border-0 shadow-sm", className)}>
+      <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Icon icon="solar:clock-circle-bold" className="size-5" />
+          <CardTitle className="flex items-center gap-3 text-lg font-semibold">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Icon icon="solar:clock-circle-bold" className="size-5 text-primary" />
+            </div>
             {title}
+            <Badge variant="secondary" className="ml-2 bg-muted/50 text-muted-foreground">
+              {activities.length}
+            </Badge>
           </CardTitle>
           {activities.length > maxItems && (
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowAll(!showAll)}
+              className="text-muted-foreground hover:text-foreground"
             >
-              {showAll ? 'Show Less' : `View All (${activities.length})`}
+              {showAll ? (
+                <>
+                  <Icon icon="solar:eye-closed-bold" className="size-4 mr-2" />
+                  Show Less
+                </>
+              ) : (
+                <>
+                  <Icon icon="solar:eye-bold" className="size-4 mr-2" />
+                  View All ({activities.length})
+                </>
+              )}
             </Button>
           )}
         </div>
       </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-96">
-          <div className="space-y-4">
-            {displayedActivities.map((activity) => (
-              <div
-                key={activity.id}
-                className={`flex items-start gap-3 p-3 rounded-lg border transition-colors ${
-                  onActivityClick 
-                    ? 'cursor-pointer hover:bg-gray-50' 
-                    : ''
-                } ${!activity.isRead ? 'bg-blue-50 border-blue-200' : 'bg-white'}`}
-                onClick={() => onActivityClick?.(activity)}
-              >
-                <div className={`p-2 rounded-full ${getActivityColor(activity.type)}`}>
-                  <Icon icon={getActivityIcon(activity.type)} className="size-4" />
-                </div>
-                
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <p className="font-medium text-sm">{activity.title}</p>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {activity.description}
-                      </p>
+      <CardContent className="pt-0">
+        <ScrollArea className="h-96 pr-4">
+          <div className="space-y-1">
+            {displayedActivities.map((activity, index) => {
+              const config = getActivityConfig(activity.type);
+              const isUnread = !activity.isRead;
+              
+              return (
+                <div
+                  key={activity.id}
+                  className={cn(
+                    "group relative flex items-start gap-4 p-4 rounded-xl transition-all duration-200",
+                    "hover:bg-muted/30 hover:shadow-sm",
+                    onActivityClick && "cursor-pointer active:scale-[0.98]",
+                    isUnread && "bg-primary/5 border border-primary/10",
+                    index !== displayedActivities.length - 1 && "border-b border-border/50"
+                  )}
+                  onClick={() => onActivityClick?.(activity)}
+                >
+                  {/* Priority indicator */}
+                  <div className={getPriorityIndicator(config.priority)} />
+                  
+                  {/* Activity icon */}
+                  <div className={cn(
+                    "relative p-2.5 rounded-xl border transition-all duration-200 group-hover:scale-105",
+                    config.color
+                  )}>
+                    <Icon 
+                      icon={getActivityIcon(activity.type)} 
+                      className="size-5" 
+                    />
+                    {isUnread && (
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full border-2 border-background" />
+                    )}
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <p className={cn(
+                          "font-semibold text-sm leading-tight",
+                          isUnread ? "text-foreground" : "text-foreground/90"
+                        )}>
+                          {activity.title}
+                        </p>
+                        {activity.description && (
+                          <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
+                            {activity.description}
+                          </p>
+                        )}
+                      </div>
+                      
+                      {activity.metadata?.actionUrl && (
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="opacity-0 group-hover:opacity-100 transition-opacity h-8 px-3 text-xs"
+                        >
+                          <Icon icon="solar:arrow-right-bold" className="size-3 mr-1" />
+                          View
+                        </Button>
+                      )}
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      {getPriorityBadge(activity.metadata?.priority)}
-                      {!activity.isRead && (
-                        <div className="size-2 bg-blue-600 rounded-full" />
+                    
+                    <div className="flex items-center justify-between mt-3">
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                        <span className="font-medium">
+                          {formatTimestamp(activity.timestamp)}
+                        </span>
+                        <span className="opacity-75">
+                          {getRelativeTime(activity.timestamp)}
+                        </span>
+                      </div>
+                      
+                      {activity.metadata?.priority && activity.metadata.priority !== 'low' && (
+                        <Badge 
+                          variant="secondary" 
+                          className={cn(
+                            "text-xs px-2 py-0.5",
+                            activity.metadata.priority === 'high' && "bg-destructive/10 text-destructive",
+                            activity.metadata.priority === 'medium' && "bg-warning/10 text-warning"
+                          )}
+                        >
+                          {activity.metadata.priority}
+                        </Badge>
                       )}
                     </div>
                   </div>
-                  
-                  <div className="flex items-center justify-between mt-2">
-                    <p className="text-xs text-muted-foreground">
-                      {formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true })}
-                    </p>
-                    {activity.metadata?.actionUrl && (
-                      <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">
-                        View Details
-                      </Button>
-                    )}
-                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </ScrollArea>
         
         {showLoadMore && onLoadMore && (
-          <div className="mt-4 text-center">
+          <div className="mt-6 text-center">
             <Button
               variant="outline"
               onClick={onLoadMore}
               disabled={isLoading}
+              className="w-full"
             >
               {isLoading ? (
                 <>
                   <Icon icon="solar:loading-bold" className="size-4 mr-2 animate-spin" />
-                  Loading...
+                  Loading more activities...
                 </>
               ) : (
-                'Load More Activities'
+                <>
+                  <Icon icon="solar:refresh-bold" className="size-4 mr-2" />
+                  Load More Activities
+                </>
               )}
             </Button>
           </div>

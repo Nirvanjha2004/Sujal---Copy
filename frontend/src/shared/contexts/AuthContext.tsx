@@ -16,6 +16,7 @@ interface AuthContextType {
   register: (userData: { email: string; password: string; firstName: string; lastName: string; role?: string; phone?: string }) => Promise<void>;
   logout: () => void;
   updateUser: (userData: Partial<User>) => Promise<void>;
+  updateProfile: (userData: any) => Promise<void>;
   clearError: () => void;
 }
 
@@ -58,6 +59,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const updateProfile = async (userData: any) => {
+    const result = await dispatch(updateUserProfile(userData));
+    if (updateUserProfile.rejected.match(result)) {
+      throw new Error(result.payload as string);
+    }
+  };
+
   const handleClearError = () => {
     dispatch(clearError());
   };
@@ -69,6 +77,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       register, 
       logout, 
       updateUser, 
+      updateProfile,
       clearError: handleClearError 
     }}>
       {children}

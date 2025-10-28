@@ -2,10 +2,12 @@ import { Icon } from "@iconify/react";
 import { Button } from "@/shared/components/ui/button";
 import { Badge } from "@/shared/components/ui/badge";
 import { Card, CardContent } from "@/shared/components/ui/card";
+import { PropertyCardSkeleton } from "@/shared/components/ui/loading-states";
 import { useNavigate } from "react-router-dom";
 import { Property, PropertyCardVariant } from "../../types";
 import { useFavorites } from "../../contexts/FavoritesContext";
 import { formatPrice, formatArea } from "../../utils/propertyHelpers";
+import { cn } from "@/shared/lib/utils";
 
 interface PropertyCardProps {
   property: Property;
@@ -15,6 +17,8 @@ interface PropertyCardProps {
   showAgent?: boolean;
   showDescription?: boolean;
   onClick?: (property: Property) => void;
+  className?: string;
+  loading?: boolean;
 }
 
 export function PropertyCard({ 
@@ -24,11 +28,16 @@ export function PropertyCard({
   showStats = false,
   showAgent = false,
   showDescription = false,
-  onClick
+  onClick,
+  className,
+  loading = false
 }: PropertyCardProps) {
   const navigate = useNavigate();
   const { isFavorite, toggleFavorite, isLoading } = useFavorites();
-  const isPropertyFavorite = isFavorite(property.id);
+
+  if (loading) {
+    return <PropertyCardSkeleton variant={variant} />;
+  }
 
   const handleFavoriteToggle = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -62,65 +71,115 @@ export function PropertyCard({
 
   if (variant === 'grid') {
     return (
-      <Card className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow group" onClick={handlePropertyClick}>
-        <div className="relative">
-          <img
-            src={getImageUrl()}
-            alt={property.title}
-            className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-          />
+      <Card className={cn(
+        "group overflow-hidden cursor-pointer card-interactive",
+        "border border-border/50 bg-card/50 backdrop-blur-sm",
+        className
+      )} onClick={handlePropertyClick}>
+        <div className="relative overflow-hidden">
+          <div className="aspect-[4/3] overflow-hidden bg-muted">
+            <img
+              src={getImageUrl()}
+              alt={property.title}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              loading="lazy"
+            />
+          </div>
+          
+          {/* Gradient overlay for better text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          
           {showFavorite && (
             <Button
               variant="ghost"
               size="icon"
-              className="absolute top-2 right-2 bg-white/80 hover:bg-white"
+              className="absolute top-3 right-3 size-9 bg-white/90 hover:bg-white shadow-md backdrop-blur-sm transition-all duration-200 hover:scale-110"
               onClick={handleFavoriteToggle}
               disabled={isLoading}
             >
               <Icon 
                 icon={isFavorite(property.id) ? "solar:heart-bold" : "solar:heart-linear"} 
-                className={`size-5 ${isFavorite(property.id) ? 'text-red-500' : 'text-gray-600'}`} 
+                className={cn(
+                  "size-5 transition-colors duration-200",
+                  isFavorite(property.id) ? 'text-red-500' : 'text-gray-600 hover:text-red-400'
+                )} 
               />
             </Button>
           )}
+          
           {property.isFeatured && (
-            <Badge className="absolute top-2 left-2 bg-yellow-500 text-yellow-50">
+            <Badge className="absolute top-3 left-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-md">
+              <Icon icon="solar:star-bold" className="size-3 mr-1" />
               Featured
             </Badge>
           )}
+          
+          {/* Status badge */}
+          <Badge 
+            variant="secondary" 
+            className="absolute bottom-3 left-3 bg-white/90 text-gray-800 shadow-md backdrop-blur-sm"
+          >
+            {property.status ? property.status.replace('_', ' ') : 'Available'}
+          </Badge>
         </div>
-        <CardContent className="p-4">
-          <div className="mb-2">
-            <h3 className="font-semibold text-lg mb-1 line-clamp-1">{property.title}</h3>
-            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-              <Icon icon="solar:map-point-bold" className="size-4" />
+        
+        <CardContent className="p-5 space-y-3">
+          <div>
+            <h3 className="font-semibold text-lg leading-tight mb-2 line-clamp-2 group-hover:text-primary transition-colors duration-200">
+              {property.title}
+            </h3>
+            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+              <Icon icon="solar:map-point-bold" className="size-4 text-primary/70" />
               <span className="line-clamp-1">{property.city}, {property.state}</span>
             </div>
           </div>
-          <div className="space-y-2">
-            <p className="text-xl font-bold">{formatPrice(property.price)}</p>
-            <p className="text-sm text-muted-foreground">
-              {formatArea(getArea())} | {property.bedrooms || 0} BHK | {property.bathrooms || 0} Bath
-            </p>
+          
+          <div className="space-y-3">
+            <div className="flex items-baseline justify-between">
+              <p className="text-2xl font-bold text-primary">{formatPrice(property.price)}</p>
+              {getListingType() === 'rent' && (
+                <span className="text-sm text-muted-foreground">/month</span>
+              )}
+            </div>
+            
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <Icon icon="solar:home-2-bold" className="size-4" />
+                <span>{formatArea(getArea())}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Icon icon="solar:bed-bold" className="size-4" />
+                <span>{property.bedrooms || 0} BHK</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Icon icon="solar:bath-bold" className="size-4" />
+                <span>{property.bathrooms || 0}</span>
+              </div>
+            </div>
+            
             {showDescription && property.description && (
-              <p className="text-sm text-muted-foreground line-clamp-2">{property.description}</p>
+              <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                {property.description}
+              </p>
             )}
+            
             <div className="flex gap-2 flex-wrap">
-              <Badge variant="secondary" className="text-xs capitalize">
+              <Badge variant="secondary" className="text-xs capitalize font-medium">
                 {getPropertyType()}
               </Badge>
               <Badge variant="outline" className="text-xs capitalize">
-                {getListingType()}
+                For {getListingType()}
               </Badge>
             </div>
+            
             {showStats && property.stats && (
-              <div className="flex gap-4 text-xs text-muted-foreground pt-2 border-t">
-                <span className="flex items-center gap-1">
-                  <Icon icon="solar:eye-bold" className="size-3" />
-                  {property.stats.views}
+              <div className="flex gap-4 text-xs text-muted-foreground pt-3 border-t border-border/50">
+                <span className="flex items-center gap-1.5">
+                  <Icon icon="solar:eye-bold" className="size-3.5" />
+                  {property.stats.views} views
                 </span>
-                <span className="flex items-center gap-1">
-                  <Icon icon="solar:heart-bold" className="size-3" />
+                <span className="flex items-center gap-1.5">
+                  <Icon icon="solar:heart-bold" className="size-3.5" />
                   {property.stats.favorites}
                 </span>
               </div>
@@ -133,32 +192,57 @@ export function PropertyCard({
 
   if (variant === 'compact') {
     return (
-      <Card className="overflow-hidden cursor-pointer hover:shadow-md transition-shadow" onClick={handlePropertyClick}>
+      <Card className={cn(
+        "group overflow-hidden cursor-pointer hover-lift-subtle hover-border",
+        "bg-card/80 backdrop-blur-sm",
+        className
+      )} onClick={handlePropertyClick}>
         <div className="flex">
-          <div className="relative w-24 h-20">
+          <div className="relative w-20 h-16 flex-shrink-0 overflow-hidden">
             <img
               src={getImageUrl()}
               alt={property.title}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+              loading="lazy"
             />
+            {property.isFeatured && (
+              <div className="absolute top-1 left-1">
+                <Icon icon="solar:star-bold" className="size-3 text-yellow-500" />
+              </div>
+            )}
           </div>
-          <CardContent className="flex-1 p-3">
-            <h4 className="font-medium text-sm line-clamp-1 mb-1">{property.title}</h4>
-            <p className="text-sm font-semibold text-primary">{formatPrice(property.price)}</p>
-            <p className="text-xs text-muted-foreground">{property.city}, {property.state}</p>
+          
+          <CardContent className="flex-1 p-3 min-w-0">
+            <h4 className="font-medium text-sm line-clamp-1 mb-1 group-hover:text-primary transition-colors">
+              {property.title}
+            </h4>
+            <p className="text-sm font-semibold text-primary mb-1">{formatPrice(property.price)}</p>
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Icon icon="solar:map-point-bold" className="size-3" />
+              <span className="line-clamp-1">{property.city}, {property.state}</span>
+            </div>
+            <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+              <span>{property.bedrooms || 0} BHK</span>
+              <span>•</span>
+              <span>{formatArea(getArea())}</span>
+            </div>
           </CardContent>
+          
           {showFavorite && (
-            <div className="p-2">
+            <div className="p-2 flex items-center">
               <Button
                 variant="ghost"
                 size="icon"
-                className="size-8"
+                className="size-8 hover:bg-primary/10 transition-colors"
                 onClick={handleFavoriteToggle}
                 disabled={isLoading}
               >
                 <Icon 
                   icon={isFavorite(property.id) ? "solar:heart-bold" : "solar:heart-linear"} 
-                  className={`size-4 ${isFavorite(property.id) ? 'text-red-500' : 'text-gray-600'}`} 
+                  className={cn(
+                    "size-4 transition-colors",
+                    isFavorite(property.id) ? 'text-red-500' : 'text-gray-600 hover:text-red-400'
+                  )} 
                 />
               </Button>
             </div>
@@ -170,87 +254,151 @@ export function PropertyCard({
 
   // List variant (default)
   return (
-    <Card className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow" onClick={handlePropertyClick}>
-      <div className="flex flex-col md:flex-row">
-        <div className="relative md:w-64 h-48 md:h-auto">
+    <Card className={cn(
+      "group overflow-hidden cursor-pointer card-interactive",
+      "border border-border/50 bg-card/80 backdrop-blur-sm",
+      className
+    )} onClick={handlePropertyClick}>
+      <div className="flex flex-col lg:flex-row">
+        <div className="relative lg:w-80 h-56 lg:h-48 flex-shrink-0 overflow-hidden">
           <img
             src={getImageUrl()}
             alt={property.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            loading="lazy"
           />
+          
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          
           {showFavorite && (
             <Button
               variant="ghost"
               size="icon"
-              className="absolute top-2 right-2 bg-white/80 hover:bg-white"
+              className="absolute top-3 right-3 size-10 bg-white/90 hover:bg-white shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-110"
               onClick={handleFavoriteToggle}
               disabled={isLoading}
             >
               <Icon 
                 icon={isFavorite(property.id) ? "solar:heart-bold" : "solar:heart-linear"} 
-                className={`size-5 ${isFavorite(property.id) ? 'text-red-500' : 'text-gray-600'}`} 
+                className={cn(
+                  "size-5 transition-colors duration-200",
+                  isFavorite(property.id) ? 'text-red-500' : 'text-gray-600 hover:text-red-400'
+                )} 
               />
             </Button>
           )}
+          
           {property.isFeatured && (
-            <Badge className="absolute top-2 left-2 bg-yellow-500 text-yellow-50">
+            <Badge className="absolute top-3 left-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg">
+              <Icon icon="solar:star-bold" className="size-3 mr-1" />
               Featured
             </Badge>
           )}
+          
+          {/* Status badge */}
+          <Badge 
+            variant="secondary" 
+            className="absolute bottom-3 left-3 bg-white/90 text-gray-800 shadow-md backdrop-blur-sm"
+          >
+            {property.status ? property.status.replace('_', ' ') : 'Available'}
+          </Badge>
         </div>
-        <CardContent className="flex-1 p-6">
-          <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
-            <div className="flex-1">
-              <h3 className="font-semibold text-xl mb-2 line-clamp-2">{property.title}</h3>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                <Icon icon="solar:map-point-bold" className="size-4" />
-                <span>{property.city}, {property.state}</span>
+        
+        <CardContent className="flex-1 p-6 lg:p-8">
+          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-6">
+            <div className="flex-1 space-y-4">
+              <div>
+                <h3 className="font-semibold text-xl lg:text-2xl mb-3 line-clamp-2 group-hover:text-primary transition-colors duration-200 leading-tight">
+                  {property.title}
+                </h3>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
+                  <Icon icon="solar:map-point-bold" className="size-4 text-primary/70" />
+                  <span>{property.city}, {property.state}</span>
+                </div>
               </div>
+              
               {showDescription && property.description && (
-                <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{property.description}</p>
+                <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+                  {property.description}
+                </p>
               )}
+              
               {showAgent && property.agent && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Icon icon="solar:user-bold" className="size-4" />
-                  <span>{property.agent.name}</span>
+                <div className="flex items-center gap-2 text-sm">
+                  <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Icon icon="solar:user-bold" className="size-4 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-medium">{property.agent.name}</p>
+                    <p className="text-xs text-muted-foreground">Agent</p>
+                  </div>
                 </div>
               )}
             </div>
-            <div className="text-right">
-              <p className="text-lg font-bold">{formatPrice(property.price)}</p>
-              <p className="text-sm text-muted-foreground">
-                {formatArea(getArea())} | {property.bedrooms || 0} BHK | {property.bathrooms || 0} Bath
-              </p>
-              <p className="text-sm text-muted-foreground capitalize">
-                {getPropertyType()} • {getListingType()}
-              </p>
+            
+            <div className="lg:text-right space-y-3 lg:min-w-[200px]">
+              <div>
+                <p className="text-2xl lg:text-3xl font-bold text-primary">{formatPrice(property.price)}</p>
+                {getListingType() === 'rent' && (
+                  <p className="text-sm text-muted-foreground">/month</p>
+                )}
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex lg:justify-end items-center gap-4 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <Icon icon="solar:home-2-bold" className="size-4" />
+                    <span>{formatArea(getArea())}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Icon icon="solar:bed-bold" className="size-4" />
+                    <span>{property.bedrooms || 0} BHK</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Icon icon="solar:bath-bold" className="size-4" />
+                    <span>{property.bathrooms || 0}</span>
+                  </div>
+                </div>
+                
+                <p className="text-sm text-muted-foreground capitalize lg:text-right">
+                  {getPropertyType()} • For {getListingType()}
+                </p>
+              </div>
             </div>
           </div>
-          <div className="flex justify-between items-center mt-4">
-            <div className="flex gap-2">
-              <Badge variant="secondary" className="text-xs capitalize">
+          
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-6 pt-6 border-t border-border/50">
+            <div className="flex gap-2 flex-wrap">
+              <Badge variant="secondary" className="text-xs capitalize font-medium">
                 {getPropertyType()}
               </Badge>
               <Badge variant="outline" className="text-xs capitalize">
-                {getListingType()}
+                For {getListingType()}
               </Badge>
-              <Badge variant="outline" className="text-xs capitalize">
-                {property.status}
-              </Badge>
+              {property.status && (
+                <Badge 
+                  variant={property.status === 'active' ? 'default' : 'secondary'} 
+                  className="text-xs capitalize"
+                >
+                  {property.status.replace('_', ' ')}
+                </Badge>
+              )}
             </div>
+            
             {showStats && property.stats && (
-              <div className="flex gap-4 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <Icon icon="solar:eye-bold" className="size-3" />
-                  {property.stats.views}
+              <div className="flex gap-6 text-sm text-muted-foreground">
+                <span className="flex items-center gap-2">
+                  <Icon icon="solar:eye-bold" className="size-4" />
+                  <span>{property.stats.views} views</span>
                 </span>
-                <span className="flex items-center gap-1">
-                  <Icon icon="solar:heart-bold" className="size-3" />
-                  {property.stats.favorites}
+                <span className="flex items-center gap-2">
+                  <Icon icon="solar:heart-bold" className="size-4" />
+                  <span>{property.stats.favorites}</span>
                 </span>
-                <span className="flex items-center gap-1">
-                  <Icon icon="solar:chat-round-dots-bold" className="size-3" />
-                  {property.stats.inquiries}
+                <span className="flex items-center gap-2">
+                  <Icon icon="solar:chat-round-dots-bold" className="size-4" />
+                  <span>{property.stats.inquiries}</span>
                 </span>
               </div>
             )}

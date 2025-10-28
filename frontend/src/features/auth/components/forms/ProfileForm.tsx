@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
+import { FormField } from '@/shared/components/ui/form-field';
 import { Alert, AlertDescription } from '@/shared/components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 
 import { useProfile } from '../../hooks/useProfile';
 import { ProfileFormData, User } from '../../types';
@@ -15,7 +17,7 @@ interface ProfileFormProps {
 }
 
 export function ProfileForm({ user, onSuccess, onError, className }: ProfileFormProps) {
-  const { updateProfile, isLoading, error, fieldErrors, validateField, clearFieldError, clearError } = useProfile();
+  const { updateProfile, error, fieldErrors, validateField, clearFieldError, clearError } = useProfile();
   
   const [formData, setFormData] = useState<ProfileFormData>({
     firstName: '',
@@ -25,13 +27,14 @@ export function ProfileForm({ user, onSuccess, onError, className }: ProfileForm
   });
   
   const [success, setSuccess] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Initialize form data with user data
   useEffect(() => {
     if (user) {
       setFormData({
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
+        firstName: user.first_name || user.firstName || '',
+        lastName: user.last_name || user.lastName || '',
         phone: user.phone || '',
         avatar: user.avatar || '',
       });
@@ -66,14 +69,29 @@ export function ProfileForm({ user, onSuccess, onError, className }: ProfileForm
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
-    const updateSuccess = await updateProfile(formData);
-    
-    if (updateSuccess) {
-      setSuccess('Profile updated successfully!');
-      onSuccess?.();
-    } else {
-      onError?.(error || 'Profile update failed');
+    try {
+      // Map frontend field names to backend field names
+      const backendFormData = {
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        phone: formData.phone,
+        avatar: formData.avatar,
+      };
+      
+      const updateSuccess = await updateProfile(backendFormData);
+      
+      if (updateSuccess) {
+        setSuccess('Profile updated successfully!');
+        onSuccess?.();
+      } else {
+        onError?.(error || 'Profile update failed');
+      }
+    } catch (err) {
+      onError?.(err instanceof Error ? err.message : 'Profile update failed');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -83,115 +101,169 @@ export function ProfileForm({ user, onSuccess, onError, className }: ProfileForm
     Object.keys(fieldErrors).length === 0;
 
   return (
-    <form onSubmit={handleSubmit} className={className}>
-      {error && (
-        <Alert variant="destructive" className="mb-4">
-          <Icon icon="solar:danger-bold" className="size-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
+    <Card className={className}>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Icon icon="solar:user-bold" className="size-5 text-primary" />
+          Personal Information
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Status Messages */}
+          <div className="space-y-3">
+            {error && (
+              <Alert variant="destructive">
+                <Icon icon="solar:danger-bold" className="size-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-      {success && (
-        <Alert className="border-green-200 bg-green-50 mb-4">
-          <Icon icon="solar:check-circle-bold" className="size-4 text-green-600" />
-          <AlertDescription className="text-green-800">{success}</AlertDescription>
-        </Alert>
-      )}
-
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label htmlFor="firstName" className="text-sm font-medium">
-              First Name
-            </label>
-            <Input
-              id="firstName"
-              name="firstName"
-              type="text"
-              value={formData.firstName}
-              onChange={handleInputChange}
-              onBlur={handleBlur}
-              required
-            />
-            {fieldErrors.firstName && (
-              <p className="text-xs text-red-500">{fieldErrors.firstName}</p>
+            {success && (
+              <Alert className="border-success/20 bg-success/5">
+                <Icon icon="solar:check-circle-bold" className="size-4 text-success" />
+                <AlertDescription className="text-success">{success}</AlertDescription>
+              </Alert>
             )}
           </div>
 
-          <div className="space-y-2">
-            <label htmlFor="lastName" className="text-sm font-medium">
-              Last Name
-            </label>
-            <Input
-              id="lastName"
-              name="lastName"
-              type="text"
-              value={formData.lastName}
-              onChange={handleInputChange}
-              onBlur={handleBlur}
-              required
-            />
-            {fieldErrors.lastName && (
-              <p className="text-xs text-red-500">{fieldErrors.lastName}</p>
-            )}
+          {/* Form Fields */}
+          <div className="space-y-6">
+            {/* Name Fields */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                label="First Name"
+                required
+                error={fieldErrors.firstName}
+              >
+                <Input
+                  id="firstName"
+                  name="firstName"
+                  type="text"
+                  placeholder="Enter your first name"
+                  value={formData.firstName}
+                  onChange={handleInputChange}
+                  onBlur={handleBlur}
+                  disabled={isSubmitting}
+                  className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                />
+              </FormField>
+
+              <FormField
+                label="Last Name"
+                required
+                error={fieldErrors.lastName}
+              >
+                <Input
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  placeholder="Enter your last name"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                  onBlur={handleBlur}
+                  disabled={isSubmitting}
+                  className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                />
+              </FormField>
+            </div>
+
+            {/* Phone Field */}
+            <FormField
+              label="Phone Number"
+              description="Your phone number for contact purposes"
+              error={fieldErrors.phone}
+            >
+              <div className="relative">
+                <Icon 
+                  icon="solar:phone-bold" 
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-muted-foreground" 
+                />
+                <Input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  placeholder="+1 (555) 123-4567"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  onBlur={handleBlur}
+                  disabled={isSubmitting}
+                  className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+            </FormField>
+
+            {/* Avatar Field */}
+            <FormField
+              label="Profile Picture"
+              description="URL to your profile picture (optional)"
+              error={fieldErrors.avatar}
+            >
+              <div className="space-y-3">
+                <div className="relative">
+                  <Icon 
+                    icon="solar:camera-bold" 
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-muted-foreground" 
+                  />
+                  <Input
+                    id="avatar"
+                    name="avatar"
+                    type="url"
+                    placeholder="https://example.com/avatar.jpg"
+                    value={formData.avatar}
+                    onChange={handleInputChange}
+                    onBlur={handleBlur}
+                    disabled={isSubmitting}
+                    className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                  />
+                </div>
+                
+                {/* Avatar Preview */}
+                {formData.avatar && (
+                  <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg border">
+                    <div className="size-10 rounded-full overflow-hidden bg-muted">
+                      <img
+                        src={formData.avatar}
+                        alt="Avatar preview"
+                        className="size-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Preview of your profile picture
+                    </div>
+                  </div>
+                )}
+              </div>
+            </FormField>
           </div>
-        </div>
 
-        <div className="space-y-2">
-          <label htmlFor="phone" className="text-sm font-medium">
-            Phone Number
-          </label>
-          <Input
-            id="phone"
-            name="phone"
-            type="tel"
-            value={formData.phone}
-            onChange={handleInputChange}
-            onBlur={handleBlur}
-          />
-          {fieldErrors.phone && (
-            <p className="text-xs text-red-500">{fieldErrors.phone}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="avatar" className="text-sm font-medium">
-            Avatar URL (Optional)
-          </label>
-          <Input
-            id="avatar"
-            name="avatar"
-            type="url"
-            placeholder="https://example.com/avatar.jpg"
-            value={formData.avatar}
-            onChange={handleInputChange}
-            onBlur={handleBlur}
-          />
-          {fieldErrors.avatar && (
-            <p className="text-xs text-red-500">{fieldErrors.avatar}</p>
-          )}
-        </div>
-
-        <div className="flex justify-end">
-          <Button
-            type="submit"
-            disabled={!isFormValid || isLoading}
-            className="shadow-lg shadow-primary/20"
-          >
-            {isLoading ? (
-              <>
-                <Icon icon="solar:loading-bold" className="size-4 animate-spin mr-2" />
-                Updating...
-              </>
-            ) : (
-              <>
-                <Icon icon="solar:diskette-bold" className="size-4 mr-2" />
-                Save Changes
-              </>
-            )}
-          </Button>
-        </div>
-      </div>
-    </form>
+          {/* Submit Button */}
+          <div className="flex justify-end pt-4 border-t border-border">
+            <Button
+              type="submit"
+              disabled={!isFormValid || isSubmitting}
+              loading={isSubmitting}
+              className="min-w-[140px] shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-200"
+            >
+              {isSubmitting ? (
+                <>
+                  <Icon icon="solar:loading-bold" className="size-4 animate-spin mr-2" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Icon icon="solar:diskette-bold" className="size-4 mr-2" />
+                  Save Changes
+                </>
+              )}
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

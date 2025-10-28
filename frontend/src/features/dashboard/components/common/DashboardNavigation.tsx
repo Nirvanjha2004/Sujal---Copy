@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Icon } from '@iconify/react';
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
-import { Separator } from '@/shared/components/ui/separator';
 import { cn } from '@/shared/lib/utils';
 
 interface NavigationItem {
@@ -22,7 +21,7 @@ interface DashboardNavigationProps {
   activeItem?: string;
   onItemClick?: (item: NavigationItem) => void;
   className?: string;
-  collapsible?: boolean;
+  collapsed?: boolean;
 }
 
 export function DashboardNavigation({
@@ -30,9 +29,8 @@ export function DashboardNavigation({
   activeItem,
   onItemClick,
   className,
-  collapsible = false
+  collapsed = false
 }: DashboardNavigationProps) {
-  const [collapsed, setCollapsed] = useState(false);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
 
   const toggleExpanded = (itemId: string) => {
@@ -48,7 +46,7 @@ export function DashboardNavigation({
   const handleItemClick = (item: NavigationItem) => {
     if (item.isDisabled) return;
     
-    if (item.children && item.children.length > 0) {
+    if (item.children && item.children.length > 0 && !collapsed) {
       toggleExpanded(item.id);
     } else {
       onItemClick?.(item);
@@ -63,34 +61,43 @@ export function DashboardNavigation({
     return (
       <div key={item.id}>
         <Button
-          variant={isActive ? 'secondary' : 'ghost'}
+          variant="ghost"
           className={cn(
-            'w-full justify-start h-auto py-3 px-4',
-            level > 0 && 'ml-4 w-auto',
+            'w-full nav-item group relative',
+            collapsed ? 'justify-center px-2 py-3' : 'justify-start px-3 py-2.5',
+            level > 0 && !collapsed && 'ml-6 w-auto',
             item.isDisabled && 'opacity-50 cursor-not-allowed',
-            isActive && 'bg-primary/10 text-primary border-primary/20'
+            isActive && 'active bg-primary/10 text-primary hover:bg-primary/15 border-r-2 border-primary',
+            !isActive && 'hover:bg-muted/50'
           )}
           onClick={() => handleItemClick(item)}
           disabled={item.isDisabled}
+          title={collapsed ? item.label : undefined}
         >
-          <div className="flex items-center gap-3 w-full">
+          <div className={cn(
+            'flex items-center w-full',
+            collapsed ? 'justify-center' : 'gap-3'
+          )}>
             <Icon 
               icon={item.icon} 
               className={cn(
-                'size-5 flex-shrink-0',
-                collapsed && 'size-6'
+                'flex-shrink-0 transition-transform group-hover:scale-110',
+                collapsed ? 'size-5' : 'size-4'
               )} 
             />
             
             {!collapsed && (
               <>
-                <span className="flex-1 text-left font-medium">
+                <span className="flex-1 text-left font-medium text-sm">
                   {item.label}
                 </span>
                 
                 <div className="flex items-center gap-2">
                   {item.badge && (
-                    <Badge variant="secondary" className="text-xs">
+                    <Badge 
+                      variant="secondary" 
+                      className="text-xs px-1.5 py-0.5 bg-primary/20 text-primary border-primary/30"
+                    >
                       {item.badge}
                     </Badge>
                   )}
@@ -98,17 +105,29 @@ export function DashboardNavigation({
                   {hasChildren && (
                     <Icon
                       icon={isExpanded ? 'solar:alt-arrow-up-bold' : 'solar:alt-arrow-down-bold'}
-                      className="size-4"
+                      className="size-3 transition-transform"
                     />
                   )}
                 </div>
               </>
             )}
           </div>
+
+          {/* Tooltip for collapsed state */}
+          {collapsed && (
+            <div className="absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded-md shadow-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 whitespace-nowrap">
+              {item.label}
+              {item.badge && (
+                <Badge variant="secondary" className="ml-2 text-xs">
+                  {item.badge}
+                </Badge>
+              )}
+            </div>
+          )}
         </Button>
         
         {hasChildren && isExpanded && !collapsed && (
-          <div className="mt-1 space-y-1">
+          <div className="mt-1 space-y-1 animate-in slide-in-from-top-2 duration-200">
             {item.children!.map(child => renderNavigationItem(child, level + 1))}
           </div>
         )}
@@ -117,29 +136,8 @@ export function DashboardNavigation({
   };
 
   return (
-    <nav className={cn('space-y-2', className)}>
-      {collapsible && (
-        <>
-          <div className="flex items-center justify-between p-4">
-            {!collapsed && (
-              <h2 className="text-lg font-semibold">Dashboard</h2>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setCollapsed(!collapsed)}
-            >
-              <Icon 
-                icon={collapsed ? 'solar:hamburger-menu-bold' : 'solar:close-square-bold'} 
-                className="size-5" 
-              />
-            </Button>
-          </div>
-          <Separator />
-        </>
-      )}
-      
-      <div className="space-y-1 p-2">
+    <nav className={cn('space-y-1', className)}>
+      <div className={cn('space-y-1', collapsed ? 'px-1' : 'px-2')}>
         {items.map(item => renderNavigationItem(item))}
       </div>
     </nav>

@@ -7,7 +7,6 @@ export * from './amenities';
 export {
   PROPERTY_TYPES,
   LISTING_TYPES,
-  PROPERTY_STATUSES,
   BEDROOM_OPTIONS,
   BATHROOM_OPTIONS,
   AMENITIES_LIST,

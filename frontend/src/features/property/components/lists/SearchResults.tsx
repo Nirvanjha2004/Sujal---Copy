@@ -165,7 +165,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
             </div>
             
             <div className="flex items-center gap-2">
-              {onSaveSearch && (
+              {/* {onSaveSearch && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -175,7 +175,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
                   <Bookmark className="h-4 w-4" />
                   Save Search
                 </Button>
-              )}
+              )} */}
               
               {onShareResults && (
                 <Button

@@ -60,8 +60,8 @@ export function AccountSettingsPage() {
   useEffect(() => {
     if (user) {
       setProfileData({
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
+        firstName: user.first_name || user.firstName || '',
+        lastName: user.last_name || user.lastName || '',
         email: user.email || '',
         phone: user.phone || '',
         role: user.role || 'buyer',

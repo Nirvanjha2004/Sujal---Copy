@@ -1,12 +1,13 @@
 import { ReactNode } from 'react';
 import { Icon } from '@iconify/react';
 import { Button } from '@/shared/components/ui/button';
-import { Card, CardContent } from '@/shared/components/ui/card';
+
 import { Separator } from '@/shared/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
 import { Badge } from '@/shared/components/ui/badge';
 import { DashboardNavigation } from './DashboardNavigation';
 import { cn } from '@/shared/lib/utils';
+
 import type { User } from '@/features/auth/types';
 
 interface NavigationItem {
@@ -25,10 +26,10 @@ interface DashboardSidebarProps {
   user: User;
   navigationItems: NavigationItem[];
   activeItem?: string;
+  collapsed?: boolean;
   onNavigationClick?: (item: NavigationItem) => void;
+  onToggleCollapse?: () => void;
   onProfileClick?: () => void;
-  onSettingsClick?: () => void;
-  onLogoutClick?: () => void;
   footer?: ReactNode;
   className?: string;
 }
@@ -37,92 +38,139 @@ export function DashboardSidebar({
   user,
   navigationItems,
   activeItem,
+  collapsed = false,
   onNavigationClick,
+  onToggleCollapse,
   onProfileClick,
-  onSettingsClick,
-  onLogoutClick,
   footer,
   className
 }: DashboardSidebarProps) {
   const getRoleColor = (role: string) => {
     switch (role) {
       case 'admin':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
       case 'agent':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
       case 'builder':
-        return 'bg-orange-100 text-orange-800';
+        return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
       case 'owner':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
       case 'buyer':
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
     }
   };
 
   return (
-    <div className={cn('flex flex-col h-full bg-white', className)}>
-      {/* User Profile Section */}
-      <div className="p-6 border-b">
-        <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <Avatar className="size-12">
-                <AvatarImage src={user.avatar} alt={`${user.firstName} ${user.lastName}`} />
-                <AvatarFallback className="text-sm font-semibold">
-                  {user.firstName?.[0]}{user.lastName?.[0]}
-                </AvatarFallback>
-              </Avatar>
-              
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm truncate">
-                  {user.firstName} {user.lastName}
-                </p>
-                <p className="text-xs text-muted-foreground truncate">
-                  {user.email}
-                </p>
-                <Badge variant="secondary" className={cn('text-xs mt-1', getRoleColor(user.role))}>
-                  {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-                </Badge>
-              </div>
-            </div>
-            
-            <div className="flex gap-2 mt-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="flex-1 h-8"
-                onClick={onProfileClick}
-              >
-                <Icon icon="solar:user-bold" className="size-4 mr-1" />
-                Profile
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="flex-1 h-8"
-                onClick={onSettingsClick}
-              >
-                <Icon icon="solar:settings-bold" className="size-4 mr-1" />
-                Settings
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+    <aside
+      className={cn(
+        'flex flex-col h-full bg-card border-r border-border transition-all duration-300 ease-in-out',
+        className
+      )}
+      role="complementary"
+      aria-label="Dashboard navigation"
+    >
+      {/* Collapse Toggle */}
+      <div className="flex items-center justify-between p-4 border-b border-border">
+        {!collapsed && (
+          <div className="flex items-center gap-2 animate-in fade-in-0 slide-in-from-left-2 duration-300">
+            <span className="font-semibold text-foreground">Navigation</span>
+          </div>
+        )}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onToggleCollapse}
+          className="size-8 hover:bg-muted transition-colors duration-200"
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-expanded={!collapsed}
+        >
+          <Icon
+            icon={collapsed ? "solar:alt-arrow-right-bold" : "solar:alt-arrow-left-bold"}
+            className="size-4 transition-transform duration-200"
+            aria-hidden="true"
+          />
+        </Button>
       </div>
 
+      {/* User Profile Section - Simplified */}
+      {!collapsed && (
+        <div className="p-4 border-b border-border animate-in fade-in-0 slide-in-from-left-2 duration-300">
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+            <Avatar className="size-10 ring-2 ring-primary/20">
+              <AvatarImage src={user.avatar} alt="" />
+              <AvatarFallback className="text-sm font-semibold bg-primary/10">
+                {(user.first_name || user.firstName)?.[0]}{(user.last_name || user.lastName)?.[0]}
+              </AvatarFallback>
+            </Avatar>
+            
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-sm truncate text-foreground">
+                {user.first_name || user.firstName} {user.last_name || user.lastName}
+              </p>
+              <Badge 
+                variant="secondary" 
+                className={cn(
+                  'text-xs mt-1 transition-colors duration-200', 
+                  getRoleColor(user.role)
+                )}
+              >
+                {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+              </Badge>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Collapsed User Avatar */}
+      {collapsed && (
+        <div className="p-4 border-b border-border flex justify-center group">
+          <div className="relative">
+            <button
+              className="focus-visible-enhanced rounded-full"
+              onClick={onProfileClick}
+              aria-label={`${user.first_name || user.firstName} ${user.last_name || user.lastName}, ${user.role}. Click to view profile.`}
+            >
+              <Avatar className="size-10 ring-2 ring-primary/20 transition-all duration-200 hover:ring-primary/40 cursor-pointer">
+                <AvatarImage src={user.avatar} alt="" />
+                <AvatarFallback className="text-xs font-semibold bg-primary/10">
+                  {(user.first_name || user.firstName)?.[0]}{(user.last_name || user.lastName)?.[0]}
+                </AvatarFallback>
+              </Avatar>
+            </button>
+
+            {/* Status indicator */}
+            <div
+              className="absolute -bottom-0.5 -right-0.5 size-3 bg-green-500 border-2 border-card rounded-full"
+              aria-hidden="true"
+            ></div>
+
+            {/* Tooltip */}
+            <div
+              className="absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded-md shadow-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 whitespace-nowrap"
+              role="tooltip"
+              aria-hidden="true"
+            >
+              {user.first_name || user.firstName} {user.last_name || user.lastName}
+              <div className="text-xs text-muted-foreground">{user.role}</div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Navigation Section */}
-      <div className="flex-1 overflow-y-auto">
+      <nav className="flex-1 overflow-y-auto" aria-label="Main navigation">
         <DashboardNavigation
           items={navigationItems}
           activeItem={activeItem}
           onItemClick={onNavigationClick}
-          className="p-4"
+          collapsed={collapsed}
+          className="p-2"
         />
-      </div>
+      </nav>
 
       {/* Footer Section */}
-      {footer && (
+      {footer && !collapsed && (
         <>
           <Separator />
           <div className="p-4">
@@ -131,17 +179,7 @@ export function DashboardSidebar({
         </>
       )}
 
-      {/* Logout Section */}
-      <div className="p-4 border-t">
-        <Button
-          variant="ghost"
-          className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
-          onClick={onLogoutClick}
-        >
-          <Icon icon="solar:logout-2-bold" className="size-5 mr-3" />
-          Sign Out
-        </Button>
-      </div>
-    </div>
+
+    </aside>
   );
 }

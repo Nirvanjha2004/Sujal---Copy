@@ -88,7 +88,7 @@ export function PropertyListingPage() {
             const inquiryResponse = await api.createInquiry({
                 property_id: property.id,
                 message: defaultMessage,
-                name: authState.user.firstName || "Interested Buyer",
+                name: authState.user.first_name || authState.user.firstName || "Interested Buyer",
                 email: authState.user.email,
                 inquirer_id: authState.user.id,
             });

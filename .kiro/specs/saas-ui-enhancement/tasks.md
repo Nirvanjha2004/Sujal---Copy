@@ -343,14 +343,22 @@
   - Fix any browser-specific issues and inconsistencies
   - _Requirements: 1.1, 1.2, 4.4_
 
-- [ ] 13. Documentation and style guide updates
-- [ ] 13.1 Update component documentation
+- [ ] 13. Fix specific page layout inconsistencies
+- [x] 13.1 Improve My Properties page layout and spacing
+  - Update container padding and margins to match other dashboard pages
+  - Enhance spacing between header, filters, and content sections
+  - Improve card spacing and grid layout consistency
+  - Fix responsive behavior to match other pages
+  - _Requirements: 1.1, 1.2, 2.1, 2.2_
+
+- [ ] 14. Documentation and style guide updates
+- [ ] 14.1 Update component documentation
   - Document new design tokens and utility classes
   - Create usage examples for enhanced components
   - Update existing component documentation with new styling options
   - _Requirements: 4.1, 4.2_
 
-- [ ] 13.2 Create design system style guide
+- [ ] 14.2 Create design system style guide
   - Document color palette, typography, and spacing guidelines
   - Create component library with interactive examples
   - Add guidelines for consistent implementation across the platform

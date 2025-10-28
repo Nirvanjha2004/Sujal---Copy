@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { api } from '@/shared/lib/api';
 import { BuyerDashboardContent } from '../components/role-specific/BuyerDashboardContent';
 import { AgentDashboardContent } from '../components/role-specific/AgentDashboardContent';
+import { OwnerDashboardContent } from '../components/role-specific/OwnerDashboardContent';
 import { BuilderDashboardContent } from '../components/role-specific/BuilderDashboardContent';
 import { AdminDashboardContent } from '../components/role-specific/AdminDashboardContent';
 import { UserDashboardContent } from '../components/role-specific/UserDashboardContent';
@@ -82,7 +83,7 @@ export function DashboardPage() {
             setStats(prev => ({
               ...prev,
               savedProperties: favorites.length,
-              savedSearches: searchesResponse.data?.searches?.length || 0,
+              savedSearches: (searchesResponse.data as any)?.savedSearches?.length || (searchesResponse.data as any)?.searches?.length || 0,
               totalListings: properties.length,
               activeListings: activeListings,
               soldListings: soldListings,
@@ -109,7 +110,7 @@ export function DashboardPage() {
             setStats(prev => ({
               ...prev,
               savedProperties: favorites.length,
-              savedSearches: searchesResponse.data?.searches?.length || 0,
+              savedSearches: (searchesResponse.data as any)?.savedSearches?.length || (searchesResponse.data as any)?.searches?.length || 0,
               messages: 0
             }));
           } catch (error) {
@@ -206,7 +207,7 @@ export function DashboardPage() {
         return <AdminDashboardContent stats={adminStats} />;
       
       case 'owner':
-        // Use agent dashboard for owners as they have similar functionality
+        // Use dedicated owner dashboard with owner-specific features
         const ownerStats = {
           totalListings: stats.totalListings,
           activeListings: stats.activeListings,
@@ -214,7 +215,7 @@ export function DashboardPage() {
           rentedListings: stats.rentedListings,
           messages: stats.messages
         };
-        return <AgentDashboardContent stats={ownerStats} />;
+        return <OwnerDashboardContent stats={ownerStats} />;
       
       default:
         return <UserDashboardContent stats={defaultOverallStats} />;

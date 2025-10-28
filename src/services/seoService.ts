@@ -128,8 +128,8 @@ class SeoService {
       case 'home':
         defaultMetadata = {
           title: 'Find Your Dream Property - Real Estate Portal',
-          description: 'Discover the best properties for sale and rent. Browse apartments, houses, commercial spaces, and land with advanced search filters.',
-          keywords: 'real estate, property, buy, sell, rent, apartment, house, commercial, land',
+          description: 'Discover the best properties for sale and rent. Browse apartments, houses, villas, plots, commercial spaces, and land with advanced search filters.',
+          keywords: 'real estate, property, buy, sell, rent, apartment, house, villa, plot, commercial, land',
           ogTitle: 'Real Estate Portal - Find Your Perfect Property',
           ogDescription: 'Browse thousands of properties for sale and rent. Find your dream home today!',
         };

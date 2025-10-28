@@ -20,6 +20,8 @@ import { Conversation } from './Conversation';
 export enum PropertyType {
   APARTMENT = 'apartment',
   HOUSE = 'house',
+  VILLA = 'villa',
+  PLOT = 'plot',
   COMMERCIAL = 'commercial',
   LAND = 'land',
 }

@@ -15,16 +15,19 @@ import { PropertyGridSkeleton } from "@/shared/components/ui/loading";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { Layout } from "@/shared/components/layout/Layout";
 import { Icon } from "@iconify/react";
+import { toast } from 'sonner';
+import { useAuth } from '@/shared/contexts/AuthContext';
+import { api } from '@/shared/lib/api';
 
 export function PropertyDetailsPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const propertyId = id ? parseInt(id) : 0;
-    
+
     const { property, isLoading: loading, error } = useProperty({ propertyId });
     const { isFavorite, addToFavorites, removeFromFavorites } = useFavorites();
     const [activeTab, setActiveTab] = useState('overview');
-
+    const { state: authState } = useAuth();
     const formatPrice = (price: number) => {
         if (price >= 10000000) {
             return `₹ ${(price / 10000000).toFixed(2)} CRORE`;
@@ -35,9 +38,84 @@ export function PropertyDetailsPage() {
         }
     };
 
+    const handleContactOwnerClick = async () => {
+        console.log("Contact Owner button clicked");
+
+        if (!authState.isAuthenticated || !authState.user?.email) {
+            console.log("User not authenticated, redirecting to login");
+            toast.info("Please log in to contact the owner.");
+            navigate('/login');
+            return;
+        }
+
+        if (!property || !property.id) {
+            console.log("Property not available:", property);
+            toast.error("Property details not available. Please refresh the page.");
+            return;
+        }
+
+        try {
+            console.log("Creating inquiry for property:", property.id);
+            const defaultMessage = `I'm interested in your property: "${property.title}".`;
+
+            const inquiryData = {
+                property_id: property.id,
+                message: defaultMessage,
+                name: authState.user.first_name || authState.user.firstName || "Interested Buyer",
+                email: authState.user.email,
+                inquirer_id: authState.user.id,
+            };
+
+            console.log("Inquiry data:", inquiryData);
+
+            const inquiryResponse = await api.createInquiry(inquiryData);
+            console.log("Inquiry response:", inquiryResponse);
+
+            if (!inquiryResponse || !inquiryResponse.data) {
+                throw new Error("Invalid response from server");
+            }
+
+            const inquiry = inquiryResponse.data.inquiry;
+            if (!inquiry) {
+                throw new Error("No inquiry data in response");
+            }
+
+            const conversationId = inquiry.conversation_id;
+            console.log("Conversation ID:", conversationId);
+
+            if (!conversationId) {
+                throw new Error("Could not retrieve conversation ID.");
+            }
+
+            toast.success("Opening conversation...");
+            console.log("Navigating to:", `/dashboard/messages/${conversationId}`);
+            navigate(`/dashboard/messages/${conversationId}`);
+
+        } catch (err) {
+            console.error("Failed to create inquiry:", err);
+
+            // More detailed error handling
+            if (err instanceof Error) {
+                toast.error(`Error: ${err.message}`);
+            } else if (typeof err === 'object' && err !== null) {
+                const errorObj = err as any;
+                if (errorObj.response?.data?.message) {
+                    toast.error(`Server error: ${errorObj.response.data.message}`);
+                } else if (errorObj.message) {
+                    toast.error(`Error: ${errorObj.message}`);
+                } else {
+                    toast.error("Could not start conversation. Please try again.");
+                }
+            } else {
+                toast.error("Could not start conversation. Please try again.");
+            }
+        }
+    };
+
+
     const handleFavoriteToggle = async () => {
         if (!property) return;
-        
+
         try {
             if (isFavorite(property.id)) {
                 await removeFromFavorites(property.id);
@@ -51,7 +129,7 @@ export function PropertyDetailsPage() {
 
     const getAmenitiesList = (amenities: any) => {
         if (!amenities || typeof amenities !== 'object') return [];
-        
+
         const amenityLabels: Record<string, string> = {
             parking: 'Parking',
             gym: 'Gym',
@@ -93,8 +171,8 @@ export function PropertyDetailsPage() {
                         <AlertDescription>
                             Property not found or failed to load.
                         </AlertDescription>
-                        <Button 
-                            variant="outline" 
+                        <Button
+                            variant="outline"
                             className="mt-4"
                             onClick={() => navigate('/properties')}
                         >
@@ -113,18 +191,18 @@ export function PropertyDetailsPage() {
             <div className="container mx-auto px-4 py-6">
                 {/* Breadcrumb */}
                 <div className="text-sm text-muted-foreground mb-4">
-                    <Button 
-                        variant="ghost" 
-                        size="sm" 
+                    <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => navigate('/properties')}
                         className="p-0 h-auto font-normal"
                     >
                         Properties
                     </Button>
                     {" > "}
-                    <Button 
-                        variant="ghost" 
-                        size="sm" 
+                    <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => navigate(`/properties?city=${property.city}`)}
                         className="p-0 h-auto font-normal"
                     >
@@ -155,9 +233,9 @@ export function PropertyDetailsPage() {
                                 onClick={handleFavoriteToggle}
                                 className="hover:bg-red-50"
                             >
-                                <Icon 
-                                    icon={isFavorite(property.id) ? "solar:heart-bold" : "solar:heart-linear"} 
-                                    className={`size-6 ${isFavorite(property.id) ? 'text-red-500' : 'text-gray-400'}`} 
+                                <Icon
+                                    icon={isFavorite(property.id) ? "solar:heart-bold" : "solar:heart-linear"}
+                                    className={`size-6 ${isFavorite(property.id) ? 'text-red-500' : 'text-gray-400'}`}
                                 />
                             </Button>
                         </div>
@@ -209,6 +287,7 @@ export function PropertyDetailsPage() {
                     {/* Action Buttons */}
                     <div className="flex flex-col gap-3 lg:w-64">
                         <Button
+                            onClick={handleContactOwnerClick}
                             size="lg"
                             className="w-full shadow-lg shadow-primary/20"
                         >
@@ -220,9 +299,9 @@ export function PropertyDetailsPage() {
                                 variant="outline"
                                 onClick={handleFavoriteToggle}
                             >
-                                <Icon 
-                                    icon={isFavorite(property.id) ? "solar:heart-bold" : "solar:heart-linear"} 
-                                    className={`size-4 mr-2 ${isFavorite(property.id) ? 'text-red-500' : ''}`} 
+                                <Icon
+                                    icon={isFavorite(property.id) ? "solar:heart-bold" : "solar:heart-linear"}
+                                    className={`size-4 mr-2 ${isFavorite(property.id) ? 'text-red-500' : ''}`}
                                 />
                                 {isFavorite(property.id) ? 'Saved' : 'Save'}
                             </Button>
@@ -263,7 +342,7 @@ export function PropertyDetailsPage() {
                     <TabsContent value="contact" className="space-y-6">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <PropertyContact property={property} />
-                            
+
                             {/* Property Stats */}
                             <PropertyStats propertyId={property.id} />
                         </div>

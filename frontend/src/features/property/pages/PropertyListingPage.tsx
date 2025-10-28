@@ -71,41 +71,76 @@ export function PropertyListingPage() {
     };
 
     const handleContactOwnerClick = async () => {
+        console.log("Contact Owner button clicked");
+
         if (!authState.isAuthenticated || !authState.user?.email) {
+            console.log("User not authenticated, redirecting to login");
             toast.info("Please log in to contact the owner.");
             navigate('/login');
             return;
         }
 
         if (!property || !property.id) {
+            console.log("Property not available:", property);
             toast.error("Property details not available. Please refresh the page.");
             return;
         }
 
         try {
+            console.log("Creating inquiry for property:", property.id);
             const defaultMessage = `I'm interested in your property: "${property.title}".`;
 
-            const inquiryResponse = await api.createInquiry({
+            const inquiryData = {
                 property_id: property.id,
                 message: defaultMessage,
                 name: authState.user.first_name || authState.user.firstName || "Interested Buyer",
                 email: authState.user.email,
                 inquirer_id: authState.user.id,
-            });
+            };
+
+            console.log("Inquiry data:", inquiryData);
+
+            const inquiryResponse = await api.createInquiry(inquiryData);
+            console.log("Inquiry response:", inquiryResponse);
+
+            if (!inquiryResponse || !inquiryResponse.data) {
+                throw new Error("Invalid response from server");
+            }
 
             const inquiry = inquiryResponse.data.inquiry;
+            if (!inquiry) {
+                throw new Error("No inquiry data in response");
+            }
+
             const conversationId = inquiry.conversation_id;
+            console.log("Conversation ID:", conversationId);
 
             if (!conversationId) {
                 throw new Error("Could not retrieve conversation ID.");
             }
 
             toast.success("Opening conversation...");
+            console.log("Navigating to:", `/dashboard/messages/${conversationId}`);
             navigate(`/dashboard/messages/${conversationId}`);
 
         } catch (err) {
             console.error("Failed to create inquiry:", err);
-            toast.error("Could not start conversation. Please try again.");
+
+            // More detailed error handling
+            if (err instanceof Error) {
+                toast.error(`Error: ${err.message}`);
+            } else if (typeof err === 'object' && err !== null) {
+                const errorObj = err as any;
+                if (errorObj.response?.data?.message) {
+                    toast.error(`Server error: ${errorObj.response.data.message}`);
+                } else if (errorObj.message) {
+                    toast.error(`Error: ${errorObj.message}`);
+                } else {
+                    toast.error("Could not start conversation. Please try again.");
+                }
+            } else {
+                toast.error("Could not start conversation. Please try again.");
+            }
         }
     };
 

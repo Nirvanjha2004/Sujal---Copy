@@ -27,7 +27,7 @@ class PropertyImageService {
 
       // Create form data for upload
       const formData = new FormData();
-      formData.append('image', optimizedFile);
+      formData.append('images', optimizedFile); // Use 'images' to match backend middleware
       formData.append('property_id', propertyId.toString());
       formData.append('image_type', imageType);
       if (caption) {
@@ -69,23 +69,38 @@ class PropertyImageService {
         throw new Error(`Cannot upload more than ${this.MAX_IMAGES_PER_PROPERTY} images per property`);
       }
 
-      // Upload images sequentially to avoid overwhelming the server
-      const uploadedImages: PropertyImage[] = [];
+      // Create form data for bulk upload
+      const formData = new FormData();
       
-      for (let i = 0; i < imageFiles.length; i++) {
-        const file = imageFiles[i];
-        try {
-          const uploadedImage = await this.uploadPropertyImage(
-            propertyId, 
-            file, 
-            imageType,
-            `Image ${existingImages.length + i + 1}`
-          );
-          uploadedImages.push(uploadedImage);
-        } catch (error: any) {
-          console.error(`Failed to upload image ${file.name}:`, error);
-          // Continue with other images even if one fails
-        }
+      // Add all images to the same form data with the field name 'images'
+      imageFiles.forEach((file) => {
+        formData.append('images', file);
+      });
+      
+      // Add metadata
+      formData.append('property_id', propertyId.toString());
+      formData.append('image_type', imageType);
+
+      // Upload using fetch directly since we need to send FormData
+      const response = await this.uploadMultipleImageFiles(formData, propertyId);
+      
+      // Transform response to PropertyImage array
+      const uploadedImages: PropertyImage[] = [];
+      if (response.successful && Array.isArray(response.successful)) {
+        response.successful.forEach((imageData: any, index: number) => {
+          uploadedImages.push({
+            id: imageData.imageId || imageData.id,
+            propertyId: propertyId,
+            url: imageData.url || imageData.image_url,
+            thumbnailUrl: imageData.thumbnailUrl || imageData.thumbnail_url,
+            alt: `Property ${propertyId} image ${index + 1}`,
+            caption: `Image ${existingImages.length + index + 1}`,
+            order: existingImages.length + index,
+            isPrimary: index === 0 && existingImages.length === 0,
+            uploadedAt: new Date().toISOString(),
+            imageType: imageType
+          });
+        });
       }
 
       return uploadedImages;
@@ -244,7 +259,33 @@ class PropertyImageService {
     // Get auth token
     const token = localStorage.getItem('token');
     
-    const response = await fetch(`${API_BASE_URL}/upload/properties/${propertyId}/images`, {
+    const response = await fetch(`${API_BASE_URL}/uploads/properties/${propertyId}/images`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result.data || result;
+  }
+
+  /**
+   * Upload multiple image files using fetch
+   */
+  private async uploadMultipleImageFiles(formData: FormData, propertyId: number): Promise<any> {
+    const API_BASE_URL = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3001/api/v1';
+    
+    // Get auth token
+    const token = localStorage.getItem('token');
+    
+    const response = await fetch(`${API_BASE_URL}/uploads/properties/${propertyId}/images/bulk`, {
       method: 'POST',
       body: formData,
       headers: {

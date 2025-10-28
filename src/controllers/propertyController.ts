@@ -5,6 +5,7 @@ import { Property, PropertyType, ListingType, PropertyStatus } from '../models/P
 import { PropertyImage } from '../models/PropertyImage';
 import { Op } from 'sequelize';
 import { body, query, param, validationResult } from 'express-validator';
+import { transformPropertiesWithImages } from '../utils/imageUtils';
 
 class PropertyController {
   private propertyService: PropertyService;

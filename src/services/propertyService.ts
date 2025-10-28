@@ -2,6 +2,7 @@ import { Property, PropertyType, ListingType, PropertyStatus } from '../models/P
 import { PropertyImage } from '../models/PropertyImage';
 import { User } from '../models/User';
 import { Op, WhereOptions, Order } from 'sequelize';
+import { transformPropertiesWithImages, transformPropertyWithImages } from '../utils/imageUtils';
 import RedisConnection from '../config/redis';
 import CacheService from './cacheService';
 
@@ -169,7 +170,7 @@ class PropertyService {
             // Cache the result
             await this.cacheService.cachePropertyDetails(id, property.toJSON());
 
-            return property;
+            return transformPropertyWithImages(property);
         } catch (error) {
             console.error('Error fetching property:', error);
             throw error;
@@ -577,7 +578,7 @@ class PropertyService {
             }
 
             const result = {
-                data: rows,
+                data: transformPropertiesWithImages(rows),
                 pagination: {
                     page,
                     limit,
@@ -637,7 +638,7 @@ class PropertyService {
             const totalPages = Math.ceil(count / limit);
 
             return {
-                data: rows,
+                data: transformPropertiesWithImages(rows),
                 pagination: {
                     page,
                     limit,
@@ -712,7 +713,7 @@ class PropertyService {
             // Cache for 30 minutes
             await this.redis.setEx(cacheKey, 1800, JSON.stringify(properties));
 
-            return properties;
+            return transformPropertiesWithImages(properties);
         } catch (error) {
             console.error('Error fetching featured properties:', error);
             throw error;

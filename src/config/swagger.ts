@@ -196,7 +196,7 @@ const swaggerDefinition: SwaggerDefinition = {
           },
           propertyType: {
             type: 'string',
-            enum: ['apartment', 'house', 'commercial', 'land'],
+            enum: ['apartment', 'house', 'villa', 'plot', 'commercial', 'land'],
             example: 'apartment',
           },
           listingType: {

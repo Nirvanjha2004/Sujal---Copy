@@ -178,8 +178,8 @@ router.post(
   (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
-      message: 'Image upload routes are handled by /api/upload/properties/:propertyId/images',
-      redirectTo: '/api/upload/properties/' + req.params.id + '/images'
+      message: 'Image upload routes are handled by /api/uploads/properties/:propertyId/images',
+      redirectTo: '/api/uploads/properties/' + req.params.id + '/images'
     });
   }
 );

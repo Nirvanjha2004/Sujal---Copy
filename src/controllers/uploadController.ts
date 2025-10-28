@@ -113,6 +113,8 @@ export class UploadController {
         return;
       }
 
+      console.log("The files are", files);
+
       const result = await ImageService.processBulkPropertyImages(
         parseInt(propertyId),
         files,
@@ -124,6 +126,7 @@ export class UploadController {
           quality: 85
         }
       );
+      console.log("The image result is", result);
 
       res.status(201).json({
         success: true,

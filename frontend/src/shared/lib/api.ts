@@ -392,11 +392,11 @@ export const api = {
   },
 
   getPropertyImages: (propertyId: number): Promise<{ data: { images: PropertyImage[] } }> => {
-    return apiRequest(`/upload/properties/${propertyId}/images`);
+    return apiRequest(`/uploads/properties/${propertyId}/images`);
   },
 
   deletePropertyImage: (propertyId: number, imageId: number): Promise<void> => {
-    return apiRequest(`/upload/images/${imageId}`, {
+    return apiRequest(`/uploads/images/${imageId}`, {
       method: 'DELETE',
     });
   },

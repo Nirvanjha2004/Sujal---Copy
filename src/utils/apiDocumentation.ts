@@ -119,7 +119,7 @@ export const exampleImplementation = {
     },
     propertyCreation: {
       title: 'string.min(5).max(255).required()',
-      propertyType: 'string.valid("apartment", "house", "commercial", "land").required()',
+      propertyType: 'string.valid("apartment", "house", "villa", "plot", "commercial", "land").required()',
       price: 'number.positive().required()',
       address: 'string.min(10).max(500).required()',
       city: 'string.min(2).max(100).required()',

@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
 import { ErrorBoundary } from '@/shared/components/layout/ErrorBoundary'
 import { ProtectedRoute } from '@/features/auth/components/guards/ProtectedRoute'
+import { Toaster } from 'sonner'
 import { RealEstateLandingPage } from './components/landing/RealEstateLandingPage2'
 import { PropertyDetailsPage } from '@/features/property/pages'
 import { PropertyListingGrid } from '@/features/property/pages/PropertyListingGrid'
@@ -213,6 +214,7 @@ function App() {
                     />
                 </Routes>
             </div>
+            <Toaster position="top-right" richColors />
         </ErrorBoundary>
     )
 }

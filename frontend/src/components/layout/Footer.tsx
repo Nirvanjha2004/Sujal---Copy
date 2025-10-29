@@ -45,7 +45,7 @@ export function Footer() {
               <li><a href="#" className="hover:text-white">Naukri.com - Jobs in India</a></li>
               <li><a href="#" className="hover:text-white">Naukrigulf.com - Jobs in middle east</a></li>
               <li><a href="#" className="hover:text-white">Jeevansathi.com - Matrimony</a></li>
-              <li><a href="#" className="hover:text-white">99acres.com - Professional Networking</a></li>
+              <li><a href="#" className="hover:text-white">PropPortal.com - Professional Networking</a></li>
               <li><a href="#" className="hover:text-white">Policybazaar.com - Education</a></li>
               <li><a href="#" className="hover:text-white">Career Info</a></li>
               <li><a href="#" className="hover:text-white">Policybazaar.com - Insurance BFSI</a></li>

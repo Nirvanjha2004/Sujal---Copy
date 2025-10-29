@@ -2,7 +2,7 @@
 
 ## Overview
 
-This design document outlines the enhancement of the real estate platform's internal pages (dashboards, profiles, and other user interfaces) to achieve a modern, professional SaaS-like design. The design maintains consistency with the existing 99acres-inspired landing page while creating a distinctive, brandable identity suitable for a scalable SaaS platform.
+This design document outlines the enhancement of the real estate platform's internal pages (dashboards, profiles, and other user interfaces) to achieve a modern, professional SaaS-like design. The design maintains consistency with the existing PropPortal-inspired landing page while creating a distinctive, brandable identity suitable for a scalable SaaS platform.
 
 The enhancement focuses on:
 - Consistent design system based on existing landing page patterns

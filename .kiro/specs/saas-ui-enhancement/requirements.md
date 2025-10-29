@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The current real estate platform has a solid foundation with landing pages, property listings, and basic dashboard functionality. However, the internal pages (dashboards, profile pages, and other user-facing interfaces) need enhancement to achieve a modern, professional SaaS-like design that maintains visual consistency with the existing 99acres-inspired landing page. The goal is to create a cohesive, scalable design system that feels professional and brandable while preserving all existing functionality.
+The current real estate platform has a solid foundation with landing pages, property listings, and basic dashboard functionality. However, the internal pages (dashboards, profile pages, and other user-facing interfaces) need enhancement to achieve a modern, professional SaaS-like design that maintains visual consistency with the existing PropPortal-inspired landing page. The goal is to create a cohesive, scalable design system that feels professional and brandable while preserving all existing functionality.
 
 ## Requirements
 
@@ -107,11 +107,11 @@ The current real estate platform has a solid foundation with landing pages, prop
 
 ### Requirement 10
 
-**User Story:** As a user, I want the overall platform to maintain the 99acres-inspired branding while having its own distinct, professional identity suitable for a SaaS platform.
+**User Story:** As a user, I want the overall platform to maintain the PropPortal-inspired branding while having its own distinct, professional identity suitable for a SaaS platform.
 
 #### Acceptance Criteria
 
-1. WHEN using the platform THEN the system SHALL maintain familiar layout patterns from 99acres while having unique branding elements
-2. WHEN viewing any page THEN the system SHALL use a consistent color scheme that differentiates from 99acres but maintains professionalism
+1. WHEN using the platform THEN the system SHALL maintain familiar layout patterns from PropPortal while having unique branding elements
+2. WHEN viewing any page THEN the system SHALL use a consistent color scheme that differentiates from PropPortal but maintains professionalism
 3. WHEN interacting with the platform THEN the system SHALL feel like a cohesive, branded SaaS product rather than a clone
 4. WHEN comparing to competitors THEN the system SHALL have a distinctive visual identity that stands out in the market

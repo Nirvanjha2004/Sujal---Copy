@@ -713,7 +713,7 @@ export function PropertyListingPage() {
                             <div className="space-y-2">
                                 <p className="text-sm text-gray-300">Toll Free - 1800 41 99099</p>
                                 <p className="text-sm text-gray-300">9:30 AM to 6:30 PM (Mon-Sun)</p>
-                                <p className="text-sm text-gray-300">Email - feedback@99acres.com</p>
+                                <p className="text-sm text-gray-300">Email - feedback@PropPortal.com</p>
                                 <p className="text-sm text-gray-300">Connect with us</p>
                                 <div className="flex gap-3 mt-4">
                                     <Icon

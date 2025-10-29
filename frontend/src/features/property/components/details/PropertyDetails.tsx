@@ -252,10 +252,10 @@ export const PropertyDetails: React.FC<PropertyDetailsProps> = ({
 
       {/* Property Details Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="features">Features & Amenities</TabsTrigger>
-          <TabsTrigger value="contact">Contact</TabsTrigger>
+          {/* <TabsTrigger value="contact">Contact</TabsTrigger> */}
         </TabsList>
 
         <TabsContent value="overview" className="mt-6">

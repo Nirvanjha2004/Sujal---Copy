@@ -115,7 +115,7 @@ export function PropertyGallery({
             </Button>
 
             {/* Navigation Arrows for Main Image */}
-            {displayImages.length > 1 && (
+            {/* {displayImages.length > 1 && (
               <>
                 <Button
                   size="icon"
@@ -140,7 +140,7 @@ export function PropertyGallery({
                   <Icon icon="solar:arrow-right-bold" className="size-5" />
                 </Button>
               </>
-            )}
+            )} */}
 
             {/* Image Counter */}
             <div className="absolute bottom-2 left-2 bg-black/50 text-white px-2 py-1 rounded text-sm">
@@ -228,7 +228,7 @@ export function PropertyGallery({
             </Button>
 
             {/* Navigation Buttons */}
-            {displayImages.length > 1 && (
+            {/* {displayImages.length > 1 && (
               <>
                 <Button
                   size="icon"
@@ -253,7 +253,7 @@ export function PropertyGallery({
                   <Icon icon="solar:arrow-right-bold" className="size-6" />
                 </Button>
               </>
-            )}
+            )} */}
 
             {/* Image Counter */}
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">

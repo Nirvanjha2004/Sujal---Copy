@@ -56,9 +56,19 @@ router.get('/public', projectController.getPublicProjects);
 router.get('/public/recent', projectController.getRecentProjects);
 router.get('/public/:id', projectController.getPublicProjectById);
 
+// Debug middleware to log all requests
+router.use((req, res, next) => {
+  console.log(`🔍 Project Route Debug: ${req.method} ${req.path}`);
+  console.log('🔍 Full URL:', req.originalUrl);
+  next();
+});
+
 // --- Project Routes ---
 router.get('/', authenticate, projectController.getBuilderProjects);
 router.post('/', authenticate, ProjectController.createProjectValidation, projectController.createProject);
+
+// --- Stats Route (must be before /:id route) ---
+router.get('/stats', authenticate, projectController.getProjectStats);
 
 router.get('/:id', authenticate, projectController.getProjectById);
 router.put('/:id', authenticate, projectController.updateProject);
@@ -80,8 +90,7 @@ router.delete('/:projectId/units/:unitId', authenticate, projectController.delet
 router.post('/:projectId/images', authenticate, uploadImages.array('images', 10), projectController.uploadProjectImages);
 router.delete('/:projectId/images/:imageId', authenticate, projectController.deleteProjectImage);
 
-// --- Stats Route ---
-router.get('/stats', authenticate, projectController.getProjectStats);
+
 
 
 export default router;

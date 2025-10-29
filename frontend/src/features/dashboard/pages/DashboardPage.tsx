@@ -49,24 +49,91 @@ export function DashboardPage() {
     rentedListings: 0
   });
 
-  const [recentProjects] = useState<Project[]>([]);
+  const [recentProjects, setRecentProjects] = useState<Project[]>([]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setIsLoading(true);
         if (user?.role === 'builder') {
-          // Fetch builder-specific data
-          // Mock data for now - replace with actual API calls when available
-          setStats(prev => ({
-            ...prev,
-            totalProjects: 5,
-            activeProjects: 3,
-            unitsListed: 150,
-            unitsAvailable: 89,
-            totalInquiries: 47,
-            messages: 23
-          }));
+          // Fetch builder-specific data from real APIs
+          try {
+            const [projectStatsResponse, projectsResponse, inquiriesResponse, messagesResponse] = await Promise.all([
+              api.projects.getProjectStats().catch(() => ({ 
+                success: false, 
+                data: { 
+                  totalProjects: 0, 
+                  activeProjects: 0, 
+                  totalUnits: 0, 
+                  soldUnits: 0, 
+                  availableUnits: 0, 
+                  blockedUnits: 0 
+                } 
+              })),
+              api.projects.getBuilderProjects({ limit: 5 }).catch(() => ({ 
+                success: false, 
+                data: { 
+                  projects: [], 
+                  pagination: { page: 1, limit: 5, total: 0, totalPages: 0 } 
+                } 
+              })),
+              api.communication.getInquiries({ limit: 100 }).catch(() => ({ 
+                data: [], 
+                total: 0 
+              })),
+              api.communication.getUnreadCount().catch(() => ({ 
+                data: { unread_count: 0 } 
+              }))
+            ]);
+
+            const projectStats = projectStatsResponse.data;
+            const projects = projectsResponse.data.projects || [];
+            const inquiries = inquiriesResponse.data || [];
+            const unreadMessages = messagesResponse.data?.unread_count || 0;
+
+            console.log('Builder Dashboard Data:', {
+              projectStats,
+              projectsCount: projects.length,
+              inquiriesCount: Array.isArray(inquiries) ? inquiries.length : 0,
+              unreadMessages
+            });
+
+            // Update recent projects state with safety checks
+            const formattedProjects = projects.map(project => ({
+              id: project.id,
+              name: project.name || 'Unnamed Project',
+              location: `${project.city || 'Unknown'}, ${project.state || 'Unknown'}`,
+              phase: (project.status || 'planning').replace('_', ' ').toLowerCase(),
+              units: project.total_units || 0,
+              sold: project.sold_units || 0,
+              status: project.status || 'planning'
+            }));
+
+            setStats(prev => ({
+              ...prev,
+              totalProjects: projectStats.totalProjects,
+              activeProjects: projectStats.activeProjects,
+              unitsListed: projectStats.totalUnits,
+              unitsAvailable: projectStats.availableUnits,
+              totalInquiries: Array.isArray(inquiries) ? inquiries.length : (inquiriesResponse.total || 0),
+              messages: unreadMessages
+            }));
+
+            // Update recent projects
+            setRecentProjects(formattedProjects);
+          } catch (error) {
+            console.error('Failed to fetch builder dashboard data:', error);
+            // Fallback to default values
+            setStats(prev => ({
+              ...prev,
+              totalProjects: 0,
+              activeProjects: 0,
+              unitsListed: 0,
+              unitsAvailable: 0,
+              totalInquiries: 0,
+              messages: 0
+            }));
+          }
         } else if (['owner', 'agent'].includes(user?.role || '')) {
           // Fetch owner/agent specific data
           try {

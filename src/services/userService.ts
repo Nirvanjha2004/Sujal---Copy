@@ -32,7 +32,7 @@ class UserService {
    */
   async getUserProfile(userId: number): Promise<Omit<User, 'password_hash'>> {
     const user = await User.findByPk(userId);
-    
+
     if (!user) {
       throw new Error('User not found');
     }
@@ -49,7 +49,7 @@ class UserService {
    */
   async updateProfile(userId: number, updateData: UpdateProfileData): Promise<Omit<User, 'password_hash'>> {
     const user = await User.findByPk(userId);
-    
+
     if (!user) {
       throw new Error('User not found');
     }
@@ -58,8 +58,8 @@ class UserService {
       throw new Error('User account is deactivated');
     }
 
-    // Validate phone if provided
-    if (updateData.phone && !User.validatePhone(updateData.phone)) {
+    // Validate phone if provided and not empty
+    if (updateData.phone && updateData.phone.trim() !== '' && !User.validatePhone(updateData.phone)) {
       throw new Error('Invalid phone number format');
     }
 
@@ -87,7 +87,7 @@ class UserService {
    */
   async changePassword(userId: number, passwordData: ChangePasswordData): Promise<void> {
     const user = await User.findByPk(userId);
-    
+
     if (!user) {
       throw new Error('User not found');
     }
@@ -120,7 +120,7 @@ class UserService {
    */
   async activateAccount(userId: number): Promise<void> {
     const user = await User.findByPk(userId);
-    
+
     if (!user) {
       throw new Error('User not found');
     }
@@ -134,7 +134,7 @@ class UserService {
    */
   async deactivateAccount(userId: number): Promise<void> {
     const user = await User.findByPk(userId);
-    
+
     if (!user) {
       throw new Error('User not found');
     }
@@ -203,7 +203,7 @@ class UserService {
     // Generate and store OTP for password reset
     const otp = authService.generateOTP();
     const resetKey = `password_reset:${email}`;
-    
+
     try {
       await this.redis.setEx(resetKey, 10 * 60, otp); // 10 minutes expiration
     } catch (error) {
@@ -220,7 +220,7 @@ class UserService {
    */
   async resetPassword(resetData: ResetPasswordData): Promise<void> {
     const resetKey = `password_reset:${resetData.email}`;
-    
+
     try {
       // Verify OTP
       const storedOTP = await this.redis.get(resetKey);
@@ -272,7 +272,7 @@ class UserService {
     totalPages: number;
   }> {
     const offset = (page - 1) * limit;
-    
+
     const { count, rows } = await User.findAndCountAll({
       limit,
       offset,
@@ -292,7 +292,7 @@ class UserService {
    */
   async updateUserRole(userId: number, newRole: UserRole): Promise<Omit<User, 'password_hash'>> {
     const user = await User.findByPk(userId);
-    
+
     if (!user) {
       throw new Error('User not found');
     }
@@ -315,7 +315,7 @@ class UserService {
    */
   async deleteUser(userId: number): Promise<void> {
     const user = await User.findByPk(userId);
-    
+
     if (!user) {
       throw new Error('User not found');
     }

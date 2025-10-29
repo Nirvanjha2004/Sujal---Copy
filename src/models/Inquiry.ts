@@ -185,7 +185,7 @@ export class Inquiry extends Model {
       throw new Error('Message must be between 10 and 1000 characters');
     }
 
-    if (instance.phone && !Inquiry.validatePhone(instance.phone)) {
+    if (instance.phone && instance.phone.trim() !== '' && !Inquiry.validatePhone(instance.phone)) {
       throw new Error('Invalid phone number format');
     }
 

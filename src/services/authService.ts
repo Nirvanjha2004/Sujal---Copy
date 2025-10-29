@@ -137,8 +137,8 @@ class AuthService {
       throw new Error('Invalid email format');
     }
 
-    // Validate phone if provided
-    if (userData.phone && !User.validatePhone(userData.phone)) {
+    // Validate phone if provided and not empty
+    if (userData.phone && userData.phone.trim() !== '' && !User.validatePhone(userData.phone)) {
       throw new Error('Invalid phone number format');
     }
 

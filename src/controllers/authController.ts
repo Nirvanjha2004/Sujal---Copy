@@ -1,110 +1,13 @@
 import { Request, Response } from 'express';
-import { body, validationResult } from 'express-validator';
+import { validationResult } from 'express-validator';
 import authService, { LoginCredentials, RegisterData } from '../services/authService';
 import userService from '../services/userService';
-import { UserRole } from '../models/User';
 import { AuthenticatedRequest } from '../middleware/auth';
 
 class AuthController {
-  /**
-   * Validation rules for user registration
-   */
-  static registerValidation = [
-    body('email')
-      .isEmail()
-      .normalizeEmail()
-      .withMessage('Valid email is required'),
-    body('password')
-      .isLength({ min: 8 })
-      .withMessage('Password must be at least 8 characters long')
-      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-      .withMessage('Password must contain at least one lowercase letter, one uppercase letter, and one number'),
-    body('firstName')
-      .trim()
-      .isLength({ min: 2, max: 50 })
-      .withMessage('First name must be between 2 and 50 characters'),
-    body('lastName')
-      .trim()
-      .isLength({ min: 2, max: 50 })
-      .withMessage('Last name must be between 2 and 50 characters'),
-    body('phone')
-      .optional({ nullable: true, checkFalsy: true })
-      .custom((value) => {
-        if (!value || value.trim() === '') {
-          return true; // Allow empty values
-        }
-        // Clean the phone number (remove non-digits)
-        const cleanPhone = value.replace(/\D/g, '');
-        // Check if it's a valid 10-digit Indian mobile number
-        if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
-          throw new Error('Invalid phone number format');
-        }
-        return true;
-      }),
-    body('role')
-      .isIn(Object.values(UserRole))
-      .withMessage('Invalid user role'),
-  ];
 
-  /**
-   * Validation rules for user login
-   */
-  static loginValidation = [
-    body('email')
-      .isEmail()
-      .normalizeEmail()
-      .withMessage('Valid email is required'),
-    body('password')
-      .notEmpty()
-      .withMessage('Password is required'),
-  ];
 
-  /**
-   * Validation rules for password reset request
-   */
-  static forgotPasswordValidation = [
-    body('email')
-      .isEmail()
-      .normalizeEmail()
-      .withMessage('Valid email is required'),
-  ];
 
-  /**
-   * Validation rules for password reset
-   */
-  static resetPasswordValidation = [
-    body('token')
-      .notEmpty()
-      .withMessage('Reset token is required'),
-    body('password')
-      .isLength({ min: 8 })
-      .withMessage('Password must be at least 8 characters long')
-      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-      .withMessage('Password must contain at least one lowercase letter, one uppercase letter, and one number'),
-  ];
-
-  /**
-   * Validation rules for token refresh
-   */
-  static refreshTokenValidation = [
-    body('refreshToken')
-      .notEmpty()
-      .withMessage('Refresh token is required'),
-  ];
-
-  /**
-   * Validation rules for email verification
-   */
-  static verifyEmailValidation = [
-    body('email')
-      .isEmail()
-      .normalizeEmail()
-      .withMessage('Valid email is required'),
-    body('otp')
-      .isLength({ min: 6, max: 6 })
-      .isNumeric()
-      .withMessage('OTP must be a 6-digit number'),
-  ];
 
   /**
    * Register a new user

@@ -1,6 +1,7 @@
 import { User, UserRole } from '../models/User';
 import authService from './authService';
 import RedisConnection from '../config/redis';
+import emailService from './emailService';
 
 export interface UpdateProfileData {
   firstName?: string;
@@ -183,8 +184,17 @@ class UserService {
     const otp = authService.generateOTP();
     await authService.storeOTP(email, otp);
 
-    // TODO: Send email with OTP (will be implemented in email service)
-    console.log(`Verification OTP for ${email}: ${otp}`);
+    try {
+      // Send verification OTP email
+      await emailService.sendVerificationOTP(email, {
+        userName: `${user.first_name} ${user.last_name}`,
+        otp: otp,
+        expirationMinutes: 10
+      });
+    } catch (error) {
+      console.error('Failed to send verification OTP email:', error);
+      throw new Error('Failed to send verification email. Please try again or contact support.');
+    }
   }
 
   /**
@@ -211,8 +221,17 @@ class UserService {
       throw new Error('Failed to initiate password reset');
     }
 
-    // TODO: Send email with reset OTP (will be implemented in email service)
-    console.log(`Password reset OTP for ${email}: ${otp}`);
+    try {
+      // Send password reset OTP email
+      await emailService.sendPasswordResetOTP(email, {
+        userName: `${user.first_name} ${user.last_name}`,
+        otp: otp,
+        expirationMinutes: 10
+      });
+    } catch (error) {
+      console.error('Failed to send password reset OTP email:', error);
+      throw new Error('Failed to send password reset email. Please try again or contact support.');
+    }
   }
 
   /**

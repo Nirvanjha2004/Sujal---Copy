@@ -5,6 +5,7 @@ import { UserRole } from '../models/User';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { getFileUrl, deleteUploadedFile } from '../middleware/upload';
 import path from 'path';
+import { sendErrorResponse, sendSuccessResponse, ValidationError, AuthenticationError } from '../utils/errorResponse';
 
 class UserController {
   /**
@@ -254,39 +255,16 @@ class UserController {
       // Check validation results
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          error: {
-            code: 'VALIDATION_ERROR',
-            message: 'Invalid input data',
-            details: errors.array(),
-          },
-          timestamp: new Date().toISOString(),
-        });
-        return;
+        throw new ValidationError('Invalid input data', errors.array());
       }
 
       const { email } = req.body;
       await userService.initiatePasswordReset(email);
 
-      res.status(200).json({
-        success: true,
-        data: { message: 'Password reset OTP sent to your email' },
-        timestamp: new Date().toISOString(),
-      });
+      sendSuccessResponse(res, { message: 'Password reset OTP sent to your email' });
     } catch (error) {
       console.error('Initiate password reset error:', error);
-      
-      const message = error instanceof Error ? error.message : 'Failed to initiate password reset';
-
-      res.status(400).json({
-        success: false,
-        error: {
-          code: 'INITIATE_PASSWORD_RESET_ERROR',
-          message,
-        },
-        timestamp: new Date().toISOString(),
-      });
+      sendErrorResponse(res, error instanceof Error ? error : new Error('Failed to initiate password reset'));
     }
   }
 
@@ -298,16 +276,7 @@ class UserController {
       // Check validation results
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          error: {
-            code: 'VALIDATION_ERROR',
-            message: 'Invalid input data',
-            details: errors.array(),
-          },
-          timestamp: new Date().toISOString(),
-        });
-        return;
+        throw new ValidationError('Invalid input data', errors.array());
       }
 
       const resetData: ResetPasswordData = {
@@ -318,24 +287,10 @@ class UserController {
 
       await userService.resetPassword(resetData);
 
-      res.status(200).json({
-        success: true,
-        data: { message: 'Password reset successfully' },
-        timestamp: new Date().toISOString(),
-      });
+      sendSuccessResponse(res, { message: 'Password reset successfully' });
     } catch (error) {
       console.error('Reset password error:', error);
-      
-      const message = error instanceof Error ? error.message : 'Failed to reset password';
-
-      res.status(400).json({
-        success: false,
-        error: {
-          code: 'RESET_PASSWORD_ERROR',
-          message,
-        },
-        timestamp: new Date().toISOString(),
-      });
+      sendErrorResponse(res, error instanceof Error ? error : new Error('Failed to reset password'));
     }
   }
 

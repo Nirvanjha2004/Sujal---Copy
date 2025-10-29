@@ -2,7 +2,9 @@ import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import authService, { LoginCredentials, RegisterData } from '../services/authService';
 import userService from '../services/userService';
+import emailService from '../services/emailService';
 import { AuthenticatedRequest } from '../middleware/auth';
+import { sendErrorResponse, sendSuccessResponse, isEmailDeliveryError, handleEmailDeliveryError, ValidationError } from '../utils/errorResponse';
 
 class AuthController {
 
@@ -18,16 +20,7 @@ class AuthController {
       console.log("The response reached here", req.body)
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          error: {
-            code: 'VALIDATION_ERROR',
-            message: 'Invalid input data',
-            details: errors.array(),
-          },
-          timestamp: new Date().toISOString(),
-        });
-        return;
+        throw new ValidationError('Invalid input data', errors.array());
       }
 
       const registerData: RegisterData = {
@@ -47,32 +40,34 @@ class AuthController {
       const otp = authService.generateOTP();
       await authService.storeOTP(result.user.email, otp);
 
-      // TODO: Send email with OTP (will be implemented in email service)
-      console.log(`Verification OTP for ${result.user.email}: ${otp}`);
+      // Send verification OTP via email
+      try {
+        await emailService.sendVerificationOTP(result.user.email, {
+          userName: `${result.user.first_name} ${result.user.last_name}`,
+          otp: otp,
+          expirationMinutes: 10
+        });
 
-      res.status(201).json({
-        success: true,
-        data: {
+        sendSuccessResponse(res, {
           user: result.user,
           tokens: result.tokens,
           message: 'Registration successful. Please verify your email with the OTP sent to your email address.',
-        },
-        timestamp: new Date().toISOString(),
-      });
+        }, 201);
+      } catch (emailError) {
+        console.error('Failed to send verification email:', emailError);
+        
+        sendSuccessResponse(res, {
+          user: result.user,
+          tokens: result.tokens,
+          message: 'Registration successful, but failed to send verification email. Please try resending the verification code.',
+        }, 201, {
+          code: 'EMAIL_DELIVERY_ERROR',
+          message: 'Failed to send verification email. Please try again or contact support.',
+        });
+      }
     } catch (error) {
       console.error('Registration error:', error);
-
-      const message = error instanceof Error ? error.message : 'Registration failed';
-      const statusCode = message.includes('already exists') ? 409 : 400;
-
-      res.status(statusCode).json({
-        success: false,
-        error: {
-          code: 'REGISTRATION_ERROR',
-          message,
-        },
-        timestamp: new Date().toISOString(),
-      });
+      sendErrorResponse(res, error instanceof Error ? error : new Error('Registration failed'));
     }
   }
 
@@ -263,37 +258,15 @@ class AuthController {
       const { email } = req.body;
 
       if (!email) {
-        res.status(400).json({
-          success: false,
-          error: {
-            code: 'VALIDATION_ERROR',
-            message: 'Email is required',
-          },
-          timestamp: new Date().toISOString(),
-        });
-        return;
+        throw new ValidationError('Email is required');
       }
 
       await userService.resendVerificationOTP(email);
 
-      res.status(200).json({
-        success: true,
-        data: { message: 'Verification OTP sent successfully' },
-        timestamp: new Date().toISOString(),
-      });
+      sendSuccessResponse(res, { message: 'Verification OTP sent successfully' });
     } catch (error) {
       console.error('Resend OTP error:', error);
-
-      const message = error instanceof Error ? error.message : 'Failed to send verification OTP';
-
-      res.status(400).json({
-        success: false,
-        error: {
-          code: 'RESEND_OTP_ERROR',
-          message,
-        },
-        timestamp: new Date().toISOString(),
-      });
+      sendErrorResponse(res, error instanceof Error ? error : new Error('Failed to send verification OTP'));
     }
   }
 

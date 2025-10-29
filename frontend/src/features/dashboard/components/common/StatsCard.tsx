@@ -143,7 +143,7 @@ export function StatsCard({
   return (
     <Card 
       className={cn(
-        "group relative overflow-hidden border-0 shadow-sm hover:shadow-md transition-all duration-300 ease-out",
+        "group relative overflow-hidden border-0 shadow-sm hover:shadow-md transition-all duration-300 ease-out h-full",
         "bg-gradient-to-br from-card to-card/50",
         onClick && "cursor-pointer hover:scale-[1.02] active:scale-[0.98]",
         className
@@ -153,8 +153,8 @@ export function StatsCard({
       {/* Subtle background pattern */}
       <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-muted/5" />
       
-      <CardContent className={sizeClasses.card}>
-        <div className="relative flex items-start gap-4">
+      <CardContent className={cn(sizeClasses.card, "h-full flex flex-col justify-between")}>
+        <div className="relative flex items-start gap-4 flex-1">
           {/* Enhanced icon container with animation */}
           <div className={cn(
             "rounded-xl transition-all duration-300 group-hover:scale-110",

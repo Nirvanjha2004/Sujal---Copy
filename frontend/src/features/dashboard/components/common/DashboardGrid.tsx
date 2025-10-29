@@ -51,7 +51,7 @@ export function DashboardGrid({
   };
 
   return (
-    <div className={cn('grid', getGridCols(), getGap(), className)}>
+    <div className={cn('grid items-stretch', getGridCols(), getGap(), className)}>
       {children}
     </div>
   );
@@ -78,7 +78,7 @@ export function GridItem({ children, span = 1, className }: GridItemProps) {
   };
 
   return (
-    <div className={cn(getColSpan(), className)}>
+    <div className={cn(getColSpan(), 'flex', className)}>
       {children}
     </div>
   );

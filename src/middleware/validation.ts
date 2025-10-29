@@ -108,7 +108,7 @@ export const userSchemas = {
       }),
     firstName: Joi.string().min(2).max(50).required(),
     lastName: Joi.string().min(2).max(50).required(),
-    phone: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/).optional(),
+    phone: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/).allow('').optional(),
     role: Joi.string().valid('buyer', 'owner', 'agent', 'builder').required(),
   }),
 
@@ -120,7 +120,7 @@ export const userSchemas = {
   updateProfile: Joi.object({
     firstName: Joi.string().min(2).max(50).optional(),
     lastName: Joi.string().min(2).max(50).optional(),
-    phone: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/).optional(),
+    phone: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/).allow('').optional(),
     profileImage: Joi.string().uri().optional(),
   }),
 
@@ -182,7 +182,7 @@ export const inquirySchemas = {
     propertyId: Joi.number().integer().positive().required(),
     name: Joi.string().min(2).max(100).required(),
     email: Joi.string().email().required(),
-    phone: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/).optional(),
+    phone: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/).allow('').optional(),
     message: Joi.string().min(10).max(1000).required(),
   }),
 

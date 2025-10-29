@@ -294,6 +294,11 @@ export class InquiryService {
     page: number;
     totalPages: number;
   }> {
+    // Validate ownerId
+    if (!ownerId || isNaN(ownerId) || ownerId <= 0) {
+      throw new Error('Invalid owner ID provided');
+    }
+
     const { page = 1, limit = 10, sort = 'created_at', order = 'DESC' } = options;
     const offset = (page - 1) * limit;
 

@@ -3,11 +3,11 @@ import { body, param, query, validationResult } from 'express-validator';
 import inquiryService, { CreateInquiryData, InquiryFilters } from '../services/inquiryService';
 import { InquiryStatus } from '../models/Inquiry';
 import { UserRole } from '../models/User';
-import sequelize from '../config/database'; // 1. Import sequelize instance
+
 
 export interface AuthenticatedRequest extends Request {
   user?: {
-    id: number;
+    userId: number;
     email: string;
     role: UserRole;
   };
@@ -69,7 +69,7 @@ class InquiryController {
 
       // // If user is authenticated, add their ID
       // if (req.user) {
-      //   inquiryData.inquirer_id = req.user.id;
+      //   inquiryData.inquirer_id = req.user.userId;
       // }
 
       // 3. Pass the transaction to the service method
@@ -141,13 +141,25 @@ class InquiryController {
       }
 
       // Role-based filtering
-      if (req.user) {
+      if (req.user && req.user.userId) {
         if (req.user.role === UserRole.BUYER) {
           // Buyers can only see their own inquiries
-          filters.inquirer_id = req.user.id;
+          filters.inquirer_id = req.user.userId;
         } else if ([UserRole.OWNER, UserRole.AGENT, UserRole.BUILDER].includes(req.user.role)) {
           // Property owners/agents/builders see inquiries for their properties
-          const result = await inquiryService.getInquiriesForOwner(req.user.id, options);
+          // Validate that user ID is defined
+          if (!req.user.userId) {
+            res.status(401).json({
+              success: false,
+              error: {
+                code: 'UNAUTHORIZED',
+                message: 'User ID not found in authentication',
+              },
+            });
+            return;
+          }
+
+          const result = await inquiryService.getInquiriesForOwner(req.user.userId, options);
           res.json({
             success: true,
             data: result,
@@ -155,6 +167,18 @@ class InquiryController {
           return;
         }
         // Admins can see all inquiries (no additional filtering)
+      } else {
+        // If no user or user ID, return empty result
+        res.json({
+          success: true,
+          data: {
+            inquiries: [],
+            total: 0,
+            page: options.page,
+            totalPages: 0,
+          },
+        });
+        return;
       }
 
       const result = await inquiryService.getInquiries(filters, options);
@@ -206,10 +230,10 @@ class InquiryController {
 
       // Check permissions
       if (req.user) {
-        const canView = 
+        const canView =
           req.user.role === UserRole.ADMIN ||
-          inquiry.inquirer_id === req.user.id ||
-          inquiry.property?.user_id === req.user.id;
+          inquiry.inquirer_id === req.user.userId ||
+          inquiry.property?.user_id === req.user.userId;
 
         if (!canView) {
           res.status(403).json({
@@ -225,10 +249,10 @@ class InquiryController {
 
       // Mask phone number if not the owner or inquirer
       let maskedInquiry = inquiry.toJSON();
-      if (req.user && 
-          inquiry.inquirer_id !== req.user.id && 
-          inquiry.property?.user_id !== req.user.id &&
-          req.user.role !== UserRole.ADMIN) {
+      if (req.user &&
+        inquiry.inquirer_id !== req.user.userId &&
+        inquiry.property?.user_id !== req.user.userId &&
+        req.user.role !== UserRole.ADMIN) {
         if (maskedInquiry.phone) {
           maskedInquiry.phone = await inquiryService.maskPhoneNumber(maskedInquiry.phone);
         }
@@ -293,7 +317,7 @@ class InquiryController {
         return;
       }
 
-      const userId = req.user.role === UserRole.ADMIN ? undefined : req.user.id;
+      const userId = req.user.role === UserRole.ADMIN ? undefined : req.user.userId;
       const inquiry = await inquiryService.updateInquiryStatus(inquiryId, status, userId);
 
       res.json({
@@ -309,7 +333,7 @@ class InquiryController {
       });
     } catch (error) {
       console.error('Update inquiry status error:', error);
-      
+
       if (error instanceof Error) {
         if (error.message === 'Inquiry not found') {
           res.status(404).json({
@@ -321,7 +345,7 @@ class InquiryController {
           });
           return;
         }
-        
+
         if (error.message === 'Unauthorized to update this inquiry') {
           res.status(403).json({
             success: false,
@@ -384,7 +408,7 @@ class InquiryController {
         return;
       }
 
-      const userId = req.user.role === UserRole.ADMIN ? undefined : req.user.id;
+      const userId = req.user.role === UserRole.ADMIN ? undefined : req.user.userId;
       await inquiryService.deleteInquiry(inquiryId, userId);
 
       res.json({
@@ -393,7 +417,7 @@ class InquiryController {
       });
     } catch (error) {
       console.error('Delete inquiry error:', error);
-      
+
       if (error instanceof Error) {
         if (error.message === 'Inquiry not found') {
           res.status(404).json({
@@ -405,7 +429,7 @@ class InquiryController {
           });
           return;
         }
-        
+
         if (error.message === 'Unauthorized to delete this inquiry') {
           res.status(403).json({
             success: false,
@@ -442,7 +466,7 @@ class InquiryController {
       }
 
       const propertyId = req.query.property_id ? parseInt(req.query.property_id as string) : undefined;
-      
+
       // Only allow property owners/agents/builders to get stats for their properties
       // Admins can get stats for any property
       if (propertyId && req.user.role !== UserRole.ADMIN) {

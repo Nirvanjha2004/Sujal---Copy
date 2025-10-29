@@ -16,12 +16,12 @@ interface BuilderDashboardContentProps {
 }
 
 // Enhanced Project Overview Card Component
-function ProjectOverviewCard({ 
-  project, 
-  onClick 
-}: { 
-  project: Project; 
-  onClick: () => void; 
+function ProjectOverviewCard({
+  project,
+  onClick
+}: {
+  project: Project;
+  onClick: () => void;
 }) {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -61,7 +61,7 @@ function ProjectOverviewCard({
   const completionPercentage = project.units > 0 ? Math.round((project.sold / project.units) * 100) : 0;
 
   return (
-    <Card 
+    <Card
       className="group cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] border-0 bg-gradient-to-br from-card to-card/50"
       onClick={onClick}
     >
@@ -85,7 +85,7 @@ function ProjectOverviewCard({
           </div>
         </div>
       </CardHeader>
-      
+
       <CardContent className="pt-0">
         <div className="space-y-4">
           {/* Project Phase */}
@@ -103,7 +103,7 @@ function ProjectOverviewCard({
               </span>
             </div>
             <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
-              <div 
+              <div
                 className="h-full bg-gradient-to-r from-primary to-primary/80 transition-all duration-500 ease-out"
                 style={{ width: `${completionPercentage}%` }}
               />
@@ -189,10 +189,10 @@ function ProjectStatisticsSection({ stats }: { stats: BuilderDashboardStats }) {
   );
 }
 
-export function BuilderDashboardContent({ 
-  stats, 
-  recentProjects, 
-  isLoading = false 
+export function BuilderDashboardContent({
+  stats,
+  recentProjects,
+  isLoading = false
 }: BuilderDashboardContentProps) {
   const { state: { user } } = useAuth();
   const navigate = useNavigate();
@@ -341,7 +341,7 @@ export function BuilderDashboardContent({
             onClick={() => navigate('/builder/projects')}
           />
         </GridItem>
-        
+
         <GridItem>
           <StatsCard
             title="Units Available"
@@ -358,7 +358,7 @@ export function BuilderDashboardContent({
             onClick={() => navigate('/builder/units')}
           />
         </GridItem>
-        
+
         <GridItem>
           <StatsCard
             title="Project Inquiries"
@@ -373,7 +373,7 @@ export function BuilderDashboardContent({
             }}
           />
         </GridItem>
-        
+
         <GridItem>
           <StatsCard
             title="Unread Messages"

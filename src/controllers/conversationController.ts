@@ -10,7 +10,6 @@ import { UserRole } from '../models/User';
 export interface AuthenticatedRequest extends Request {
   user?: {
     userId: number;
-    id: number;
     email: string;
     role: UserRole;
   };
@@ -60,7 +59,7 @@ class ConversationController {
       const offset = (page - 1) * limit;
 
       // Use userId (which seems to be the correct field based on your JWT)
-      const userId = req.user.userId || req.user.id;
+      const userId = req.user.userId;
 
       console.log('Using userId:', userId);
       
@@ -171,7 +170,7 @@ class ConversationController {
       }
 
       const conversationId = parseInt(req.params.id);
-      const userId = req.user.userId || req.user.id;
+      const userId = req.user.userId;
 
       // Check if user is a participant in this conversation
       const participant = await ConversationParticipant.findOne({

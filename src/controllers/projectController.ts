@@ -55,6 +55,18 @@ class ProjectController {
         return;
       }
 
+      // Validate user ID
+      if (!req.user.userId || isNaN(req.user.userId) || req.user.userId <= 0) {
+        res.status(401).json({
+          success: false,
+          error: {
+            code: 'INVALID_USER',
+            message: 'Invalid user ID in authentication',
+          },
+        });
+        return;
+      }
+
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
       const offset = (page - 1) * limit;
@@ -141,6 +153,18 @@ class ProjectController {
 
       const projectId = parseInt(req.params.id);
       const userId = req.user?.userId;
+
+      // Validate projectId
+      if (isNaN(projectId) || projectId <= 0) {
+        res.status(400).json({
+          success: false,
+          error: {
+            code: 'INVALID_ID',
+            message: 'Invalid project ID',
+          },
+        });
+        return;
+      }
 
       const project = await Project.findOne({
         where: {
@@ -1502,6 +1526,7 @@ class ProjectController {
 
   // Get project statistics
   async getProjectStats(req: ProjectRequest, res: Response): Promise<void> {
+    console.log("Inside the stats function")
     try {
       if (!req.user || req.user.role !== 'builder') {
         res.status(403).json({
@@ -1514,7 +1539,27 @@ class ProjectController {
         return;
       }
 
+      // Validate user ID
+      if (!req.user.userId || isNaN(req.user.userId) || req.user.userId <= 0) {
+        res.status(401).json({
+          success: false,
+          error: {
+            code: 'INVALID_USER',
+            message: 'Invalid user ID in authentication',
+          },
+        });
+        return;
+      }
+
       const builderId = req.user.userId;
+
+      // Get project IDs for this builder first
+      const builderProjects = await Project.findAll({
+        where: { builder_id: builderId },
+        attributes: ['id']
+      });
+
+      const projectIds = builderProjects.map(p => p.id);
 
       const [totalProjects, activeProjects, totalUnits, soldUnits, availableUnits] = await Promise.all([
         Project.count({ where: { builder_id: builderId } }),
@@ -1526,29 +1571,21 @@ class ProjectController {
             }
           }
         }),
-        ProjectUnit.count({
-          include: [{
-            model: Project,
-            as: 'project',
-            where: { builder_id: builderId },
-          }],
-        }),
-        ProjectUnit.count({
-          where: { status: UnitStatus.SOLD },
-          include: [{
-            model: Project,
-            as: 'project',
-            where: { builder_id: builderId },
-          }],
-        }),
-        ProjectUnit.count({
-          where: { status: UnitStatus.AVAILABLE },
-          include: [{
-            model: Project,
-            as: 'project',
-            where: { builder_id: builderId },
-          }],
-        }),
+        projectIds.length > 0 ? ProjectUnit.count({
+          where: { project_id: { [Op.in]: projectIds } }
+        }) : 0,
+        projectIds.length > 0 ? ProjectUnit.count({
+          where: {
+            project_id: { [Op.in]: projectIds },
+            status: UnitStatus.SOLD
+          }
+        }) : 0,
+        projectIds.length > 0 ? ProjectUnit.count({
+          where: {
+            project_id: { [Op.in]: projectIds },
+            status: UnitStatus.AVAILABLE
+          }
+        }) : 0,
       ]);
 
       res.json({

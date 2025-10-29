@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Badge } from '@/shared/components/ui/badge';
 import  projectService  from '../services/projectService';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 const projectSchema = z.object({
   name: z.string().min(3, 'Project name must be at least 3 characters'),

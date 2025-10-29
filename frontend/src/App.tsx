@@ -185,15 +185,6 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
-                    <Route
-                        path="/builder/projects/:id/bulk-units"
-                        element={
-                            <ProtectedRoute requiredRole="builder">
-                                <BulkUnitsPage />
-                            </ProtectedRoute>
-                        }
-                    />
-
                     <Route path="/builder/projects/:id/units/new" element={<ProtectedRoute requiredRole="builder"><NewUnitPage /></ProtectedRoute>} />
                     <Route path="/builder/projects/:id/units/bulk" element={<ProtectedRoute requiredRole="builder"><BulkUnitsPage /></ProtectedRoute>} />
                     {/* <Route

@@ -26,7 +26,7 @@ import {
 } from '@/shared/components/ui/alert-dialog';
 import { EditUnitDialog } from '../components/EditUnitDialog';
 import  projectService  from '../services/projectService';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 export function ProjectUnitsPage() {
   const { id } = useParams<{ id: string }>();
@@ -198,7 +198,7 @@ export function ProjectUnitsPage() {
                     <Icon icon="solar:home-2-bold" className="size-6" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{filteredUnits.length}</p>
+                    <p className="text-2xl font-bold">{project?.total_units || units.length}</p>
                     <p className="text-sm font-medium">Total Units</p>
                   </div>
                 </div>
@@ -294,7 +294,7 @@ export function ProjectUnitsPage() {
               <div className="flex gap-2">
                 <Button
                   variant="outline"
-                  onClick={() => navigate(`/builder/projects/${id}/bulk-units`)}
+                  onClick={() => navigate(`/builder/projects/${id}/units/bulk`)}
                 >
                   <Icon icon="solar:document-add-bold" className="size-4 mr-2" />
                   Bulk Add Units
@@ -335,7 +335,7 @@ export function ProjectUnitsPage() {
                     </Button>
                     <Button
                       variant="outline"
-                      onClick={() => navigate(`/builder/projects/${id}/bulk-units`)}
+                      onClick={() => navigate(`/builder/projects/${id}/units/bulk`)}
                     >
                       <Icon icon="solar:document-add-bold" className="size-4 mr-2" />
                       Bulk Add
@@ -344,8 +344,35 @@ export function ProjectUnitsPage() {
                 )}
               </div>
             ) : (
-              <div className="border rounded-lg overflow-hidden">
-                <Table>
+              <div>
+                {/* Filter indicator */}
+                {(searchTerm || statusFilter !== 'all' || unitTypeFilter !== 'all') && (
+                  <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Icon icon="solar:filter-bold" className="size-4 text-blue-600" />
+                        <span className="text-sm font-medium text-blue-800">
+                          Showing {filteredUnits.length} of {units.length} units
+                        </span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setSearchTerm('');
+                          setStatusFilter('all');
+                          setUnitTypeFilter('all');
+                        }}
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        Clear filters
+                      </Button>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="border rounded-lg overflow-hidden">
+                  <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Unit Number</TableHead>
@@ -395,7 +422,8 @@ export function ProjectUnitsPage() {
                       </TableRow>
                     ))}
                   </TableBody>
-                </Table>
+                  </Table>
+                </div>
               </div>
             )}
           </CardContent>

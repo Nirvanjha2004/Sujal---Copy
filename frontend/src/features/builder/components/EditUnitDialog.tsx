@@ -7,7 +7,7 @@ import { Label } from '@/shared/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import  projectService  from '../services/projectService';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 interface EditUnitDialogProps {
   open: boolean;

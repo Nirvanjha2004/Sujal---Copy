@@ -496,32 +496,60 @@ class ProjectController {
       const offset = (page - 1) * limit;
       const status = req.query.status as UnitStatus;
       const unitType = req.query.unitType as string;
+      const all = req.query.all === 'true'; // New parameter to get all units
 
       const whereClause: any = { project_id: projectId };
       if (status) whereClause.status = status;
       if (unitType) whereClause.unit_type = unitType;
 
-      const { rows: units, count: total } = await ProjectUnit.findAndCountAll({
-        where: whereClause,
-        order: [['floor_number', 'ASC'], ['unit_number', 'ASC']],
-        limit,
-        offset,
-      });
+      let units, total;
 
-      const totalPages = Math.ceil(total / limit);
+      if (all) {
+        // Get all units without pagination
+        units = await ProjectUnit.findAll({
+          where: whereClause,
+          order: [['floor_number', 'ASC'], ['unit_number', 'ASC']],
+        });
+        total = units.length;
 
-      res.json({
-        success: true,
-        data: {
-          units,
-          pagination: {
-            page,
-            limit,
-            total,
-            totalPages,
+        res.json({
+          success: true,
+          data: {
+            units,
+            pagination: {
+              page: 1,
+              limit: total,
+              total,
+              totalPages: 1,
+            },
           },
-        },
-      });
+        });
+      } else {
+        // Use pagination
+        const result = await ProjectUnit.findAndCountAll({
+          where: whereClause,
+          order: [['floor_number', 'ASC'], ['unit_number', 'ASC']],
+          limit,
+          offset,
+        });
+
+        units = result.rows;
+        total = result.count;
+        const totalPages = Math.ceil(total / limit);
+
+        res.json({
+          success: true,
+          data: {
+            units,
+            pagination: {
+              page,
+              limit,
+              total,
+              totalPages,
+            },
+          },
+        });
+      }
     } catch (error) {
       console.error('Get project units error:', error);
       res.status(500).json({
@@ -582,13 +610,59 @@ class ProjectController {
         return;
       }
 
+      // Check for existing unit numbers to prevent duplicates
+      const unitNumbers = units.map(unit => unit.unit_number);
+      const existingUnits = await ProjectUnit.findAll({
+        where: {
+          project_id: projectId,
+          unit_number: unitNumbers,
+        },
+        attributes: ['unit_number'],
+      });
+
+      if (existingUnits.length > 0) {
+        const duplicateNumbers = existingUnits.map(unit => unit.unit_number);
+        res.status(409).json({
+          success: false,
+          error: {
+            code: 'DUPLICATE_UNITS',
+            message: `Units with these numbers already exist: ${duplicateNumbers.join(', ')}`,
+            details: duplicateNumbers,
+          },
+        });
+        return;
+      }
+
+      // Validate unit data
+      const validationErrors: string[] = [];
+      units.forEach((unit, index) => {
+        if (!unit.unit_number) validationErrors.push(`Unit ${index + 1}: unit_number is required`);
+        if (!unit.unit_type) validationErrors.push(`Unit ${index + 1}: unit_type is required`);
+        if (!unit.area_sqft || unit.area_sqft <= 0) validationErrors.push(`Unit ${index + 1}: valid area_sqft is required`);
+        if (!unit.price || unit.price <= 0) validationErrors.push(`Unit ${index + 1}: valid price is required`);
+        if (!unit.bedrooms && unit.bedrooms !== 0) validationErrors.push(`Unit ${index + 1}: bedrooms is required`);
+        if (!unit.bathrooms || unit.bathrooms <= 0) validationErrors.push(`Unit ${index + 1}: bathrooms is required`);
+      });
+
+      if (validationErrors.length > 0) {
+        res.status(400).json({
+          success: false,
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'Invalid unit data',
+            details: validationErrors,
+          },
+        });
+        return;
+      }
+
       // Add project_id to each unit
       const unitsToCreate = units.map(unit => ({
         ...unit,
         project_id: projectId,
         status: UnitStatus.AVAILABLE,
         area_sqm: unit.area_sqm || (unit.area_sqft * 0.092903),
-        price_per_sqft: unit.price_per_sqft || (unit.price / unit.area_sqft),
+        price_per_sqft: unit.price_per_sqft || Math.round(unit.price / unit.area_sqft),
       }));
 
       const createdUnits = await ProjectUnit.bulkCreate(unitsToCreate);
@@ -602,13 +676,51 @@ class ProjectController {
         data: { units: createdUnits, count: createdUnits.length },
         message: `${createdUnits.length} units created successfully`,
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Bulk create units error:', error);
+
+      // Handle specific database errors
+      if (error.name === 'SequelizeUniqueConstraintError') {
+        const duplicateField = error.errors?.[0]?.path || 'unknown field';
+        const duplicateValue = error.errors?.[0]?.value || 'unknown value';
+
+        res.status(409).json({
+          success: false,
+          error: {
+            code: 'DUPLICATE_ENTRY',
+            message: `Duplicate entry detected: ${duplicateValue} already exists`,
+            details: error.errors?.map((err: any) => ({
+              field: err.path,
+              value: err.value,
+              message: err.message,
+            })) || [],
+          },
+        });
+        return;
+      }
+
+      if (error.name === 'SequelizeValidationError') {
+        res.status(400).json({
+          success: false,
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'Data validation failed',
+            details: error.errors?.map((err: any) => ({
+              field: err.path,
+              value: err.value,
+              message: err.message,
+            })) || [],
+          },
+        });
+        return;
+      }
+
       res.status(500).json({
         success: false,
         error: {
           code: 'INTERNAL_ERROR',
           message: 'Failed to create units',
+          details: process.env.NODE_ENV === 'development' ? error.message : undefined,
         },
       });
     }

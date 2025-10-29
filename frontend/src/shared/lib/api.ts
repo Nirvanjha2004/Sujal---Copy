@@ -1324,6 +1324,7 @@ export const api = {
         unitType?: string;
         floorNumber?: number;
         tower?: string;
+        all?: boolean; // New parameter to get all units
       }): Promise<{
         success: boolean;
         data: {

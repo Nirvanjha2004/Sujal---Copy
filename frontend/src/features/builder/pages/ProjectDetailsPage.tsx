@@ -267,11 +267,10 @@ export function ProjectDetailsPage() {
           {/* Main Content */}
           <div className="lg:col-span-2">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="units">Units ({units.length})</TabsTrigger>
                 <TabsTrigger value="gallery">Gallery</TabsTrigger>
-                <TabsTrigger value="analytics">Analytics</TabsTrigger>
               </TabsList>
 
               <TabsContent value="overview" className="space-y-6">
@@ -474,21 +473,6 @@ export function ProjectDetailsPage() {
                 />
               </TabsContent>
 
-              <TabsContent value="analytics">
-                <Card>
-                  <CardContent className="p-8 text-center">
-                    <Icon icon="solar:chart-bold" className="size-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="font-semibold mb-2">Project Analytics</h3>
-                    <p className="text-muted-foreground mb-4">
-                      View detailed analytics and performance metrics
-                    </p>
-                    <Button>
-                      <Icon icon="solar:eye-bold" className="size-4 mr-2" />
-                      View Analytics
-                    </Button>
-                  </CardContent>
-                </Card>
-              </TabsContent>
             </Tabs>
           </div>
 

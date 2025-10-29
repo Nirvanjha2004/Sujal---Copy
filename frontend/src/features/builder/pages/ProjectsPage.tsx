@@ -9,7 +9,7 @@ import { Input } from '@/shared/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import  projectService  from '../services/projectService';
 import { Project } from '../types';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 export function ProjectsPage() {
   const navigate = useNavigate();

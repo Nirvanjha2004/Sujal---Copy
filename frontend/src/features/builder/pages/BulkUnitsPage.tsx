@@ -11,8 +11,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/shared/components/ui/badge';
 import { Alert, AlertDescription } from '@/shared/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
-import  projectService  from '../services/projectService';
-import { toast } from 'react-hot-toast';
+import projectService from '../services/projectService';
+import { toast } from 'sonner';
 
 interface BulkUnit {
   unit_number: string;
@@ -36,6 +36,12 @@ export function BulkUnitsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // If no project ID is provided, redirect to projects page
+  if (!id) {
+    navigate('/builder/projects');
+    return null;
+  }
   
   const [activeTab, setActiveTab] = useState<'form' | 'csv'>('form');
   const [loading, setLoading] = useState(false);
@@ -172,14 +178,39 @@ export function BulkUnitsPage() {
         toast.success(data.message || 'Units created successfully');
         navigate(`/builder/projects/${id}/units`);
       } else {
-        toast.error(data.error?.message || 'Failed to create units');
-        if (data.error?.details) {
-          setErrors(data.error.details);
+        // Handle different error types
+        const errorData = data.error;
+        
+        switch (errorData?.code) {
+          case 'DUPLICATE_UNITS':
+          case 'DUPLICATE_ENTRY':
+            toast.error(`Duplicate units found: ${errorData.details?.join?.(', ') || 'Some units already exist'}`);
+            setErrors([errorData.message, ...(errorData.details || [])]);
+            break;
+            
+          case 'VALIDATION_ERROR':
+            toast.error('CSV validation failed - please check your data');
+            setErrors(errorData.details?.map((detail: any) => 
+              typeof detail === 'string' ? detail : detail.message || 'Validation error'
+            ) || [errorData.message]);
+            break;
+            
+          default:
+            toast.error(errorData?.message || 'Failed to create units');
+            setErrors(errorData?.details || [errorData?.message || 'Upload failed']);
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('CSV upload error:', error);
-      toast.error('Failed to upload CSV file');
+      
+      if (error.response?.data?.error) {
+        const errorData = error.response.data.error;
+        toast.error(errorData.message || 'Failed to upload CSV file');
+        setErrors([errorData.message || 'Upload failed']);
+      } else {
+        toast.error('Failed to upload CSV file - please try again');
+        setErrors(['Network error or server unavailable']);
+      }
     } finally {
       setLoading(false);
     }
@@ -211,10 +242,56 @@ export function BulkUnitsPage() {
     return units;
   };
 
+  // Add function to check for existing units
+  const checkForExistingUnits = async (units: BulkUnit[]): Promise<string[]> => {
+    try {
+      const existingUnits = await projectService.getProjectUnits(id!);
+      const existingUnitNumbers = existingUnits.map((unit: any) => unit.unit_number);
+      const newUnitNumbers = units.map(unit => unit.unit_number);
+      
+      return newUnitNumbers.filter(unitNumber => existingUnitNumbers.includes(unitNumber));
+    } catch (error) {
+      console.error('Error checking existing units:', error);
+      return [];
+    }
+  };
+
+  // Function to suggest alternative floor ranges
+  const suggestAlternativeFloors = async (): Promise<string> => {
+    try {
+      const existingUnits = await projectService.getProjectUnits(id!);
+      const existingFloors = [...new Set(existingUnits.map((unit: any) => unit.floor_number))].sort((a, b) => a - b);
+      
+      if (existingFloors.length === 0) {
+        return "You can start from floor 1";
+      }
+      
+      const maxFloor = Math.max(...existingFloors);
+      const suggestedStart = maxFloor + 1;
+      
+      return `Consider starting from floor ${suggestedStart} to avoid conflicts`;
+    } catch (error) {
+      return "Check existing units to avoid conflicts";
+    }
+  };
+
   const handleFormBulkCreate = async () => {
     try {
       setLoading(true);
+      setErrors([]); // Clear previous errors
       const units = generateUnitsFromForm();
+      
+      // Check for existing units first
+      const duplicateUnits = await checkForExistingUnits(units);
+      if (duplicateUnits.length > 0) {
+        const suggestion = await suggestAlternativeFloors();
+        toast.error(`These unit numbers already exist: ${duplicateUnits.join(', ')}`);
+        setErrors([
+          `Duplicate units: ${duplicateUnits.join(', ')}`,
+          `Suggestion: ${suggestion}`
+        ]);
+        return;
+      }
       
       const response = await projectService.bulkCreateUnits(parseInt(id!), units);
       
@@ -222,9 +299,35 @@ export function BulkUnitsPage() {
         toast.success(`${response.data.count} units created successfully`);
         navigate(`/builder/projects/${id}/units`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Form bulk create error:', error);
-      toast.error('Failed to create units');
+      
+      // Handle different types of errors
+      if (error.response?.data?.error) {
+        const errorData = error.response.data.error;
+        
+        switch (errorData.code) {
+          case 'DUPLICATE_UNITS':
+          case 'DUPLICATE_ENTRY':
+            toast.error(`Duplicate units found: ${errorData.details?.join?.(', ') || 'Some units already exist'}`);
+            setErrors([errorData.message]);
+            break;
+            
+          case 'VALIDATION_ERROR':
+            toast.error('Validation failed - please check your unit data');
+            setErrors(errorData.details?.map((detail: any) => 
+              typeof detail === 'string' ? detail : detail.message || 'Validation error'
+            ) || [errorData.message]);
+            break;
+            
+          default:
+            toast.error(errorData.message || 'Failed to create units');
+            setErrors([errorData.message || 'An error occurred']);
+        }
+      } else {
+        toast.error('Failed to create units - please try again');
+        setErrors(['Network error or server unavailable']);
+      }
     } finally {
       setLoading(false);
     }
@@ -516,6 +619,23 @@ export function BulkUnitsPage() {
                     </div>
                   </CardContent>
                 </Card>
+
+                {errors.length > 0 && (
+                  <Card className="border-destructive">
+                    <CardHeader>
+                      <CardTitle className="text-sm text-destructive">Issues Found</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-1 text-sm">
+                        {errors.map((error, i) => (
+                          <div key={i} className="text-destructive">
+                            • {error}
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
             </div>
           </TabsContent>

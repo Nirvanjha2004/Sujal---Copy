@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/shared/components/ui/card';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { Alert, AlertDescription } from '@/shared/components/ui/alert';
-import  projectService  from '../services/projectService';
+import projectService from '../services/projectService';
 import { toast } from 'sonner';
 
 interface ProjectImageUploadProps {
@@ -142,14 +142,14 @@ export function ProjectImageUpload({ projectId, images, onImagesUpdate }: Projec
               </p>
               
               <div className="flex items-center justify-center gap-4">
-                <Label htmlFor="image-upload" className="cursor-pointer">
-                  <Button type="button" disabled={uploading} asChild>
-                    <span>
-                      <Icon icon="solar:upload-bold" className="size-4 mr-2" />
-                      Choose Files
-                    </span>
-                  </Button>
-                </Label>
+                <Button 
+                  type="button" 
+                  disabled={uploading}
+                  onClick={() => document.getElementById('image-upload')?.click()}
+                >
+                  <Icon icon="solar:upload-bold" className="size-4 mr-2" />
+                  Choose Files
+                </Button>
                 <Input
                   id="image-upload"
                   type="file"

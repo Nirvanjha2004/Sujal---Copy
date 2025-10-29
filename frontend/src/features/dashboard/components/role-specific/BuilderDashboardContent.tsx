@@ -208,11 +208,32 @@ export function BuilderDashboardContent({
     {
       id: 'bulk-units',
       title: 'Bulk Add Units',
-      description: 'Add multiple units to projects',
-      icon: 'solar:upload-bold',
-      action: () => navigate('/builder/bulk-units'),
+      description: recentProjects && recentProjects.length === 1
+        ? `Add units to ${recentProjects[0].name}`
+        : recentProjects && recentProjects.length > 1
+          ? 'Select a project to add multiple units'
+          : 'Create a project first to add units',
+      icon: recentProjects && recentProjects.length === 1
+        ? 'solar:upload-bold'
+        : recentProjects && recentProjects.length > 1
+          ? 'solar:buildings-2-bold'
+          : 'solar:hammer-bold',
+      action: () => {
+        // Smart navigation based on available projects
+        if (recentProjects && recentProjects.length === 1) {
+          // If only one project, go directly to its bulk units page
+          navigate(`/builder/projects/${recentProjects[0].id}/units/bulk`);
+        } else if (recentProjects && recentProjects.length > 1) {
+          // If multiple projects, go to projects page so user can select
+          navigate('/builder/projects');
+        } else {
+          // If no projects, go to create project page
+          navigate('/builder/new-project');
+        }
+      },
       color: 'orange' as const,
       isEnabled: true,
+      badge: recentProjects && recentProjects.length > 1 ? recentProjects.length : undefined,
       priority: 'low' as const
     },
     // {

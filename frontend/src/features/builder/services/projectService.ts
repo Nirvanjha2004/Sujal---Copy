@@ -131,10 +131,16 @@ class ProjectService {
     }
   }
 
-  async getProjectUnits(projectId: string) {
+  async getProjectUnits(projectId: string, options?: { paginated?: boolean; limit?: number }) {
     try {
       console.log(`ProjectService: Fetching units for project ${projectId}`);
-      const response = await api.projects.units.getUnits(parseInt(projectId));
+      
+      // By default, get all units unless specifically requesting pagination
+      const params = options?.paginated 
+        ? { limit: options.limit || 20 }
+        : { all: true };
+        
+      const response = await api.projects.units.getUnits(parseInt(projectId), params);
       console.log('ProjectService: Units response:', response);
       
       return response.data.units || [];
@@ -166,6 +172,91 @@ class ProjectService {
       return response;
     } catch (error) {
       console.error(`ProjectService: Error deleting unit ${unitId} from project ${projectId}:`, error);
+      throw error;
+    }
+  }
+
+  async getProjectUnitsPaginated(projectId: string, page: number = 1, limit: number = 20, filters?: { status?: string; unitType?: string }) {
+    try {
+      console.log(`ProjectService: Fetching paginated units for project ${projectId}, page ${page}`);
+      
+      const params = {
+        page,
+        limit,
+        ...filters
+      };
+        
+      const response = await api.projects.units.getUnits(parseInt(projectId), params);
+      console.log('ProjectService: Paginated units response:', response);
+      
+      return response.data;
+    } catch (error) {
+      console.error(`ProjectService: Error fetching paginated units for project ${projectId}:`, error);
+      return { units: [], pagination: { page: 1, limit, total: 0, totalPages: 0 } };
+    }
+  }
+
+  async bulkCreateUnits(projectId: number, units: any[]) {
+    try {
+      console.log(`ProjectService: Bulk creating ${units.length} units for project ${projectId}`);
+      const response = await api.projects.units.bulkCreateUnits(projectId, units);
+      console.log('ProjectService: Bulk create response:', response);
+      
+      return response;
+    } catch (error) {
+      console.error(`ProjectService: Error bulk creating units for project ${projectId}:`, error);
+      throw error;
+    }
+  }
+
+  async uploadProjectImages(projectId: number, formData: FormData) {
+    try {
+      console.log(`ProjectService: Uploading images for project ${projectId}`);
+      
+      const response = await fetch(`/api/v1/projects/${projectId}/images`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error?.message || 'Failed to upload images');
+      }
+      
+      console.log('ProjectService: Upload images response:', data);
+      return data;
+    } catch (error) {
+      console.error(`ProjectService: Error uploading images for project ${projectId}:`, error);
+      throw error;
+    }
+  }
+
+  async deleteProjectImage(projectId: number, imageId: number) {
+    try {
+      console.log(`ProjectService: Deleting image ${imageId} from project ${projectId}`);
+      
+      const response = await fetch(`/api/v1/projects/${projectId}/images/${imageId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error?.message || 'Failed to delete image');
+      }
+      
+      console.log('ProjectService: Delete image response:', data);
+      return data;
+    } catch (error) {
+      console.error(`ProjectService: Error deleting image ${imageId} from project ${projectId}:`, error);
       throw error;
     }
   }

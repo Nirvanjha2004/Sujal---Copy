@@ -315,12 +315,12 @@ export function PropertyDetailsPage() {
 
                 {/* Property Details Tabs */}
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-                    <TabsList className="grid w-full grid-cols-5">
+                    <TabsList className="grid w-full grid-cols-4">
                         <TabsTrigger value="overview">Overview</TabsTrigger>
                         <TabsTrigger value="details">Details</TabsTrigger>
                         <TabsTrigger value="amenities">Amenities</TabsTrigger>
                         <TabsTrigger value="location">Location</TabsTrigger>
-                        <TabsTrigger value="contact">Contact</TabsTrigger>
+                        {/* <TabsTrigger value="contact">Contact</TabsTrigger> */}
                     </TabsList>
 
                     <TabsContent value="overview" className="space-y-6">

@@ -70,6 +70,10 @@ router.post('/', authenticate, ProjectController.createProjectValidation, projec
 // --- Stats Route (must be before /:id route) ---
 router.get('/stats', authenticate, projectController.getProjectStats);
 
+// --- Inquiry Routes (TODO: Enable after running migration) ---
+router.get('/:projectId/inquiries', authenticate, projectController.getProjectInquiries);
+router.post('/:projectId/inquiries', ProjectController.createProjectInquiryValidation, projectController.createProjectInquiry);
+
 router.get('/:id', authenticate, projectController.getProjectById);
 router.put('/:id', authenticate, projectController.updateProject);
 router.patch('/:id/status', authenticate, projectController.updateProjectStatus);

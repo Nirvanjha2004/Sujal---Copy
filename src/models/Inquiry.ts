@@ -28,6 +28,10 @@ export enum InquiryStatus {
     {
       fields: ['property_id'],
     },
+    // TODO: Add back after running migration
+    // {
+    //   fields: ['project_id'],
+    // },
     {
       fields: ['inquirer_id'],
     },
@@ -43,15 +47,20 @@ export enum InquiryStatus {
   ],
 })
 export class Inquiry extends Model {
+  [x: string]: any;
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
   id!: number;
 
-  @AllowNull(false)
   @Column(DataType.INTEGER)
   @Index
-  property_id!: number;
+  property_id?: number;
+
+  // TODO: Uncomment after running migration
+  @Column(DataType.INTEGER)
+  @Index
+  project_id?: number;
 
   @Column(DataType.INTEGER)
   @Index
@@ -85,7 +94,8 @@ export class Inquiry extends Model {
   created_at!: Date;
 
   // Remove all decorator-based associations, they'll be defined in associations.ts
-  property!: any;
+  property?: any;
+  project?: any;
   inquirer?: any;
   conversation?: any;
 
@@ -145,6 +155,15 @@ export class Inquiry extends Model {
   @BeforeCreate
   @BeforeUpdate
   static validateInquiryData(instance: Inquiry): void {
+    // Validate that either property_id or project_id is provided, but not both
+    if (!instance.property_id && !instance.project_id) {
+      throw new Error('Either property_id or project_id must be provided');
+    }
+
+    if (instance.property_id && instance.project_id) {
+      throw new Error('Cannot provide both property_id and project_id');
+    }
+
     if (!Inquiry.validateEmail(instance.email)) {
       throw new Error('Invalid email format');
     }
@@ -170,14 +189,33 @@ export class Inquiry extends Model {
     }
   }
 
+  // Helper methods
+  get isPropertyInquiry(): boolean {
+    return !!this.property_id;
+  }
+
+  get isProjectInquiry(): boolean {
+    return !!this.project_id;
+  }
+
+  get inquiryType(): 'property' | 'project' {
+    return this.property_id ? 'property' : 'project';
+  }
+
   // Static methods for analytics
-  static async getInquiryStats(propertyId?: number): Promise<{
+  static async getInquiryStats(propertyId?: number, projectId?: number): Promise<{
     total: number;
     new: number;
     contacted: number;
     closed: number;
   }> {
-    const whereClause = propertyId ? { property_id: propertyId } : {};
+    let whereClause = {};
+    
+    if (propertyId) {
+      whereClause = { property_id: propertyId };
+    } else if (projectId) {
+      whereClause = { project_id: projectId };
+    }
 
     const [total, newCount, contactedCount, closedCount] = await Promise.all([
       Inquiry.count({ where: whereClause }),
@@ -191,6 +229,64 @@ export class Inquiry extends Model {
       new: newCount,
       contacted: contactedCount,
       closed: closedCount,
+    };
+  }
+
+  // Get inquiries for a builder's projects
+  static async getBuilderInquiryStats(builderId: number): Promise<{
+    total: number;
+    new: number;
+    contacted: number;
+    closed: number;
+    propertyInquiries: number;
+    projectInquiries: number;
+  }> {
+    // This will be implemented after we add the associations
+    const [total, newCount, contactedCount, closedCount, propertyInquiries, projectInquiries] = await Promise.all([
+      Inquiry.count({
+        include: [
+          { model: require('./Property').Property, where: { user_id: builderId }, required: false },
+          { model: require('./Project').Project, where: { builder_id: builderId }, required: false }
+        ]
+      }),
+      Inquiry.count({
+        where: { status: InquiryStatus.NEW },
+        include: [
+          { model: require('./Property').Property, where: { user_id: builderId }, required: false },
+          { model: require('./Project').Project, where: { builder_id: builderId }, required: false }
+        ]
+      }),
+      Inquiry.count({
+        where: { status: InquiryStatus.CONTACTED },
+        include: [
+          { model: require('./Property').Property, where: { user_id: builderId }, required: false },
+          { model: require('./Project').Project, where: { builder_id: builderId }, required: false }
+        ]
+      }),
+      Inquiry.count({
+        where: { status: InquiryStatus.CLOSED },
+        include: [
+          { model: require('./Property').Property, where: { user_id: builderId }, required: false },
+          { model: require('./Project').Project, where: { builder_id: builderId }, required: false }
+        ]
+      }),
+      Inquiry.count({
+        where: { property_id: { [require('sequelize').Op.ne]: null } },
+        include: [{ model: require('./Property').Property, where: { user_id: builderId } }]
+      }),
+      Inquiry.count({
+        where: { project_id: { [require('sequelize').Op.ne]: null } },
+        include: [{ model: require('./Project').Project, where: { builder_id: builderId } }]
+      })
+    ]);
+
+    return {
+      total,
+      new: newCount,
+      contacted: contactedCount,
+      closed: closedCount,
+      propertyInquiries,
+      projectInquiries,
     };
   }
 }

@@ -4,6 +4,7 @@ import { Project, ProjectStatus, ProjectType } from '../models/Project';
 import { ProjectImage } from '../models/ProjectImage';
 import { ProjectUnit, UnitStatus } from '../models/ProjectUnit';
 import { User, UserRole } from '../models/User';
+import { Inquiry, InquiryStatus } from '../models/Inquiry';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { Op } from 'sequelize';
 import fs from 'fs';
@@ -1586,6 +1587,12 @@ class ProjectController {
             status: UnitStatus.AVAILABLE
           }
         }) : 0,
+        // TODO: Enable after running migration
+        // projectIds.length > 0 ? Inquiry.count({
+        //   where: {
+        //     project_id: { [Op.in]: projectIds }
+        //   }
+        // }) : 0,
       ]);
 
       res.json({
@@ -1597,6 +1604,8 @@ class ProjectController {
           soldUnits,
           availableUnits,
           blockedUnits: totalUnits - soldUnits - availableUnits,
+          // TODO: Enable after running migration
+          // totalInquiries,
         },
       });
     } catch (error) {
@@ -1610,6 +1619,219 @@ class ProjectController {
       });
     }
   }
+
+  // Get project inquiries
+  async getProjectInquiries(req: ProjectRequest, res: Response): Promise<void> {
+    try {
+      const projectId = parseInt(req.params.projectId);
+
+      if (isNaN(projectId)) {
+        res.status(400).json({
+          success: false,
+          error: {
+            code: 'INVALID_PROJECT_ID',
+            message: 'Invalid project ID',
+          },
+        });
+        return;
+      }
+
+      // Check if project exists and user has access
+      const project = await Project.findByPk(projectId);
+      if (!project) {
+        res.status(404).json({
+          success: false,
+          error: {
+            code: 'PROJECT_NOT_FOUND',
+            message: 'Project not found',
+          },
+        });
+        return;
+      }
+
+      // Check if user is the builder of this project
+      if (req.user && req.user.role === 'builder' && project.builder_id !== req.user.userId) {
+        res.status(403).json({
+          success: false,
+          error: {
+            code: 'FORBIDDEN',
+            message: 'Access denied. You can only view inquiries for your own projects.',
+          },
+        });
+        return;
+      }
+
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const offset = (page - 1) * limit;
+      const status = req.query.status as InquiryStatus;
+
+      const whereClause: any = { project_id: projectId };
+      if (status && Object.values(InquiryStatus).includes(status)) {
+        whereClause.status = status;
+      }
+
+      const { count, rows: inquiries } = await Inquiry.findAndCountAll({
+        where: whereClause,
+        include: [
+          {
+            model: User,
+            as: 'inquirer',
+            attributes: ['id', 'name', 'email'],
+          },
+        ],
+        order: [['created_at', 'DESC']],
+        limit,
+        offset,
+      });
+
+      res.json({
+        success: true,
+        data: {
+          inquiries,
+          pagination: {
+            page,
+            limit,
+            total: count,
+            pages: Math.ceil(count / limit),
+          },
+        },
+      });
+    } catch (error) {
+      console.error('Get project inquiries error:', error);
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'Failed to retrieve project inquiries',
+        },
+      });
+    }
+  }
+
+  // Create project inquiry
+  async createProjectInquiry(req: Request, res: Response): Promise<void> {
+    try {
+      const projectId = parseInt(req.params.projectId);
+
+      if (isNaN(projectId)) {
+        res.status(400).json({
+          success: false,
+          error: {
+            code: 'INVALID_PROJECT_ID',
+            message: 'Invalid project ID',
+          },
+        });
+        return;
+      }
+
+      // Check if project exists and is active
+      const project = await Project.findOne({
+        where: {
+          id: projectId,
+          is_active: true,
+        },
+      });
+
+      if (!project) {
+        res.status(404).json({
+          success: false,
+          error: {
+            code: 'PROJECT_NOT_FOUND',
+            message: 'Project not found or not active',
+          },
+        });
+        return;
+      }
+
+      const { name, email, phone, message } = req.body;
+
+      // Validate required fields
+      if (!name || !email || !message) {
+        res.status(400).json({
+          success: false,
+          error: {
+            code: 'MISSING_FIELDS',
+            message: 'Name, email, and message are required',
+          },
+        });
+        return;
+      }
+
+      // Create inquiry
+      const inquiry = await Inquiry.create({
+        project_id: projectId,
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        phone: phone?.trim(),
+        message: message.trim(),
+        status: InquiryStatus.NEW,
+      });
+
+      // Load the created inquiry with associations
+      const createdInquiry = await Inquiry.findByPk(inquiry.id, {
+        include: [
+          {
+            model: Project,
+            as: 'project',
+            attributes: ['id', 'name', 'location'],
+          },
+        ],
+      });
+
+      res.status(201).json({
+        success: true,
+        data: {
+          inquiry: createdInquiry,
+        },
+        message: 'Project inquiry submitted successfully',
+      });
+    } catch (error) {
+      console.error('Create project inquiry error:', error);
+
+      if (error instanceof Error && error.message.includes('validation')) {
+        res.status(400).json({
+          success: false,
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: error.message,
+          },
+        });
+        return;
+      }
+
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'Failed to create project inquiry',
+        },
+      });
+    }
+  }
+
+  // Validation rules for project inquiry creation
+  static createProjectInquiryValidation = [
+    param('projectId').isInt({ min: 1 }).withMessage('Valid project ID is required'),
+    body('name')
+      .trim()
+      .isLength({ min: 2, max: 100 })
+      .withMessage('Name must be between 2 and 100 characters'),
+    body('email')
+      .trim()
+      .isEmail()
+      .normalizeEmail()
+      .withMessage('Valid email is required'),
+    body('phone')
+      .optional()
+      .trim()
+      .matches(/^\+?[\d\s\-\(\)]{10,}$/)
+      .withMessage('Valid phone number is required'),
+    body('message')
+      .trim()
+      .isLength({ min: 10, max: 1000 })
+      .withMessage('Message must be between 10 and 1000 characters'),
+  ];
 }
 
 const projectController = new ProjectController();

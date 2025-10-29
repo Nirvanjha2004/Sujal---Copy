@@ -16,7 +16,24 @@ export interface AuthenticatedRequest extends Request {
 class InquiryController {
   // Validation rules
   static createInquiryValidation = [
-    body('property_id').isInt({ min: 1 }).withMessage('Valid property ID is required'),
+    // Custom validation to ensure either property_id or project_id is provided, but not both
+    body().custom((value) => {
+      const { property_id, project_id } = value;
+      
+      // Check if both are provided
+      if (property_id && project_id) {
+        throw new Error('Cannot provide both property_id and project_id');
+      }
+      
+      // Check if neither is provided
+      if (!property_id && !project_id) {
+        throw new Error('Either property_id or project_id must be provided');
+      }
+      
+      return true;
+    }),
+    body('property_id').optional().isInt({ min: 1 }).withMessage('Valid property ID is required'),
+    body('project_id').optional().isInt({ min: 1 }).withMessage('Valid project ID is required'),
     body('name').trim().isLength({ min: 2, max: 100 }).withMessage('Name must be between 2 and 100 characters'),
     body('email').isEmail().normalizeEmail().withMessage('Valid email is required'),
     body('phone').optional().isMobilePhone('any').withMessage('Valid phone number is required'),

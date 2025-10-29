@@ -185,14 +185,25 @@ export interface User {
 
 export interface Inquiry {
   id: number;
-  property_id: number;
-  user_id: number;
+  property_id?: number;
+  project_id?: number;
+  inquirer_id?: number;
+  name: string;
+  email: string;
+  phone?: string;
   message: string;
-  contact_info?: any;
-  status: 'pending' | 'responded' | 'closed';
+  status: 'new' | 'contacted' | 'closed';
   created_at: string;
   property?: Property;
-  user?: User;
+  project?: {
+    id: number;
+    name: string;
+    project_type: string;
+    status: string;
+    city: string;
+    state: string;
+  };
+  inquirer?: User;
 }
 
 export interface Favorite {
@@ -545,7 +556,8 @@ export const api = {
   communication: {
     // Inquiries
     createInquiry: (inquiryData: {
-      property_id: number;
+      property_id?: number;
+      project_id?: number;
       name: string;
       email: string;
       phone?: string;
@@ -562,7 +574,8 @@ export const api = {
       limit?: number;
       status?: string;
       property_id?: number;
-    }): Promise<{ data: any[]; total: number; page: number; totalPages: number }> => {
+      project_id?: number;
+    }): Promise<{ data: { inquiries: any[]; total: number; page: number; totalPages: number } }> => {
       const queryParams = new URLSearchParams();
       if (params) {
         Object.entries(params).forEach(([key, value]) => {
@@ -591,9 +604,12 @@ export const api = {
       });
     },
 
-    getInquiryStats: (propertyId?: number): Promise<{ data: any }> => {
-      const params = propertyId ? `?property_id=${propertyId}` : '';
-      return apiRequest(`/inquiries/stats${params}`);
+    getInquiryStats: (propertyId?: number, projectId?: number): Promise<{ data: any }> => {
+      const params = new URLSearchParams();
+      if (propertyId) params.append('property_id', propertyId.toString());
+      if (projectId) params.append('project_id', projectId.toString());
+      const queryString = params.toString();
+      return apiRequest(`/inquiries/stats${queryString ? `?${queryString}` : ''}`);
     },
 
     // Messaging
@@ -665,7 +681,8 @@ export const api = {
 
   // Legacy inquiry methods (for backward compatibility)
   createInquiry: (inquiryData: {
-    property_id: number;
+    property_id?: number;
+    project_id?: number;
     message: string;
     name: string;
     email: string;

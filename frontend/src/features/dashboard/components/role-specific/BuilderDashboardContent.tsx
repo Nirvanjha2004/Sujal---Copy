@@ -5,8 +5,10 @@ import { WelcomeSection } from '../common/WelcomeSection';
 import { StatsCard } from '../common/StatsCard';
 import { QuickActions } from '../common/QuickActions';
 import { DashboardGrid, GridItem } from '../common/DashboardGrid';
+import { InquiryList } from '../common/InquiryList';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { cn } from '@/shared/lib/utils';
+import { useInquiries } from '@/features/dashboard/hooks/useInquiries';
 import type { BuilderDashboardStats, Project } from '@/features/dashboard/types/dashboard';
 
 interface BuilderDashboardContentProps {
@@ -131,63 +133,6 @@ function ProjectOverviewCard({
   );
 }
 
-// Enhanced Project Statistics Section
-function ProjectStatisticsSection({ stats }: { stats: BuilderDashboardStats }) {
-  const statisticsData = [
-    {
-      label: 'Project Completion Rate',
-      value: stats.totalProjects > 0 ? Math.round((stats.activeProjects / stats.totalProjects) * 100) : 0,
-      suffix: '%',
-      icon: 'solar:chart-2-bold',
-      color: 'text-success',
-      bgColor: 'bg-success/10'
-    },
-    {
-      label: 'Unit Availability',
-      value: stats.unitsListed > 0 ? Math.round((stats.unitsAvailable / stats.unitsListed) * 100) : 0,
-      suffix: '%',
-      icon: 'solar:home-2-bold',
-      color: 'text-primary',
-      bgColor: 'bg-primary/10'
-    },
-    {
-      label: 'Inquiry Response Rate',
-      value: 92, // This would come from actual data
-      suffix: '%',
-      icon: 'solar:chat-round-bold',
-      color: 'text-warning',
-      bgColor: 'bg-warning/10'
-    }
-  ];
-
-  return (
-    <Card className="border-0 shadow-sm bg-gradient-to-br from-card to-card/50">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <Icon icon="solar:chart-2-bold" className="size-5 text-primary" />
-          Project Statistics
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {statisticsData.map((stat, index) => (
-            <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-background/50">
-              <div className={cn("p-2 rounded-lg", stat.bgColor)}>
-                <Icon icon={stat.icon} className={cn("size-5", stat.color)} />
-              </div>
-              <div className="flex-1">
-                <div className="text-2xl font-bold text-foreground">
-                  {stat.value}{stat.suffix}
-                </div>
-                <div className="text-sm text-muted-foreground">{stat.label}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
 
 export function BuilderDashboardContent({
   stats,
@@ -197,13 +142,21 @@ export function BuilderDashboardContent({
   const { state: { user } } = useAuth();
   const navigate = useNavigate();
 
+  // Fetch inquiries for the builder
+  const { inquiries, stats: inquiryStats, isLoading: inquiriesLoading, error: inquiriesError } = useInquiries({
+    limit: 5 // Show only recent 5 inquiries
+  });
+
+  // Ensure inquiries is always an array
+  const safeInquiries = Array.isArray(inquiries) ? inquiries : [];
+
   // Provide default values for stats to prevent undefined errors
   const safeStats = {
     totalProjects: stats?.totalProjects || 0,
     activeProjects: stats?.activeProjects || 0,
     unitsListed: stats?.unitsListed || 0,
     unitsAvailable: stats?.unitsAvailable || 0,
-    totalInquiries: stats?.totalInquiries || 0,
+    totalInquiries: inquiryStats?.total || stats?.totalInquiries || 0,
     messages: stats?.messages || 0
   };
 
@@ -262,16 +215,16 @@ export function BuilderDashboardContent({
       isEnabled: true,
       priority: 'low' as const
     },
-    {
-      id: 'project-analytics',
-      title: 'Project Analytics',
-      description: 'View project performance metrics',
-      icon: 'solar:chart-2-bold',
-      action: () => navigate('/builder/analytics'),
-      color: 'teal' as const,
-      isEnabled: true,
-      priority: 'low' as const
-    }
+    // {
+    //   id: 'project-analytics',
+    //   title: 'Project Analytics',
+    //   description: 'View project performance metrics',
+    //   icon: 'solar:chart-2-bold',
+    //   action: () => navigate('/builder/analytics'),
+    //   color: 'teal' as const,
+    //   isEnabled: true,
+    //   priority: 'low' as const
+    // }
   ];
 
   if (isLoading) {
@@ -387,7 +340,7 @@ export function BuilderDashboardContent({
       </DashboardGrid>
 
       {/* Project Management Section */}
-      <DashboardGrid columns={2} gap="lg">
+      <DashboardGrid columns={1}>
         <GridItem>
           {/* Recent Projects Overview */}
           <Card className="border-0 shadow-sm bg-gradient-to-br from-card to-card/50">
@@ -407,8 +360,8 @@ export function BuilderDashboardContent({
             </CardHeader>
             <CardContent>
               {recentProjects && recentProjects.length > 0 ? (
-                <div className="space-y-4">
-                  {recentProjects.slice(0, 3).map((project) => (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {recentProjects.slice(0, 6).map((project) => (
                     <ProjectOverviewCard
                       key={project.id}
                       project={project}
@@ -417,14 +370,17 @@ export function BuilderDashboardContent({
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8">
-                  <Icon icon="solar:buildings-2-bold" className="size-12 text-muted-foreground mx-auto mb-3" />
-                  <p className="text-muted-foreground mb-4">No projects yet</p>
+                <div className="text-center py-12">
+                  <Icon icon="solar:buildings-2-bold" className="size-16 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-foreground mb-2">No projects yet</h3>
+                  <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                    Start building your portfolio by creating your first construction project
+                  </p>
                   <button
                     onClick={() => navigate('/builder/new-project')}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors duration-200"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors duration-200 font-medium"
                   >
-                    <Icon icon="solar:hammer-bold" className="size-4" />
+                    <Icon icon="solar:hammer-bold" className="size-5" />
                     Create Your First Project
                   </button>
                 </div>
@@ -432,11 +388,42 @@ export function BuilderDashboardContent({
             </CardContent>
           </Card>
         </GridItem>
+      </DashboardGrid>
 
+      {/* Inquiries and Communication Section */}
+      <DashboardGrid columns={1}>
         <GridItem>
-          {/* Project Statistics */}
-          <ProjectStatisticsSection stats={safeStats} />
+          {/* Recent Inquiries */}
+          {inquiriesError ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Icon icon="solar:chat-round-bold" className="size-5 text-primary" />
+                  Recent Inquiries
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8">
+                  <Icon icon="solar:danger-circle-bold" className="size-12 text-destructive mx-auto mb-3" />
+                  <p className="text-destructive mb-2">Failed to load inquiries</p>
+                  <p className="text-sm text-muted-foreground">{inquiriesError}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <InquiryList
+              inquiries={safeInquiries}
+              isLoading={inquiriesLoading}
+              maxItems={8}
+              title="Recent Inquiries"
+              onInquiryClick={() => {
+                // Navigate to messages or inquiry details
+                navigate('/dashboard/messages');
+              }}
+            />
+          )}
         </GridItem>
+
       </DashboardGrid>
 
       {/* Enhanced Quick Actions with better organization */}

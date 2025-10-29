@@ -28,9 +28,19 @@ class AuthController {
       .isLength({ min: 2, max: 50 })
       .withMessage('Last name must be between 2 and 50 characters'),
     body('phone')
-      .optional()
-      .matches(/^\+?[\d\s\-\(\)]{10,}$/)
-      .withMessage('Invalid phone number format'),
+      .optional({ nullable: true, checkFalsy: true })
+      .custom((value) => {
+        if (!value || value.trim() === '') {
+          return true; // Allow empty values
+        }
+        // Clean the phone number (remove non-digits)
+        const cleanPhone = value.replace(/\D/g, '');
+        // Check if it's a valid 10-digit Indian mobile number
+        if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
+          throw new Error('Invalid phone number format');
+        }
+        return true;
+      }),
     body('role')
       .isIn(Object.values(UserRole))
       .withMessage('Invalid user role'),

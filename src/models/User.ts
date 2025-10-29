@@ -134,8 +134,17 @@ export class User extends Model {
   }
 
   static validatePhone(phone: string): boolean {
-    const phoneRegex = /^\+?[\d\s\-\(\)]{10,}$/;
-    return phoneRegex.test(phone);
+    // Allow empty phone numbers
+    if (!phone || phone.trim() === '') {
+      return true;
+    }
+    
+    // Clean the phone number (remove non-digits)
+    const cleanPhone = phone.replace(/\D/g, '');
+    
+    // Check if it's a valid 10-digit Indian mobile number
+    const phoneRegex = /^[6-9]\d{9}$/;
+    return phoneRegex.test(cleanPhone);
   }
 
   static validateRole(role: string): boolean {

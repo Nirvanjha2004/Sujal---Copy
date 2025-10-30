@@ -171,8 +171,8 @@ class SeoService {
   async generateSitemap(baseUrl: string): Promise<string> {
     const properties = await Property.findAll({
       where: { is_active: true },
-      attributes: ['id', 'updatedAt'],
-      order: [['updatedAt', 'DESC']],
+      attributes: ['id', 'updated_at'],
+      order: [['updated_at', 'DESC']],
     });
 
     const staticPages = [
@@ -199,7 +199,7 @@ class SeoService {
     for (const property of properties) {
       sitemap += '  <url>\n';
       sitemap += `    <loc>${baseUrl}/property/${property.id}</loc>\n`;
-      sitemap += `    <lastmod>${property.updatedAt.toISOString().split('T')[0]}</lastmod>\n`;
+      sitemap += `    <lastmod>${property.updated_at.toISOString().split('T')[0]}</lastmod>\n`;
       sitemap += '    <changefreq>weekly</changefreq>\n';
       sitemap += '    <priority>0.7</priority>\n';
       sitemap += '  </url>\n';

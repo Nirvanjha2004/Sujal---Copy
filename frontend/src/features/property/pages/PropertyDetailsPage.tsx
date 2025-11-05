@@ -61,7 +61,7 @@ export function PropertyDetailsPage() {
             const inquiryData = {
                 property_id: property.id,
                 message: defaultMessage,
-                name: authState.user.first_name || authState.user.firstName || "Interested Buyer",
+                name: authState.user.first_name || "Interested Buyer",
                 email: authState.user.email,
                 inquirer_id: authState.user.id,
             };
@@ -127,32 +127,7 @@ export function PropertyDetailsPage() {
         }
     };
 
-    const getAmenitiesList = (amenities: any) => {
-        if (!amenities || typeof amenities !== 'object') return [];
 
-        const amenityLabels: Record<string, string> = {
-            parking: 'Parking',
-            gym: 'Gym',
-            swimming_pool: 'Swimming Pool',
-            garden: 'Garden',
-            security: '24/7 Security',
-            elevator: 'Elevator',
-            power_backup: 'Power Backup',
-            water_supply: '24/7 Water Supply',
-            internet: 'High-Speed Internet',
-            air_conditioning: 'Air Conditioning',
-            furnished: 'Furnished',
-            pet_friendly: 'Pet Friendly',
-            balcony: 'Balcony',
-            terrace: 'Terrace',
-            club_house: 'Club House',
-            playground: 'Children Play Area'
-        };
-
-        return Object.entries(amenities)
-            .filter(([_, value]) => value === true)
-            .map(([key, _]) => amenityLabels[key] || key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()));
-    };
 
     if (loading) {
         return (
@@ -183,8 +158,6 @@ export function PropertyDetailsPage() {
             </Layout>
         );
     }
-
-    const amenitiesList = getAmenitiesList(property.amenities);
 
     return (
         <Layout>
@@ -332,11 +305,11 @@ export function PropertyDetailsPage() {
                     </TabsContent>
 
                     <TabsContent value="amenities" className="space-y-6">
-                        <PropertyFeatures property={property} amenities={amenitiesList} />
+                        <PropertyFeatures property={property} />
                     </TabsContent>
 
                     <TabsContent value="location" className="space-y-6">
-                        <PropertyDetails property={property} showLocationOnly={true} />
+                        <PropertyDetails property={property} />
                     </TabsContent>
 
                     <TabsContent value="contact" className="space-y-6">
@@ -344,7 +317,7 @@ export function PropertyDetailsPage() {
                             <PropertyContact property={property} />
 
                             {/* Property Stats */}
-                            <PropertyStats propertyId={property.id} />
+                            <PropertyStats property={property} />
                         </div>
                     </TabsContent>
                 </Tabs>

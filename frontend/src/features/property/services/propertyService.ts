@@ -7,7 +7,8 @@ import type {
   CreatePropertyRequest,
   UpdatePropertyRequest,
   PaginationOptions,
-  PropertyStats
+  PropertyStats,
+  PropertyAmenities
 } from '../types';
 
 /**
@@ -249,8 +250,8 @@ class PropertyService {
       const property = await this.getPropertyById(propertyId);
       
       const filters: PropertyFilters = {
-        propertyType: property.propertyType,
-        listingType: property.listingType,
+        propertyType: property.property_type,
+        listingType: property.listing_type,
         location: property.city,
         minPrice: Math.max(0, property.price * 0.8),
         maxPrice: property.price * 1.2,
@@ -393,57 +394,39 @@ class PropertyService {
   private transformApiPropertyToProperty(apiProperty: ApiProperty): Property {
     return {
       id: apiProperty.id,
+      user_id: apiProperty.owner?.id || 0,
       title: apiProperty.title,
       description: apiProperty.description || '',
-      propertyType: (apiProperty.property_type || 'apartment') as any,
-      listingType: (apiProperty.listing_type || 'sale') as any,
+      property_type: (apiProperty.property_type || 'apartment') as any,
+      listing_type: (apiProperty.listing_type || 'sale') as any,
       price: apiProperty.price,
-      area: apiProperty.area_sqft || apiProperty.area || 0,
-      areaSqft: apiProperty.area_sqft,
       area_sqft: apiProperty.area_sqft,
       bedrooms: apiProperty.bedrooms,
       bathrooms: apiProperty.bathrooms,
-      location: {
-        address: apiProperty.address,
-        city: apiProperty.city,
-        state: apiProperty.state,
-        postalCode: apiProperty.postal_code,
-        latitude: apiProperty.latitude,
-        longitude: apiProperty.longitude
-      },
       address: apiProperty.address,
       city: apiProperty.city,
       state: apiProperty.state,
-      postalCode: apiProperty.postal_code,
       postal_code: apiProperty.postal_code,
       latitude: apiProperty.latitude,
       longitude: apiProperty.longitude,
-      amenities: [],
-      images: apiProperty.images?.map(img => ({
+      amenities: {} as PropertyAmenities,
+      images: apiProperty.images?.map((img: any) => ({
         id: img.id,
-        propertyId: img.property_id,
-        url: img.image_url,
-        thumbnailUrl: img.image_url,
-        alt: img.alt_text || 'Property image',
-        order: img.display_order || 0,
-        isPrimary: img.is_primary || false,
-        uploadedAt: apiProperty.created_at
+        property_id: img.property_id,
+        image_url: img.image_url,
+        alt_text: img.alt_text || 'Property image',
+        display_order: img.display_order || 0,
+        is_primary: img.is_primary || false,
+        created_at: img.created_at || apiProperty.created_at,
+        updated_at: img.updated_at || apiProperty.updated_at
       })) || [],
-      isActive: true,
       is_active: true,
-      isFeatured: false,
       is_featured: false,
       status: (apiProperty.status || 'active') as any,
-      ownerId: apiProperty.owner?.id || 0,
-      owner_id: apiProperty.owner?.id,
-      agentId: undefined,
-      agent_id: undefined,
-      createdAt: apiProperty.created_at,
+
       created_at: apiProperty.created_at,
-      updatedAt: apiProperty.updated_at,
       updated_at: apiProperty.updated_at,
-      owner: apiProperty.owner,
-      agent: undefined
+      owner: apiProperty.owner
     };
   }
 

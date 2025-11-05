@@ -72,13 +72,13 @@ export interface QuickAction {
   description: string;
   icon: string;
   action: () => void;
-  color: string;
+  color?: 'primary' | 'success' | 'warning' | 'error' | 'info' | 'purple' | 'orange' | 'teal';
   isEnabled?: boolean;
   badge?: string | number;
   priority?: 'high' | 'medium' | 'low';
 }
 
-export interface StatsCard {
+export interface StatsCardData {
   id: string;
   title: string;
   value: number;

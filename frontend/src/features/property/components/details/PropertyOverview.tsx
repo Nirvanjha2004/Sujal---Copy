@@ -13,10 +13,7 @@ import {
   Bed, 
   Bath, 
   Car,
-  TrendingUp,
-  Eye,
-  Heart,
-  MessageSquare
+  TrendingUp
 } from 'lucide-react';
 import { formatIndianNumber as formatPrice, formatArea, formatDate } from '../../utils/propertyFormatters';
 
@@ -41,7 +38,7 @@ export const PropertyOverview: React.FC<PropertyOverviewProps> = ({
     }
   };
 
-  const PropertyTypeIcon = getPropertyTypeIcon(property.propertyType);
+  const PropertyTypeIcon = getPropertyTypeIcon(property.property_type);
 
   return (
     <div className={`space-y-6 ${className}`}>
@@ -75,7 +72,7 @@ export const PropertyOverview: React.FC<PropertyOverviewProps> = ({
                     <span>Property Type</span>
                   </div>
                   <Badge variant="outline" className="capitalize">
-                    {property.propertyType}
+                    {property.property_type}
                   </Badge>
                 </div>
 
@@ -84,8 +81,8 @@ export const PropertyOverview: React.FC<PropertyOverviewProps> = ({
                     <TrendingUp className="h-4 w-4" />
                     <span>Listing Type</span>
                   </div>
-                  <Badge variant={property.listingType === 'sale' ? 'default' : 'secondary'}>
-                    For {property.listingType === 'sale' ? 'Sale' : 'Rent'}
+                  <Badge variant={property.listing_type === 'sale' ? 'default' : 'secondary'}>
+                    For {property.listing_type === 'sale' ? 'Sale' : 'Rent'}
                   </Badge>
                 </div>
 
@@ -95,17 +92,17 @@ export const PropertyOverview: React.FC<PropertyOverviewProps> = ({
                   </div>
                   <span className="font-semibold text-blue-600">
                     {formatPrice(property.price)}
-                    {property.listingType === 'rent' && '/month'}
+                    {property.listing_type === 'rent' && '/month'}
                   </span>
                 </div>
 
-                {property.area && (
+                {property.area_sqft && (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-gray-600">
                       <Ruler className="h-4 w-4" />
                       <span>Area</span>
                     </div>
-                    <span className="font-medium">{formatArea(property.area)}</span>
+                    <span className="font-medium">{formatArea(property.area_sqft)}</span>
                   </div>
                 )}
 
@@ -159,7 +156,7 @@ export const PropertyOverview: React.FC<PropertyOverviewProps> = ({
                   </div>
                 )}
 
-                {property.isFeatured && (
+                {property.is_featured && (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-gray-600">
                       <span>Featured Property</span>
@@ -188,7 +185,7 @@ export const PropertyOverview: React.FC<PropertyOverviewProps> = ({
             <div>
               <label className="text-sm font-medium text-gray-600">Address</label>
               <p className="text-gray-900">
-                {property.location?.address || property.address}
+                {property.address}
               </p>
             </div>
 
@@ -203,10 +200,10 @@ export const PropertyOverview: React.FC<PropertyOverviewProps> = ({
                 <p className="text-gray-900">{property.state}</p>
               </div>
 
-              {(property.postalCode || property.postal_code) && (
+              {property.postal_code && (
                 <div>
                   <label className="text-sm font-medium text-gray-600">Postal Code</label>
-                  <p className="text-gray-900">{property.postalCode || property.postal_code}</p>
+                  <p className="text-gray-900">{property.postal_code}</p>
                 </div>
               )}
             </div>
@@ -223,66 +220,7 @@ export const PropertyOverview: React.FC<PropertyOverviewProps> = ({
         </CardContent>
       </Card>
 
-      {/* Property Statistics */}
-      {property.stats && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Property Statistics</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {property.stats.views && (
-                <div className="text-center p-4 bg-blue-50 rounded-lg">
-                  <Eye className="h-6 w-6 text-blue-600 mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-blue-600">
-                    {property.stats.views.toLocaleString()}
-                  </div>
-                  <div className="text-sm text-gray-600">Views</div>
-                </div>
-              )}
 
-              {property.stats.favorites && (
-                <div className="text-center p-4 bg-red-50 rounded-lg">
-                  <Heart className="h-6 w-6 text-red-600 mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-red-600">
-                    {property.stats.favorites.toLocaleString()}
-                  </div>
-                  <div className="text-sm text-gray-600">Favorites</div>
-                </div>
-              )}
-
-              {property.stats.inquiries && (
-                <div className="text-center p-4 bg-green-50 rounded-lg">
-                  <MessageSquare className="h-6 w-6 text-green-600 mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-green-600">
-                    {property.stats.inquiries.toLocaleString()}
-                  </div>
-                  <div className="text-sm text-gray-600">Inquiries</div>
-                </div>
-              )}
-
-              {property.stats.shares && (
-                <div className="text-center p-4 bg-purple-50 rounded-lg">
-                  <TrendingUp className="h-6 w-6 text-purple-600 mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-purple-600">
-                    {property.stats.shares.toLocaleString()}
-                  </div>
-                  <div className="text-sm text-gray-600">Shares</div>
-                </div>
-              )}
-            </div>
-
-            {property.stats.lastViewed && (
-              <div className="mt-4 pt-4 border-t">
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Calendar className="h-4 w-4" />
-                  <span>Last viewed: {formatDate(property.stats.lastViewed)}</span>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
 
       {/* Property History */}
       <Card>
@@ -296,7 +234,7 @@ export const PropertyOverview: React.FC<PropertyOverviewProps> = ({
                 <Calendar className="h-4 w-4" />
                 <span>Listed Date</span>
               </div>
-              <span className="font-medium">{formatDate(property.createdAt)}</span>
+              <span className="font-medium">{formatDate(property.created_at)}</span>
             </div>
 
             <div className="flex items-center justify-between">
@@ -304,7 +242,7 @@ export const PropertyOverview: React.FC<PropertyOverviewProps> = ({
                 <Calendar className="h-4 w-4" />
                 <span>Last Updated</span>
               </div>
-              <span className="font-medium">{formatDate(property.updatedAt)}</span>
+              <span className="font-medium">{formatDate(property.updated_at)}</span>
             </div>
 
             {property.owner && (
@@ -322,17 +260,7 @@ export const PropertyOverview: React.FC<PropertyOverviewProps> = ({
               </>
             )}
 
-            {property.agent && (
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-gray-600">
-                  <User className="h-4 w-4" />
-                  <span>Agent</span>
-                </div>
-                <span className="font-medium">
-                  {property.agent.name || 'Real Estate Agent'}
-                </span>
-              </div>
-            )}
+
           </div>
         </CardContent>
       </Card>

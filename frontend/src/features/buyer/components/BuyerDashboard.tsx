@@ -86,7 +86,7 @@ export function BuyerDashboard() {
     <>
       <div className="mb-8">
         <h1 className="text-3xl font-heading font-bold tracking-tight mb-2">
-          Welcome back, {state.user?.firstName} {state.user?.lastName}!
+          Welcome back, {state.user?.first_name} {state.user?.last_name}!
         </h1>
         <p className="text-muted-foreground">
           Find your dream property and manage your searches

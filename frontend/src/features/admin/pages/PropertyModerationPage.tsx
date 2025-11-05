@@ -92,7 +92,7 @@ export function PropertyModerationPage() {
         setProperties(response.data.data);
         setTotalPages(response.data.totalPages);
       } else {
-        throw new Error(response.message || 'Failed to fetch properties');
+        throw new Error(response.error?.message || 'Failed to fetch properties');
       }
     } catch (err: any) {
       console.error('Error fetching properties:', err);
@@ -118,7 +118,7 @@ export function PropertyModerationPage() {
       if (response.success) {
         fetchProperties(); // Refresh the list
       } else {
-        alert(response.message || 'Failed to update property');
+        alert(response.error?.message || 'Failed to update property');
       }
     } catch (err: any) {
       alert('Failed to update property');
@@ -133,7 +133,7 @@ export function PropertyModerationPage() {
       if (response.success) {
         fetchProperties(); // Refresh the list
       } else {
-        alert(response.message || 'Failed to delete property');
+        alert(response.error?.message || 'Failed to delete property');
       }
     } catch (err: any) {
       alert('Failed to delete property');
@@ -148,7 +148,7 @@ export function PropertyModerationPage() {
         setSelectedProperty(response.data);
         setIsModalOpen(true);
       } else {
-        alert(response.message || 'Failed to load property details');
+        alert(response.error?.message || 'Failed to load property details');
       }
     } catch (err: any) {
       alert('Failed to load property details');

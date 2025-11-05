@@ -6,7 +6,8 @@ import {
   PropertyImage, 
   PropertyStats,
   PropertyFormData,
-  CreatePropertyRequest
+  CreatePropertyRequest,
+  PropertyAmenities
 } from '../types';
 import { 
   PROPERTY_TYPES, 
@@ -107,8 +108,8 @@ export const getPropertySummary = (property: Property): string => {
     parts.push(`${property.bathrooms} Bath`);
   }
   
-  if (property.area) {
-    parts.push(formatArea(property.area));
+  if (property.area_sqft) {
+    parts.push(formatArea(property.area_sqft));
   }
   
   return parts.join(' • ');
@@ -121,7 +122,7 @@ export const getPrimaryImage = (images: PropertyImage[]): PropertyImage | null =
   if (!images || images.length === 0) return null;
   
   // Find primary image
-  const primary = images.find(img => img.isPrimary || img.is_primary);
+  const primary = images.find(img => img.is_primary);
   if (primary) return primary;
   
   // Return first image if no primary is set
@@ -136,7 +137,7 @@ export const getPropertyImageUrl = (
   fallbackUrl: string = '/images/property-placeholder.jpg'
 ): string => {
   const primaryImage = getPrimaryImage(images);
-  return primaryImage?.url || primaryImage?.image_url || fallbackUrl;
+  return primaryImage?.image_url || fallbackUrl;
 };
 
 /**
@@ -147,14 +148,13 @@ export const getPropertyThumbnailUrl = (
   fallbackUrl: string = '/images/property-placeholder-thumb.jpg'
 ): string => {
   const primaryImage = getPrimaryImage(images);
-  return primaryImage?.thumbnailUrl || primaryImage?.thumbnail_url || 
-         primaryImage?.url || primaryImage?.image_url || fallbackUrl;
+  return primaryImage?.image_url || fallbackUrl;
 };
 
 /**
  * Format property amenities for display
  */
-export const formatAmenities = (amenities: string[] | Record<string, boolean>): string[] => {
+export const formatAmenities = (amenities: string[] | Record<string, boolean> | PropertyAmenities): string[] => {
   if (Array.isArray(amenities)) {
     return amenities;
   }
@@ -207,9 +207,7 @@ export const convertAmenitiesToBackend = (amenities: string[]): Record<string, b
 export const getLocationString = (property: Property): string => {
   const parts: string[] = [];
   
-  if (property.location?.address) {
-    parts.push(property.location.address);
-  } else if (property.address) {
+  if (property.address) {
     parts.push(property.address);
   }
   
@@ -245,14 +243,14 @@ export const getShortLocationString = (property: Property): string => {
  * Check if property is available for the given listing type
  */
 export const isPropertyAvailable = (property: Property): boolean => {
-  return property.isActive || property.is_active || false;
+  return property.is_active || false;
 };
 
 /**
  * Check if property is featured
  */
 export const isPropertyFeatured = (property: Property): boolean => {
-  return property.isFeatured || property.is_featured || false;
+  return property.is_featured || false;
 };
 
 /**
@@ -332,17 +330,15 @@ export const convertFormDataToCreateRequest = (formData: PropertyFormData): Crea
   return {
     title: formData.title,
     description: formData.description,
-    propertyType: formData.property_type as PropertyType,
-    listingType: formData.listing_type as ListingType,
-    status: formData.status as PropertyStatus,
+    property_type: formData.property_type as PropertyType,
+    listing_type: formData.listing_type as ListingType,
     price: parseFloat(formData.price),
-    areaSqft: parseFloat(formData.area),
+    area_sqft: parseFloat(formData.area),
     bedrooms: parseInt(formData.bedrooms) || 0,
     bathrooms: parseInt(formData.bathrooms) || 0,
     address: formData.address,
     city: formData.city,
     state: formData.state,
-    postalCode: formData.postal_code,
     amenities: convertAmenitiesToBackend(formData.amenities)
   };
 };
@@ -353,23 +349,22 @@ export const convertFormDataToCreateRequest = (formData: PropertyFormData): Crea
 export const convertPropertyToFormData = (property: Property): PropertyFormData => {
   return {
     title: property.title,
-    description: property.description,
-    property_type: property.propertyType || property.property_type || '',
-    listing_type: property.listingType || property.listing_type || '',
+    description: property.description || '',
+    property_type: property.property_type || '',
+    listing_type: property.listing_type || '',
     status: property.status,
     price: property.price.toString(),
-    area: (property.area || property.areaSqft || property.area_sqft || 0).toString(),
+    area: (property.area_sqft || 0).toString(),
     bedrooms: (property.bedrooms || 0).toString(),
     bathrooms: (property.bathrooms || 0).toString(),
-    address: property.location?.address || property.address || '',
+    address: property.address || '',
     city: property.city,
     state: property.state,
-    postal_code: property.postalCode || property.postal_code || '',
+    postal_code: '',
     amenities: formatAmenities(property.amenities),
     images: [],
     latitude: property.latitude?.toString(),
-    longitude: property.longitude?.toString(),
-    specifications: property.specifications
+    longitude: property.longitude?.toString()
   };
 };
 
@@ -379,41 +374,27 @@ export const convertPropertyToFormData = (property: Property): PropertyFormData 
 export const normalizePropertyData = (property: any): Property => {
   return {
     id: property.id,
+    user_id: property.user_id,
     title: property.title,
     description: property.description,
-    propertyType: property.propertyType || property.property_type,
-    listingType: property.listingType || property.listing_type,
+    property_type: property.property_type,
+    listing_type: property.listing_type,
     price: property.price,
-    area: property.area || property.areaSqft || property.area_sqft,
+    area_sqft: property.area_sqft,
     bedrooms: property.bedrooms,
     bathrooms: property.bathrooms,
-    location: property.location || {
-      address: property.address || '',
-      city: property.city || '',
-      state: property.state || '',
-      postalCode: property.postalCode || property.postal_code,
-      latitude: property.latitude,
-      longitude: property.longitude
-    },
+    address: property.address,
     city: property.city,
     state: property.state,
-    postalCode: property.postalCode || property.postal_code,
     latitude: property.latitude,
     longitude: property.longitude,
-    amenities: property.amenities || [],
+    amenities: property.amenities || {},
     images: property.images || [],
-    isActive: property.isActive ?? property.is_active ?? true,
-    isFeatured: property.isFeatured ?? property.is_featured ?? false,
+    is_active: property.is_active ?? true,
+    is_featured: property.is_featured ?? false,
     status: property.status,
-    ownerId: property.ownerId || property.owner_id,
-    agentId: property.agentId || property.agent_id,
-    createdAt: property.createdAt || property.created_at,
-    updatedAt: property.updatedAt || property.updated_at,
-    stats: property.stats,
-    features: property.features,
-    specifications: property.specifications,
-    owner: property.owner,
-    agent: property.agent
+    created_at: property.created_at,
+    updated_at: property.updated_at
   };
 };
 
@@ -443,7 +424,7 @@ export const parsePropertyIdFromSlug = (slug: string): number | null => {
  */
 export const arePropertiesSimilar = (prop1: Property, prop2: Property): boolean => {
   return (
-    prop1.propertyType === prop2.propertyType &&
+    prop1.property_type === prop2.property_type &&
     prop1.city === prop2.city &&
     Math.abs(prop1.price - prop2.price) / Math.max(prop1.price, prop2.price) < 0.3 &&
     Math.abs((prop1.bedrooms || 0) - (prop2.bedrooms || 0)) <= 1
@@ -466,13 +447,13 @@ export const sortProperties = (
         comparison = a.price - b.price;
         break;
       case 'area':
-        comparison = (a.area || 0) - (b.area || 0);
+        comparison = (a.area_sqft || 0) - (b.area_sqft || 0);
         break;
       case 'created_at':
-        comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        comparison = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
         break;
       case 'updated_at':
-        comparison = new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
+        comparison = new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime();
         break;
       case 'title':
         comparison = a.title.localeCompare(b.title);
@@ -502,7 +483,7 @@ export const filterProperties = (
   return properties.filter(property => {
     if (filters.minPrice && property.price < filters.minPrice) return false;
     if (filters.maxPrice && property.price > filters.maxPrice) return false;
-    if (filters.propertyType && property.propertyType !== filters.propertyType) return false;
+    if (filters.propertyType && property.property_type !== filters.propertyType) return false;
     if (filters.bedrooms && property.bedrooms !== filters.bedrooms) return false;
     if (filters.city && property.city.toLowerCase() !== filters.city.toLowerCase()) return false;
     

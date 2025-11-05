@@ -15,14 +15,17 @@ class AnalyticsServiceImpl implements AnalyticsService {
       return {
         success: true,
         data: response.data,
-        message: 'Traffic analytics retrieved successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error fetching traffic analytics:', error);
       return {
         success: false,
-        data: null,
-        message: error.message || 'Failed to fetch traffic analytics'
+        error: {
+          code: 'ANALYTICS_ERROR',
+          message: error.message || 'Failed to fetch traffic analytics'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -33,14 +36,17 @@ class AnalyticsServiceImpl implements AnalyticsService {
       return {
         success: true,
         data: response.data,
-        message: 'Lead analytics retrieved successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error fetching lead analytics:', error);
       return {
         success: false,
-        data: null,
-        message: error.message || 'Failed to fetch lead analytics'
+        error: {
+          code: 'ANALYTICS_ERROR',
+          message: error.message || 'Failed to fetch lead analytics'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -51,14 +57,17 @@ class AnalyticsServiceImpl implements AnalyticsService {
       return {
         success: true,
         data: response.data,
-        message: 'Listing analytics retrieved successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error fetching listing analytics:', error);
       return {
         success: false,
-        data: null,
-        message: error.message || 'Failed to fetch listing analytics'
+        error: {
+          code: 'ANALYTICS_ERROR',
+          message: error.message || 'Failed to fetch listing analytics'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -69,14 +78,17 @@ class AnalyticsServiceImpl implements AnalyticsService {
       return {
         success: true,
         data: response.data,
-        message: 'System stats retrieved successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error fetching system stats:', error);
       return {
         success: false,
-        data: null,
-        message: error.message || 'Failed to fetch system stats'
+        error: {
+          code: 'ANALYTICS_ERROR',
+          message: error.message || 'Failed to fetch system stats'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }

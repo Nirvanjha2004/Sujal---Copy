@@ -97,10 +97,10 @@ export function ProfilePage() {
             <ProfileForm 
               user={{
                 ...state.user!,
-                isVerified: true,
-                isActive: true,
-                createdAt: state.user!.createdAt || new Date().toISOString(),
-                updatedAt: state.user!.updatedAt || new Date().toISOString(),
+                is_verified: true,
+                is_active: true,
+                created_at: state.user!.created_at || new Date().toISOString(),
+                updated_at: state.user!.updated_at || new Date().toISOString(),
               }}
               onSuccess={handleProfileSuccess}
               onError={handleProfileError}

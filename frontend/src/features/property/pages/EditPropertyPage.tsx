@@ -23,21 +23,9 @@ export function EditPropertyPage() {
 
     // Check if user owns this property or has permission to edit it
     const canEditThisProperty = canEditProperty && property && (
-        property.owner_id === state.user?.id || 
+        property.user_id === state.user?.id || 
         state.user?.role === 'admin'
     );
-
-    const handleSubmit = async () => {
-        if (!property) return;
-        
-        try {
-            await submitForm();
-            // Navigate back to property details or my properties
-            navigate(`/property/${property.id}`);
-        } catch (error) {
-            console.error('Error updating property:', error);
-        }
-    };
 
     if (loading) {
         return (
@@ -138,11 +126,11 @@ export function EditPropertyPage() {
                     </Alert>
                 )}
 
-                {error && (
+                {propertyError && (
                     <Alert className="mb-6 border-red-200 bg-red-50">
                         <Icon icon="solar:danger-bold" className="size-5 text-red-500" />
                         <AlertDescription className="text-red-700">
-                            {error}
+                            {propertyError}
                         </AlertDescription>
                     </Alert>
                 )}

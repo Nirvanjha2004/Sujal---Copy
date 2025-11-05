@@ -7,7 +7,7 @@ import { useProperties } from "@/shared/hooks/useProperties";
 import { PropertyGridSkeleton } from "@/shared/components/ui/loading";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
-import { PropertyFilters } from "@/features/property/types";
+import { PropertyFilters, PropertyType, ListingType } from "@/features/property/types";
 import { useAuth } from '@/shared/contexts/AuthContext';
 import { api } from '@/shared/lib/api';
 import {
@@ -37,9 +37,23 @@ export function PropertyListingGrid() {
     const minPrice = searchParams.get("min_price");
     const maxPrice = searchParams.get("max_price");
 
+    // Helper function to validate PropertyType
+    const isValidPropertyType = (type: string): type is PropertyType => {
+      return ['apartment', 'house', 'villa', 'plot', 'commercial', 'land'].includes(type);
+    };
+
+    // Helper function to validate ListingType
+    const isValidListingType = (type: string): type is ListingType => {
+      return ['sale', 'rent'].includes(type);
+    };
+
     if (query) newFilters.location = query;
-    if (propertyType && propertyType !== "all") newFilters.property_type = propertyType;
-    if (listingType) newFilters.listing_type = listingType;
+    if (propertyType && propertyType !== "all" && isValidPropertyType(propertyType)) {
+      newFilters.property_type = propertyType;
+    }
+    if (listingType && isValidListingType(listingType)) {
+      newFilters.listing_type = listingType;
+    }
     if (minPrice) newFilters.min_price = parseInt(minPrice);
     if (maxPrice) newFilters.max_price = parseInt(maxPrice);
 

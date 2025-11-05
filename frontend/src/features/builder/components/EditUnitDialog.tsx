@@ -34,7 +34,6 @@ interface UnitFormData {
   balconies: number;
   bathrooms: number;
   bedrooms: number;
-  facing: string;
   status: string;
   isCornerUnit: boolean;
   hasTerrace: boolean;
@@ -54,7 +53,6 @@ export function EditUnitDialog({ open, onOpenChange, projectId, unitId, onSucces
     balconies: 0,
     bathrooms: 1,
     bedrooms: 0,
-    facing: '',
     status: 'available',
     isCornerUnit: false,
     hasTerrace: false,
@@ -106,7 +104,7 @@ export function EditUnitDialog({ open, onOpenChange, projectId, unitId, onSucces
     try {
       setLoading(true);
       
-      const response = await projectService.updateUnit(projectId, unitId, formData);
+      const response = await projectService.updateUnit(String(projectId), unitId, formData);
       
       if (response.success) {
         toast.success('Unit updated successfully');
@@ -233,27 +231,6 @@ export function EditUnitDialog({ open, onOpenChange, projectId, unitId, onSucces
                   </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="facing">Facing</Label>
-                  <Select
-                    value={formData.facing}
-                    onValueChange={(value) => handleChange('facing', value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select facing" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="North">North</SelectItem>
-                      <SelectItem value="South">South</SelectItem>
-                      <SelectItem value="East">East</SelectItem>
-                      <SelectItem value="West">West</SelectItem>
-                      <SelectItem value="North-East">North-East</SelectItem>
-                      <SelectItem value="North-West">North-West</SelectItem>
-                      <SelectItem value="South-East">South-East</SelectItem>
-                      <SelectItem value="South-West">South-West</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
               </div>
             </div>
 

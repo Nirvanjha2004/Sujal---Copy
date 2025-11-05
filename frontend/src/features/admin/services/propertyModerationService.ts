@@ -42,7 +42,7 @@ class PropertyModerationServiceImpl implements PropertyModerationService {
           limit: params.limit,
           totalPages: response.data.totalPages
         },
-        message: 'Properties retrieved successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error fetching properties:', error);
@@ -55,7 +55,11 @@ class PropertyModerationServiceImpl implements PropertyModerationService {
           limit: params.limit,
           totalPages: 0
         },
-        message: error.response?.data?.error?.message || 'Failed to fetch properties'
+        error: {
+          code: 'PROPERTY_FETCH_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to fetch properties'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -70,14 +74,18 @@ class PropertyModerationServiceImpl implements PropertyModerationService {
       return {
         success: true,
         data: response.data,
-        message: 'Property details retrieved successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error fetching property details:', error);
       return {
         success: false,
         data: null as any,
-        message: error.response?.data?.error?.message || 'Failed to fetch property details'
+        error: {
+          code: 'PROPERTY_DETAIL_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to fetch property details'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -88,14 +96,18 @@ class PropertyModerationServiceImpl implements PropertyModerationService {
       return {
         success: true,
         data: undefined,
-        message: 'Property status updated successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error updating property status:', error);
       return {
         success: false,
         data: undefined,
-        message: error.response?.data?.error?.message || 'Failed to update property status'
+        error: {
+          code: 'PROPERTY_STATUS_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to update property status'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -109,14 +121,18 @@ class PropertyModerationServiceImpl implements PropertyModerationService {
       return {
         success: true,
         data: undefined,
-        message: 'Property approved successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error approving property:', error);
       return {
         success: false,
         data: undefined,
-        message: error.response?.data?.error?.message || 'Failed to approve property'
+        error: {
+          code: 'PROPERTY_APPROVE_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to approve property'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -130,14 +146,18 @@ class PropertyModerationServiceImpl implements PropertyModerationService {
       return {
         success: true,
         data: undefined,
-        message: 'Property rejected successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error rejecting property:', error);
       return {
         success: false,
         data: undefined,
-        message: error.response?.data?.error?.message || 'Failed to reject property'
+        error: {
+          code: 'PROPERTY_REJECT_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to reject property'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -148,14 +168,18 @@ class PropertyModerationServiceImpl implements PropertyModerationService {
       return {
         success: true,
         data: undefined,
-        message: 'Property deleted successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error deleting property:', error);
       return {
         success: false,
         data: undefined,
-        message: error.response?.data?.error?.message || 'Failed to delete property'
+        error: {
+          code: 'PROPERTY_DELETE_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to delete property'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }

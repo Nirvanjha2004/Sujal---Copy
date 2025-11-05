@@ -781,7 +781,6 @@ export function BulkUnitsPage() {
                       <ul className="list-disc list-inside space-y-1 text-muted-foreground">
                         <li>floor_number</li>
                         <li>tower</li>
-                        <li>facing</li>
                         <li>parking_spaces</li>
                         <li>balconies</li>
                         <li>is_corner_unit</li>

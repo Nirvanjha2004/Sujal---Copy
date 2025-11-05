@@ -154,7 +154,7 @@ class PropertySearchService {
   async getSavedSearches(): Promise<SavedSearch[]> {
     try {
       const response = await api.getSavedSearches();
-      return (response.data.searches || []).map(this.transformApiSavedSearchToSavedSearch);
+      return (response.data.savedSearches || []).map(this.transformApiSavedSearchToSavedSearch);
     } catch (error: any) {
       throw new Error(`Failed to fetch saved searches: ${error.message}`);
     }
@@ -339,55 +339,38 @@ class PropertySearchService {
       id: apiProperty.id,
       title: apiProperty.title,
       description: apiProperty.description || '',
-      propertyType: (apiProperty.property_type || 'apartment') as any,
-      listingType: (apiProperty.listing_type || 'sale') as any,
+      property_type: (apiProperty.property_type || 'apartment') as any,
+      listing_type: (apiProperty.listing_type || 'sale') as any,
       price: apiProperty.price,
-      area: apiProperty.area_sqft || apiProperty.area || 0,
-      areaSqft: apiProperty.area_sqft,
+
+
       area_sqft: apiProperty.area_sqft,
       bedrooms: apiProperty.bedrooms,
       bathrooms: apiProperty.bathrooms,
-      location: {
-        address: apiProperty.address,
-        city: apiProperty.city,
-        state: apiProperty.state,
-        postalCode: apiProperty.postal_code,
-        latitude: apiProperty.latitude,
-        longitude: apiProperty.longitude
-      },
       address: apiProperty.address,
       city: apiProperty.city,
       state: apiProperty.state,
-      postalCode: apiProperty.postal_code,
       postal_code: apiProperty.postal_code,
       latitude: apiProperty.latitude,
       longitude: apiProperty.longitude,
-      amenities: [],
+      amenities: apiProperty.amenities || {},
       images: apiProperty.images?.map(img => ({
         id: img.id,
-        propertyId: img.property_id,
-        url: img.image_url,
-        thumbnailUrl: img.image_url,
-        alt: img.alt_text || 'Property image',
-        order: img.display_order || 0,
-        isPrimary: img.is_primary || false,
-        uploadedAt: apiProperty.created_at
+        property_id: img.property_id,
+        image_url: img.image_url,
+        alt_text: img.alt_text || 'Property image',
+        display_order: img.display_order || 0,
+        is_primary: img.is_primary || false,
+        created_at: apiProperty.created_at,
+        updated_at: apiProperty.updated_at
       })) || [],
-      isActive: true,
-      is_active: true,
-      isFeatured: false,
-      is_featured: false,
+      is_active: apiProperty.is_active ?? true,
+      is_featured: apiProperty.is_featured ?? false,
       status: (apiProperty.status || 'active') as any,
-      ownerId: apiProperty.owner?.id || 0,
-      owner_id: apiProperty.owner?.id,
-      agentId: undefined,
-      agent_id: undefined,
-      createdAt: apiProperty.created_at,
+      user_id: apiProperty.user_id || 0,
       created_at: apiProperty.created_at,
-      updatedAt: apiProperty.updated_at,
       updated_at: apiProperty.updated_at,
-      owner: apiProperty.owner,
-      agent: undefined
+      expires_at: apiProperty.expires_at
     };
   }
 

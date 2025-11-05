@@ -34,7 +34,7 @@ export function UserManagementPage() {
         setUsers(response.data.data);
         setTotalPages(response.data.totalPages);
       } else {
-        throw new Error(response.message || 'Failed to fetch users');
+        throw new Error(response.error?.message || 'Failed to fetch users');
       }
     } catch (err: any) {
       console.error('Error fetching users:', err);
@@ -60,7 +60,7 @@ export function UserManagementPage() {
       if (response.success) {
         fetchUsers(); // Refresh the list
       } else {
-        alert(response.message || 'Failed to update user');
+        alert(response.error?.message || 'Failed to update user');
       }
     } catch (err: any) {
       alert('Failed to update user');
@@ -75,7 +75,7 @@ export function UserManagementPage() {
       if (response.success) {
         fetchUsers(); // Refresh the list
       } else {
-        alert(response.message || 'Failed to delete user');
+        alert(response.error?.message || 'Failed to delete user');
       }
     } catch (err: any) {
       alert('Failed to delete user');

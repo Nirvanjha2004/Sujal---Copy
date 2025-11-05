@@ -11,7 +11,7 @@ import { PropertyFilters as PropertyFiltersType, PropertyType, ListingType } fro
 import { PROPERTY_TYPES, LISTING_TYPES } from '../../constants';
 import { AMENITIES_CONFIG } from '../../constants/amenities';
 
-interface PropertyFiltersProps {
+export interface PropertyFiltersProps {
     filters: PropertyFiltersType;
     onFiltersChange: (filters: PropertyFiltersType) => void;
     onApplyFilters?: () => void;

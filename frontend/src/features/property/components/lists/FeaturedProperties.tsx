@@ -231,7 +231,7 @@ export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({
               
               <div>
                 <div className="text-2xl font-bold text-purple-600">
-                  {Math.round(displayProperties.reduce((sum, p) => sum + p.area, 0) / displayProperties.length)}
+                  {Math.round(displayProperties.reduce((sum, p) => sum + (p.area_sqft || 0), 0) / displayProperties.length)}
                 </div>
                 <div className="text-sm text-gray-600">Avg Area</div>
               </div>
@@ -239,9 +239,9 @@ export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({
               <div>
                 <div className="text-2xl font-bold text-orange-600 flex items-center justify-center gap-1">
                   <Eye className="h-5 w-5" />
-                  {displayProperties.reduce((sum, p) => sum + (p.stats?.views || 0), 0)}
+                  {displayProperties.length}
                 </div>
-                <div className="text-sm text-gray-600">Total Views</div>
+                <div className="text-sm text-gray-600">Properties</div>
               </div>
             </div>
           </div>

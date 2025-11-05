@@ -52,7 +52,7 @@ export function ContentManagementPage() {
         setContents(response.data.data);
         setTotalPages(response.data.totalPages);
       } else {
-        throw new Error(response.message || 'Failed to fetch contents');
+        throw new Error(response.error?.message || 'Failed to fetch contents');
       }
     } catch (err: any) {
       console.error('Error fetching contents:', err);
@@ -78,7 +78,7 @@ export function ContentManagementPage() {
       if (response.success) {
         fetchContents();
       } else {
-        alert(response.message || 'Failed to update content');
+        alert(response.error?.message || 'Failed to update content');
       }
     } catch (err: any) {
       alert('Failed to update content');
@@ -93,7 +93,7 @@ export function ContentManagementPage() {
       if (response.success) {
         fetchContents();
       } else {
-        alert(response.message || 'Failed to delete content');
+        alert(response.error?.message || 'Failed to delete content');
       }
     } catch (err: any) {
       alert('Failed to delete content');

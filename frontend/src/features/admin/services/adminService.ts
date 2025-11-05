@@ -13,14 +13,18 @@ class AdminServiceImpl implements AdminService {
       return {
         success: true,
         data: response.data,
-        message: 'Analytics data retrieved successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error fetching analytics:', error);
       return {
         success: false,
-        data: null,
-        message: error.message || 'Failed to fetch analytics data'
+        data: undefined,
+        error: {
+          code: 'ANALYTICS_ERROR',
+          message: error.message || 'Failed to fetch analytics data'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }

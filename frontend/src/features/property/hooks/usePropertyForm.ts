@@ -182,23 +182,23 @@ export const usePropertyForm = (options: UsePropertyFormOptions): UsePropertyFor
   const loadProperty = useCallback((property: Property) => {
     const propertyFormData: PropertyFormData = {
       title: property.title,
-      description: property.description,
-      property_type: property.propertyType,
-      listing_type: property.listingType,
+      description: property.description || '',
+      property_type: property.property_type,
+      listing_type: property.listing_type,
       status: property.status,
       price: property.price.toString(),
-      area: property.area.toString(),
+      area: property.area_sqft?.toString() || '',
       bedrooms: property.bedrooms?.toString() || '',
       bathrooms: property.bathrooms?.toString() || '',
-      address: property.location?.address || property.address || '',
+      address: property.address || '',
       city: property.city,
       state: property.state,
-      postal_code: property.postalCode || property.postal_code || '',
+      postal_code: property.postal_code || '',
       amenities: Array.isArray(property.amenities) ? property.amenities : [],
       images: [],
       latitude: property.latitude?.toString(),
       longitude: property.longitude?.toString(),
-      specifications: property.specifications || {},
+      specifications: {},
       existingImages: property.images || []
     };
     
@@ -220,19 +220,18 @@ export const usePropertyForm = (options: UsePropertyFormOptions): UsePropertyFor
       
       if (mode === 'create') {
         const createData: CreatePropertyRequest = {
-          title: formData.title || 'Untitled Property',
-          description: formData.description || '',
-          propertyType: formData.property_type || 'apartment' as any,
-          listingType: formData.listing_type || 'sale' as any,
-          status: formData.status || 'ACTIVE' as any,
+          title: formData.title || 'Property Title',
+          description: formData.description,
+          property_type: formData.property_type || 'apartment' as any,
+          listing_type: formData.listing_type || 'sale' as any,
           price: Number(formData.price) || 0,
-          areaSqft: Number(formData.area) || 0,
+          area_sqft: Number(formData.area) || 0,
           bedrooms: Number(formData.bedrooms) || 0,
           bathrooms: Number(formData.bathrooms) || 0,
           address: formData.address || 'Address not provided',
           city: formData.city || 'City not provided',
           state: formData.state || 'State not provided',
-          postalCode: formData.postal_code || '',
+          postal_code: formData.postal_code || '',
           amenities: formData.amenities.reduce((acc, amenity) => {
             acc[amenity] = true;
             return acc;
@@ -249,17 +248,16 @@ export const usePropertyForm = (options: UsePropertyFormOptions): UsePropertyFor
           id: propertyId,
           title: formData.title || 'Untitled Property',
           description: formData.description || '',
-          propertyType: formData.property_type || 'apartment' as any,
-          listingType: formData.listing_type || 'sale' as any,
-          status: formData.status || 'ACTIVE' as any,
+          property_type: formData.property_type || 'apartment' as any,
+          listing_type: formData.listing_type || 'sale' as any,
           price: Number(formData.price) || 0,
-          areaSqft: Number(formData.area) || 0,
+          area_sqft: Number(formData.area) || 0,
           bedrooms: Number(formData.bedrooms) || 0,
           bathrooms: Number(formData.bathrooms) || 0,
           address: formData.address || 'Address not provided',
           city: formData.city || 'City not provided',
           state: formData.state || 'State not provided',
-          postalCode: formData.postal_code || '',
+          postal_code: formData.postal_code || '',
           amenities: formData.amenities.reduce((acc, amenity) => {
             acc[amenity] = true;
             return acc;

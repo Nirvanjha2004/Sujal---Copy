@@ -439,8 +439,8 @@ export const EditPropertyForm: React.FC<EditPropertyFormProps> = ({
                   {formData.existingImages.map((image) => (
                     <div key={image.id} className="relative group">
                       <img
-                        src={image.thumbnailUrl || image.url}
-                        alt={image.alt}
+                        src={image.image_url}
+                        alt={image.alt_text || 'Property image'}
                         className="w-full h-24 object-cover rounded-lg"
                       />
                       <button

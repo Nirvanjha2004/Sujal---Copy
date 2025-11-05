@@ -39,15 +39,13 @@ class PropertyImageService {
       
       return {
         id: response.id,
-        propertyId: propertyId,
-        url: response.image_url || response.url,
-        thumbnailUrl: response.thumbnail_url,
-        alt: response.alt_text || caption || `Property ${propertyId} image`,
-        caption: caption,
-        order: response.display_order || 0,
-        isPrimary: response.is_primary || false,
-        uploadedAt: response.created_at || new Date().toISOString(),
-        imageType: imageType
+        property_id: propertyId,
+        image_url: response.image_url || response.url,
+        alt_text: caption || `Property ${propertyId} image`,
+        display_order: response.display_order || 0,
+        is_primary: response.is_primary || false,
+        created_at: response.created_at || new Date().toISOString(),
+        updated_at: response.updated_at || new Date().toISOString()
       };
     } catch (error: any) {
       throw new Error(`Failed to upload property image: ${error.message}`);
@@ -90,15 +88,13 @@ class PropertyImageService {
         response.successful.forEach((imageData: any, index: number) => {
           uploadedImages.push({
             id: imageData.imageId || imageData.id,
-            propertyId: propertyId,
-            url: imageData.url || imageData.image_url,
-            thumbnailUrl: imageData.thumbnailUrl || imageData.thumbnail_url,
-            alt: `Property ${propertyId} image ${index + 1}`,
-            caption: `Image ${existingImages.length + index + 1}`,
-            order: existingImages.length + index,
-            isPrimary: index === 0 && existingImages.length === 0,
-            uploadedAt: new Date().toISOString(),
-            imageType: imageType
+            property_id: propertyId,
+            image_url: imageData.url || imageData.image_url,
+            alt_text: `Property ${propertyId} image ${index + 1}`,
+            display_order: existingImages.length + index,
+            is_primary: index === 0 && existingImages.length === 0,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
           });
         });
       }
@@ -153,8 +149,8 @@ class PropertyImageService {
 
       // Return images sorted by the new order
       return images.sort((a, b) => {
-        const aOrder = imageOrder.find(item => item.id === a.id)?.order || a.order || 0;
-        const bOrder = imageOrder.find(item => item.id === b.id)?.order || b.order || 0;
+        const aOrder = imageOrder.find(item => item.id === a.id)?.order || a.display_order || 0;
+        const bOrder = imageOrder.find(item => item.id === b.id)?.order || b.display_order || 0;
         return aOrder - bOrder;
       });
     } catch (error: any) {
@@ -308,15 +304,13 @@ class PropertyImageService {
   private transformImageResponse(apiImage: any): PropertyImage {
     return {
       id: apiImage.id,
-      propertyId: apiImage.property_id || apiImage.propertyId,
-      url: apiImage.image_url || apiImage.url,
-      thumbnailUrl: apiImage.thumbnail_url || apiImage.thumbnailUrl,
-      alt: apiImage.alt_text || apiImage.alt || 'Property image',
-      caption: apiImage.caption,
-      order: apiImage.display_order || apiImage.order || 0,
-      isPrimary: apiImage.is_primary || apiImage.isPrimary || false,
-      uploadedAt: apiImage.created_at || apiImage.uploadedAt || new Date().toISOString(),
-      imageType: apiImage.image_type || apiImage.imageType || 'gallery'
+      property_id: apiImage.property_id || apiImage.propertyId,
+      image_url: apiImage.image_url || apiImage.url,
+      alt_text: apiImage.alt_text || apiImage.alt || 'Property image',
+      display_order: apiImage.display_order || apiImage.order || 0,
+      is_primary: apiImage.is_primary || apiImage.isPrimary || false,
+      created_at: apiImage.created_at || apiImage.uploadedAt || new Date().toISOString(),
+      updated_at: apiImage.updated_at || apiImage.updatedAt || new Date().toISOString()
     };
   }
 

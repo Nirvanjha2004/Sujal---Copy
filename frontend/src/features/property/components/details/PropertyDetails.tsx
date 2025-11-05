@@ -13,7 +13,6 @@ import {
   Share2, 
   MapPin, 
   Calendar, 
-  Eye, 
   Phone, 
   Mail, 
   MessageCircle,
@@ -65,7 +64,7 @@ export const PropertyDetails: React.FC<PropertyDetailsProps> = ({
       if (navigator.share) {
         navigator.share({
           title: property.title,
-          text: `Check out this ${property.propertyType} for ${property.listingType}`,
+          text: `Check out this ${property.property_type} for ${property.listing_type}`,
           url: window.location.href
         });
       } else {
@@ -134,13 +133,13 @@ export const PropertyDetails: React.FC<PropertyDetailsProps> = ({
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <Badge variant={property.listingType === 'sale' ? 'default' : 'secondary'}>
-                  For {property.listingType === 'sale' ? 'Sale' : 'Rent'}
+                <Badge variant={property.listing_type === 'sale' ? 'default' : 'secondary'}>
+                  For {property.listing_type === 'sale' ? 'Sale' : 'Rent'}
                 </Badge>
                 <Badge variant="outline">
-                  {property.propertyType}
+                  {property.property_type}
                 </Badge>
-                {property.isFeatured && (
+                {property.is_featured && (
                   <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
                     Featured
                   </Badge>
@@ -153,18 +152,18 @@ export const PropertyDetails: React.FC<PropertyDetailsProps> = ({
 
               <div className="flex items-center text-gray-600 mb-4">
                 <MapPin className="h-4 w-4 mr-1" />
-                <span>{property.location?.address || property.address}, {property.city}, {property.state}</span>
+                <span>{property.address}, {property.city}, {property.state}</span>
               </div>
 
               <div className="text-3xl font-bold text-blue-600 mb-4">
                 {formatPrice(property.price)}
-                {property.listingType === 'rent' && <span className="text-lg text-gray-600">/month</span>}
+                {property.listing_type === 'rent' && <span className="text-lg text-gray-600">/month</span>}
               </div>
 
               <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-                {property.area && (
+                {property.area_sqft && (
                   <div className="flex items-center gap-1">
-                    <span className="font-medium">{formatArea(property.area)}</span>
+                    <span className="font-medium">{formatArea(property.area_sqft)}</span>
                   </div>
                 )}
                 {property.bedrooms && (
@@ -179,14 +178,8 @@ export const PropertyDetails: React.FC<PropertyDetailsProps> = ({
                 )}
                 <div className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
-                  <span>Listed {formatDate(property.createdAt)}</span>
+                  <span>Listed {formatDate(property.created_at)}</span>
                 </div>
-                {property.stats?.views && (
-                  <div className="flex items-center gap-1">
-                    <Eye className="h-4 w-4" />
-                    <span>{property.stats.views} views</span>
-                  </div>
-                )}
               </div>
             </div>
 

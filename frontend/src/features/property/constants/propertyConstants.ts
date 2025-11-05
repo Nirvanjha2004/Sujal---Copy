@@ -22,7 +22,7 @@ export const PROPERTY_STATUSES: Array<{ value: PropertyStatus; label: string }> 
   { value: 'resale', label: 'Resale' },
   { value: 'under_construction', label: 'Under Construction' },
   { value: 'active', label: 'Active' },
-  { value: 'inactive', label: 'Inactive' },
+  { value: 'pending', label: 'Pending' },
   { value: 'sold', label: 'Sold' },
   { value: 'rented', label: 'Rented' }
 ];

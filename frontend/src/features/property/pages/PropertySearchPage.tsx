@@ -311,7 +311,7 @@ export function PropertySearchPage() {
                     {authState.isAuthenticated ? (
                         <Avatar className="cursor-pointer" onClick={() => navigate('/profile')}>
                             <AvatarFallback className="bg-green-500 text-white">
-                                {authState.user?.firstName?.charAt(0) || authState.user?.email?.charAt(0) || 'U'}
+                                {authState.user?.first_name?.charAt(0) || authState.user?.email?.charAt(0) || 'U'}
                             </AvatarFallback>
                         </Avatar>
                     ) : (

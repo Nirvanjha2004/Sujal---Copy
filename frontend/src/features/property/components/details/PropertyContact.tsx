@@ -112,9 +112,8 @@ export const PropertyContact: React.FC<PropertyContactProps> = ({
   };
 
   // Get contact information
-  const agent = property.agent;
   const owner = property.owner;
-  const contactPerson = agent || owner;
+  const contactPerson = owner;
 
   return (
     <div className={`space-y-6 ${className}`}>
@@ -144,12 +143,7 @@ export const PropertyContact: React.FC<PropertyContactProps> = ({
                   <h3 className="text-lg font-semibold text-gray-900">
                     {contactPerson.name || contactPerson.full_name || 'Property Contact'}
                   </h3>
-                  {agent && (
-                    <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                      Agent
-                    </Badge>
-                  )}
-                  {owner && !agent && (
+                  {owner && (
                     <Badge variant="secondary" className="bg-green-100 text-green-800">
                       Owner
                     </Badge>
@@ -427,12 +421,12 @@ export const PropertyContact: React.FC<PropertyContactProps> = ({
 
             <div className="flex justify-between items-center">
               <span className="text-gray-600">Listed Date</span>
-              <span className="font-medium">{formatDate(property.createdAt)}</span>
+              <span className="font-medium">{formatDate(property.created_at)}</span>
             </div>
 
             <div className="flex justify-between items-center">
               <span className="text-gray-600">Last Updated</span>
-              <span className="font-medium">{formatDate(property.updatedAt)}</span>
+              <span className="font-medium">{formatDate(property.updated_at)}</span>
             </div>
 
             <div className="flex justify-between items-center">
@@ -445,26 +439,7 @@ export const PropertyContact: React.FC<PropertyContactProps> = ({
               </Badge>
             </div>
 
-            {property.stats && (
-              <>
-                <Separator />
-                <div className="grid grid-cols-2 gap-4 pt-2">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">
-                      {property.stats.views || 0}
-                    </div>
-                    <div className="text-sm text-gray-600">Views</div>
-                  </div>
 
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-red-600">
-                      {property.stats.inquiries || 0}
-                    </div>
-                    <div className="text-sm text-gray-600">Inquiries</div>
-                  </div>
-                </div>
-              </>
-            )}
           </div>
         </CardContent>
       </Card>

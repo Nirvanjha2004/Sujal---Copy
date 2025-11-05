@@ -1,5 +1,22 @@
 import { api } from '@/shared/lib/api';
 import type { SavedSearch, PropertyFilters } from '../types/savedSearches';
+import type { PropertyFilters as ApiPropertyFilters } from '@/shared/lib/api';
+
+// Helper function to convert buyer PropertyFilters to API PropertyFilters
+const transformFiltersForAPI = (filters: PropertyFilters): ApiPropertyFilters => {
+  return {
+    ...filters,
+    property_type: Array.isArray(filters.property_type) 
+      ? filters.property_type.join(',') 
+      : filters.property_type,
+    bedrooms: Array.isArray(filters.bedrooms) 
+      ? filters.bedrooms[0] 
+      : filters.bedrooms,
+    bathrooms: Array.isArray(filters.bathrooms) 
+      ? filters.bathrooms[0] 
+      : filters.bathrooms,
+  } as ApiPropertyFilters;
+};
 
 export interface SavedSearchesResponse {
   data: {
@@ -29,14 +46,12 @@ export const savedSearchesService = {
       console.log('Raw API response:', response);
       
       // Handle different possible response structures
-      let searchesArray = [];
+      let searchesArray: any[] = [];
       
       if (response.data?.savedSearches) {
         // Expected structure: { data: { savedSearches: [...] } }
         searchesArray = response.data.savedSearches;
-      } else if (response.data?.searches) {
-        // Alternative structure: { data: { searches: [...] } }
-        searchesArray = response.data.searches;
+
       } else if (Array.isArray(response.data)) {
         // Direct array: { data: [...] }
         searchesArray = response.data;
@@ -80,7 +95,7 @@ export const savedSearchesService = {
    */
   async createSavedSearch(name: string, filters: PropertyFilters): Promise<SavedSearch> {
     try {
-      const response = await api.createSavedSearch(name, filters);
+      const response = await api.createSavedSearch(name, transformFiltersForAPI(filters));
       return {
         id: response.id,
         name: response.name,
@@ -119,7 +134,7 @@ export const savedSearchesService = {
     try {
       // For now, we'll delete and recreate since update endpoint doesn't exist
       await api.deleteSavedSearch(searchId);
-      const response = await api.createSavedSearch(name, filters);
+      const response = await api.createSavedSearch(name, transformFiltersForAPI(filters));
       return {
         id: response.id,
         name: response.name,
@@ -170,14 +185,31 @@ export const savedSearchesService = {
 
     // Map buyer filter format to search page format
     if (filters.location) params.append('q', filters.location);
-    if (filters.property_type) params.append('property_type', filters.property_type);
+    if (filters.property_type) {
+      const propertyType = Array.isArray(filters.property_type) 
+        ? filters.property_type.join(',') 
+        : filters.property_type;
+      params.append('property_type', propertyType);
+    }
     if (filters.listing_type) params.append('listing_type', filters.listing_type);
     if (filters.min_price) params.append('min_price', filters.min_price.toString());
     if (filters.max_price) params.append('max_price', filters.max_price.toString());
     if (filters.min_area) params.append('min_area', filters.min_area.toString());
     if (filters.max_area) params.append('max_area', filters.max_area.toString());
-    if (filters.bedrooms) params.append('bedrooms', filters.bedrooms.toString());
-    if (filters.bathrooms) params.append('bathrooms', filters.bathrooms.toString());
+    if (filters.bedrooms) {
+      if (Array.isArray(filters.bedrooms)) {
+        params.append('bedrooms', filters.bedrooms.join(','));
+      } else {
+        params.append('bedrooms', filters.bedrooms.toString());
+      }
+    }
+    if (filters.bathrooms) {
+      if (Array.isArray(filters.bathrooms)) {
+        params.append('bathrooms', filters.bathrooms.join(','));
+      } else {
+        params.append('bathrooms', filters.bathrooms.toString());
+      }
+    }
     if (filters.status) params.append('status', filters.status);
     if (filters.is_featured) params.append('is_featured', filters.is_featured.toString());
     if (filters.keywords) params.append('keywords', filters.keywords);

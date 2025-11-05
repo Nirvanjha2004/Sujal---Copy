@@ -19,7 +19,7 @@ export function EnhancedPropertyList({
   loading = false,
   variant = 'default',
   showFavorites = true,
-  showStats = false,
+  showStats: _showStats = false,
   onPropertyClick,
   className,
 }: EnhancedPropertyListProps) {
@@ -43,17 +43,17 @@ export function EnhancedPropertyList({
   };
 
   const getImageUrl = (property: Property) => {
-    const primaryImage = property.images?.find(img => img.isPrimary || img.is_primary);
+    const primaryImage = property.images?.find(img => img.is_primary);
     const firstImage = property.images?.[0];
-    return primaryImage?.url || primaryImage?.image_url || 
-           firstImage?.url || firstImage?.image_url ||
+    return primaryImage?.image_url || 
+           firstImage?.image_url ||
            "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80";
   };
 
 
   
   const getArea = (property: Property) => 
-    property.area || property.areaSqft || property.area_sqft || 0;
+    property.area_sqft || 0;
 
   const getStatusColor = (status: string): 'success' | 'warning' | 'error' | 'info' | 'default' => {
     switch (status?.toLowerCase()) {
@@ -110,28 +110,15 @@ export function EnhancedPropertyList({
       },
     ];
 
-    if (showStats && property.stats) {
-      metadata.push(
-        {
-          icon: "solar:eye-bold",
-          label: "Views",
-          value: property.stats.views,
-        },
-        {
-          icon: "solar:heart-bold",
-          label: "Favorites",
-          value: property.stats.favorites,
-        }
-      );
-    }
-
+    // Note: stats removed as not available in Property type
+    
     return {
       id: property.id,
       title: property.title,
       subtitle: `${property.city}, ${property.state}`,
       description: property.description,
       image: getImageUrl(property),
-      badge: property.isFeatured ? {
+      badge: property.is_featured ? {
         text: "Featured",
         variant: "default" as const,
       } : undefined,

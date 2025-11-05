@@ -42,7 +42,7 @@ export function ReviewModerationPage() {
         setReviews(response.data.data);
         setTotalPages(response.data.totalPages);
       } else {
-        throw new Error(response.message || 'Failed to fetch reviews');
+        throw new Error(response.error?.message || 'Failed to fetch reviews');
       }
     } catch (err: any) {
       console.error('Error fetching reviews:', err);
@@ -68,7 +68,7 @@ export function ReviewModerationPage() {
       if (response.success) {
         fetchReviews();
       } else {
-        alert(response.message || 'Failed to update review');
+        alert(response.error?.message || 'Failed to update review');
       }
     } catch (err: any) {
       alert('Failed to update review');
@@ -83,7 +83,7 @@ export function ReviewModerationPage() {
       if (response.success) {
         fetchReviews();
       } else {
-        alert(response.message || 'Failed to delete review');
+        alert(response.error?.message || 'Failed to delete review');
       }
     } catch (err: any) {
       alert('Failed to delete review');

@@ -6,7 +6,7 @@ export interface BuyerStats {
   messages: number;
 }
 
-export interface BuyerStatsCard {
+export interface BuyerStatsData {
   title: string;
   value: number;
   icon: string;

@@ -88,7 +88,7 @@ export function AdminDashboardPage({ onNavigate }: AdminDashboardPageProps) {
       if (response.success && response.data) {
         setData(response.data);
       } else {
-        throw new Error(response.message || 'Failed to fetch analytics data');
+        throw new Error(response.error?.message || 'Failed to fetch analytics data');
       }
     } catch (err: any) {
       console.error('Error fetching analytics:', err);

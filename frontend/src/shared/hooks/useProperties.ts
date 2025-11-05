@@ -12,9 +12,8 @@ export function useFeaturedProperties(limit: number = 10) {
       try {
         setLoading(true);
         const response = await api.getProperties({
-          limit,
           status: 'active'
-        });
+        }, 1, limit);
         setProperties(response.data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch properties');
@@ -69,9 +68,8 @@ export function useRecentProperties(limit: number = 10) {
       try {
         setLoading(true);
         const response = await api.getProperties({
-          limit,
           status: 'active'
-        });
+        }, 1, limit);
         // Sort by created_at descending to get most recent
         const sortedProperties = response.data.sort((a, b) =>
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
@@ -101,9 +99,8 @@ export function usePopularProperties(limit: number = 10) {
       try {
         setLoading(true);
         const response = await api.getProperties({
-          limit,
           status: 'active'
-        });
+        }, 1, limit);
         // For now, just return the properties as-is
         // In the future, you could sort by view count or other popularity metrics
         setProperties(response.data);

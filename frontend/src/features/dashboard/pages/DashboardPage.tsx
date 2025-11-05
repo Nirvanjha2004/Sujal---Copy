@@ -115,7 +115,7 @@ export function DashboardPage() {
               activeProjects: projectStats.activeProjects,
               unitsListed: projectStats.totalUnits,
               unitsAvailable: projectStats.availableUnits,
-              totalInquiries: Array.isArray(inquiries) ? inquiries.length : (inquiriesResponse.total || 0),
+              totalInquiries: Array.isArray(inquiries) ? inquiries.length : ((inquiriesResponse as any).total || 0),
               messages: unreadMessages
             }));
 
@@ -143,9 +143,9 @@ export function DashboardPage() {
             ]);
             
             const properties = propertiesResponse.data || [];
-            const activeListings = properties.filter(p => p.status === 'ACTIVE').length;
-            const soldListings = properties.filter(p => p.status === 'SOLD').length;
-            const rentedListings = properties.filter(p => p.status === 'RENTED').length;
+            const activeListings = properties.filter(p => p.status === 'active').length;
+            const soldListings = properties.filter(p => p.status === 'sold').length;
+            const rentedListings = properties.filter(p => p.status === 'rented').length;
             
             setStats(prev => ({
               ...prev,

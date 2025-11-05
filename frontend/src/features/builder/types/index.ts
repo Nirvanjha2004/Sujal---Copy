@@ -64,7 +64,6 @@ export interface ProjectUnit {
   balconies?: number;
   bathrooms: number;
   bedrooms: number;
-  facing?: string;
   status: UnitStatus;
   is_corner_unit?: boolean;
   has_terrace?: boolean;
@@ -134,7 +133,6 @@ export interface CreateUnitData {
   balconies?: number;
   bathrooms: number;
   bedrooms: number;
-  facing?: string;
   status?: UnitStatus;
   isCornerUnit?: boolean;
   hasTerrace?: boolean;

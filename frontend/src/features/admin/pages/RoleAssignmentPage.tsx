@@ -47,7 +47,7 @@ export function RoleAssignmentPage() {
         setUsers(response.data.data);
         setTotalPages(response.data.totalPages);
       } else {
-        throw new Error(response.message || 'Failed to fetch users');
+        throw new Error(response.error?.message || 'Failed to fetch users');
       }
     } catch (err: any) {
       console.error('Error fetching users:', err);
@@ -75,7 +75,7 @@ export function RoleAssignmentPage() {
       if (response.success) {
         fetchUsers();
       } else {
-        alert(response.message || 'Failed to update user role');
+        alert(response.error?.message || 'Failed to update user role');
       }
     } catch (err: any) {
       alert('Failed to update user role');

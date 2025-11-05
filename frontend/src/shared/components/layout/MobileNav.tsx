@@ -121,7 +121,7 @@ export function MobileNav({ isOpen, onToggle }: MobileNavProps) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold truncate text-foreground">
-                  {`${authState.user.first_name || authState.user.firstName} ${authState.user.last_name || authState.user.lastName}` || 'User'}
+                  {`${authState.user.first_name} ${authState.user.last_name}` || 'User'}
                 </p>
                 <p className="text-sm text-muted-foreground truncate">
                   {authState.user.email}

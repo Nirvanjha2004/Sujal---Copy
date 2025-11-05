@@ -22,4 +22,4 @@ export { PropertyComparisonPage as PropertyComparison } from './PropertyComparis
 // Type exports for pages
 export type { Property } from '../types/property';
 export type { PropertyFilters } from '../types/filters';
-export type { PropertySearchCriteria } from '../types/search';
+export type { SearchCriteria as PropertySearchCriteria } from '../types/search';

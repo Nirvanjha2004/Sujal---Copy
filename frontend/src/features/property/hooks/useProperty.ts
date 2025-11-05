@@ -58,17 +58,16 @@ export const useProperty = (options: UsePropertyOptions = {}): UsePropertyReturn
         id: propertyId,
         title: data.title,
         description: data.description,
-        propertyType: data.propertyType,
-        listingType: data.listingType,
-        status: data.status,
+        property_type: data.property_type,
+        listing_type: data.listing_type,
         price: data.price,
-        areaSqft: data.area,
+        area_sqft: data.area_sqft,
         bedrooms: data.bedrooms,
         bathrooms: data.bathrooms,
-        address: data.location?.address || data.address,
+        address: data.address,
         city: data.city,
         state: data.state,
-        postalCode: data.postalCode || data.postal_code,
+        postal_code: data.postal_code,
         amenities: Array.isArray(data.amenities) 
           ? data.amenities.reduce((acc, amenity) => {
               acc[amenity] = true;

@@ -280,12 +280,18 @@ export const validatePropertyFilters = (filters: PropertyFilters): { isValid: bo
     errors.push('Minimum area cannot be greater than maximum area');
   }
   
-  if (filters.bedrooms && filters.bedrooms < 0) {
-    errors.push('Number of bedrooms cannot be negative');
+  if (filters.bedrooms) {
+    const bedroomValues = Array.isArray(filters.bedrooms) ? filters.bedrooms : [filters.bedrooms];
+    if (bedroomValues.some(val => val < 0)) {
+      errors.push('Number of bedrooms cannot be negative');
+    }
   }
   
-  if (filters.bathrooms && filters.bathrooms < 0) {
-    errors.push('Number of bathrooms cannot be negative');
+  if (filters.bathrooms) {
+    const bathroomValues = Array.isArray(filters.bathrooms) ? filters.bathrooms : [filters.bathrooms];
+    if (bathroomValues.some(val => val < 0)) {
+      errors.push('Number of bathrooms cannot be negative');
+    }
   }
   
   return {

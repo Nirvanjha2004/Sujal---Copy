@@ -146,7 +146,7 @@ export function WelcomeSection({
           {/* User Info */}
           <div className="flex items-center gap-4">
             <Avatar className="size-16 ring-2 ring-background shadow-md">
-              <AvatarImage src={user.avatar} alt={`${user.first_name} ${user.last_name}`} />
+              <AvatarImage src={user.profile_image} alt={`${user.first_name} ${user.last_name}`} />
               <AvatarFallback className="text-lg font-bold bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
                 {user.first_name?.[0]}{user.last_name?.[0]}
               </AvatarFallback>
@@ -163,7 +163,7 @@ export function WelcomeSection({
                 </Badge>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                {roleSpecificMessage || getPersonalizedMessage(user.role, user.first_name || user.firstName)}
+                {roleSpecificMessage || getPersonalizedMessage(user.role, user.first_name)}
               </p>
             </div>
           </div>
@@ -210,16 +210,16 @@ export function WelcomeSection({
             {/* Left Section - User Info */}
             <div className="flex items-center gap-6">
               <Avatar className="size-20 ring-2 ring-background shadow-lg">
-                <AvatarImage src={user.avatar} alt={`${user.first_name || user.firstName} ${user.last_name || user.lastName}`} />
+                <AvatarImage src={user.profile_image} alt={`${user.first_name} ${user.last_name}`} />
                 <AvatarFallback className="text-xl font-bold bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
-                  {(user.first_name || user.firstName)?.[0]}{(user.last_name || user.lastName)?.[0]}
+                  {user.first_name?.[0]}{user.last_name?.[0]}
                 </AvatarFallback>
               </Avatar>
               
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
                   <h1 className="text-3xl font-bold text-foreground tracking-tight">
-                    {getGreeting()}, {user.first_name || user.firstName} {user.last_name || user.lastName}!
+                    {getGreeting()}, {user.first_name} {user.last_name}!
                   </h1>
                   <Badge variant="secondary" className={cn("px-3 py-1", roleConfig.color)}>
                     <Icon icon={roleConfig.icon} className="size-4 mr-2" />
@@ -227,7 +227,7 @@ export function WelcomeSection({
                   </Badge>
                 </div>
                 <p className="text-muted-foreground text-lg leading-relaxed max-w-2xl">
-                  {roleSpecificMessage || getPersonalizedMessage(user.role, user.first_name || user.firstName)}
+                  {roleSpecificMessage || getPersonalizedMessage(user.role, user.first_name)}
                 </p>
                 {lastActivity && (
                   <p className="text-sm text-muted-foreground flex items-center gap-2">

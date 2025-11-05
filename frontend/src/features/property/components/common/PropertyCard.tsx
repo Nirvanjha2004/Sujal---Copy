@@ -9,7 +9,7 @@ import { useFavorites } from "../../contexts/FavoritesContext";
 import { formatPrice, formatArea } from "../../utils/propertyHelpers";
 import { cn } from "@/shared/lib/utils";
 
-interface PropertyCardProps {
+export interface PropertyCardProps {
   property: Property;
   variant?: PropertyCardVariant['type'];
   showFavorite?: boolean;
@@ -25,8 +25,8 @@ export function PropertyCard({
   property, 
   variant = 'list',
   showFavorite = true,
-  showStats = false,
-  showAgent = false,
+  showStats: _showStats = false,
+  showAgent: _showAgent = false,
   showDescription = false,
   onClick,
   className,
@@ -36,7 +36,7 @@ export function PropertyCard({
   const { isFavorite, toggleFavorite, isLoading } = useFavorites();
 
   if (loading) {
-    return <PropertyCardSkeleton variant={variant} />;
+    return <PropertyCardSkeleton variant={variant === 'featured' ? 'grid' : variant} />;
   }
 
   const handleFavoriteToggle = async (e: React.MouseEvent) => {
@@ -58,16 +58,16 @@ export function PropertyCard({
   };
 
   const getImageUrl = () => {
-    const primaryImage = property.images?.find(img => img.isPrimary || img.is_primary);
+    const primaryImage = property.images?.find(img => img.is_primary);
     const firstImage = property.images?.[0];
-    return primaryImage?.url || primaryImage?.image_url || 
-           firstImage?.url || firstImage?.image_url ||
+    return primaryImage?.image_url || 
+           firstImage?.image_url ||
            "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80";
   };
 
-  const getPropertyType = () => property.propertyType || property.property_type || 'apartment';
-  const getListingType = () => property.listingType || property.listing_type || 'sale';
-  const getArea = () => property.area || property.areaSqft || property.area_sqft || 0;
+  const getPropertyType = () => property.property_type || 'apartment';
+  const getListingType = () => property.listing_type || 'sale';
+  const getArea = () => property.area_sqft || 0;
 
   if (variant === 'grid') {
     return (
@@ -107,7 +107,7 @@ export function PropertyCard({
             </Button>
           )}
           
-          {property.isFeatured && (
+          {property.is_featured && (
             <Badge className="absolute top-3 left-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-md">
               <Icon icon="solar:star-bold" className="size-3 mr-1" />
               Featured
@@ -171,19 +171,6 @@ export function PropertyCard({
                 For {getListingType()}
               </Badge>
             </div>
-            
-            {showStats && property.stats && (
-              <div className="flex gap-4 text-xs text-muted-foreground pt-3 border-t border-border/50">
-                <span className="flex items-center gap-1.5">
-                  <Icon icon="solar:eye-bold" className="size-3.5" />
-                  {property.stats.views} views
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Icon icon="solar:heart-bold" className="size-3.5" />
-                  {property.stats.favorites}
-                </span>
-              </div>
-            )}
           </div>
         </CardContent>
       </Card>
@@ -205,7 +192,7 @@ export function PropertyCard({
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
               loading="lazy"
             />
-            {property.isFeatured && (
+            {property.is_featured && (
               <div className="absolute top-1 left-1">
                 <Icon icon="solar:star-bold" className="size-3 text-yellow-500" />
               </div>
@@ -289,7 +276,7 @@ export function PropertyCard({
             </Button>
           )}
           
-          {property.isFeatured && (
+          {property.is_featured && (
             <Badge className="absolute top-3 left-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg">
               <Icon icon="solar:star-bold" className="size-3 mr-1" />
               Featured
@@ -322,18 +309,6 @@ export function PropertyCard({
                 <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
                   {property.description}
                 </p>
-              )}
-              
-              {showAgent && property.agent && (
-                <div className="flex items-center gap-2 text-sm">
-                  <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Icon icon="solar:user-bold" className="size-4 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-medium">{property.agent.name}</p>
-                    <p className="text-xs text-muted-foreground">Agent</p>
-                  </div>
-                </div>
               )}
             </div>
             
@@ -385,23 +360,6 @@ export function PropertyCard({
                 </Badge>
               )}
             </div>
-            
-            {showStats && property.stats && (
-              <div className="flex gap-6 text-sm text-muted-foreground">
-                <span className="flex items-center gap-2">
-                  <Icon icon="solar:eye-bold" className="size-4" />
-                  <span>{property.stats.views} views</span>
-                </span>
-                <span className="flex items-center gap-2">
-                  <Icon icon="solar:heart-bold" className="size-4" />
-                  <span>{property.stats.favorites}</span>
-                </span>
-                <span className="flex items-center gap-2">
-                  <Icon icon="solar:chat-round-dots-bold" className="size-4" />
-                  <span>{property.stats.inquiries}</span>
-                </span>
-              </div>
-            )}
           </div>
         </CardContent>
       </div>

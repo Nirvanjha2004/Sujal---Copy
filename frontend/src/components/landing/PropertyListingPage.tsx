@@ -45,7 +45,7 @@ export function PropertyListingPage() {
     const [visitTime, setVisitTime] = useState<string>("10:00");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const { property, isLoading: loading, error } = useProperty({ propertyId });
+    const { property, loading, error } = useProperty(propertyId);
     const { isFavorite, addToFavorites, removeFromFavorites } = useFavorites();
 
     // Remove state related to the contact message as it's no longer needed here

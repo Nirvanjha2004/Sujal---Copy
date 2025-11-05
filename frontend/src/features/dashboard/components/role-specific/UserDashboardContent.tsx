@@ -37,7 +37,7 @@ export function UserDashboardContent({ stats, isLoading = false }: UserDashboard
       description: 'Finish setting up your account',
       icon: 'solar:user-bold',
       action: () => navigate('/profile'),
-      color: 'bg-primary',
+      color: 'primary',
       isEnabled: safeStats.profileCompletion < 100,
       priority: safeStats.profileCompletion < 50 ? 'high' : 'medium'
     },
@@ -47,7 +47,7 @@ export function UserDashboardContent({ stats, isLoading = false }: UserDashboard
       description: 'Explore available properties',
       icon: 'solar:home-bold',
       action: () => navigate('/'),
-      color: 'bg-blue-500',
+      color: 'info',
       isEnabled: true
     },
     {
@@ -56,7 +56,7 @@ export function UserDashboardContent({ stats, isLoading = false }: UserDashboard
       description: 'Manage your account preferences',
       icon: 'solar:settings-bold',
       action: () => navigate('/settings'),
-      color: 'bg-gray-600',
+      color: 'info',
       isEnabled: true
     },
     {
@@ -65,7 +65,7 @@ export function UserDashboardContent({ stats, isLoading = false }: UserDashboard
       description: 'Get help or contact support',
       icon: 'solar:help-bold',
       action: () => navigate('/support'),
-      color: 'bg-green-500',
+      color: 'success',
       isEnabled: true
     },
     {
@@ -74,7 +74,7 @@ export function UserDashboardContent({ stats, isLoading = false }: UserDashboard
       description: 'Unlock additional features',
       icon: 'solar:crown-bold',
       action: () => navigate('/upgrade'),
-      color: 'bg-yellow-500',
+      color: 'warning',
       isEnabled: true
     },
     {
@@ -83,7 +83,7 @@ export function UserDashboardContent({ stats, isLoading = false }: UserDashboard
       description: 'Manage your notification preferences',
       icon: 'solar:bell-bold',
       action: () => navigate('/notifications'),
-      color: 'bg-purple-500',
+      color: 'purple',
       isEnabled: true
     }
   ];
@@ -104,10 +104,10 @@ export function UserDashboardContent({ stats, isLoading = false }: UserDashboard
     );
   }
 
-  const getProfileCompletionColor = () => {
-    if (safeStats.profileCompletion >= 80) return 'bg-green-100 text-green-600';
-    if (safeStats.profileCompletion >= 50) return 'bg-yellow-100 text-yellow-600';
-    return 'bg-red-100 text-red-600';
+  const getProfileCompletionColor = (): 'success' | 'warning' | 'error' => {
+    if (safeStats.profileCompletion >= 80) return 'success';
+    if (safeStats.profileCompletion >= 50) return 'warning';
+    return 'error';
   };
 
   return (
@@ -116,20 +116,10 @@ export function UserDashboardContent({ stats, isLoading = false }: UserDashboard
       <WelcomeSection
         user={user!}
         roleSpecificMessage="Welcome to your dashboard. Complete your profile to get started."
-        primaryAction={{
-          label: safeStats.profileCompletion < 100 ? 'Complete Profile' : 'Browse Properties',
-          icon: safeStats.profileCompletion < 100 ? 'solar:user-bold' : 'solar:home-bold',
-          onClick: () => navigate(safeStats.profileCompletion < 100 ? '/profile' : '/')
-        }}
-        secondaryAction={{
-          label: 'Account Settings',
-          icon: 'solar:settings-bold',
-          onClick: () => navigate('/settings')
-        }}
-        stats={{
+        stats={[{
           label: 'Profile Complete',
           value: safeStats.profileCompletion
-        }}
+        }]}
       />
 
       {/* Stats Cards */}
@@ -150,7 +140,7 @@ export function UserDashboardContent({ stats, isLoading = false }: UserDashboard
             title="Account Age"
             value={safeStats.accountAge}
             icon="solar:calendar-bold"
-            color="bg-blue-100 text-blue-600"
+            color="info"
             subtitle="Days since joining"
           />
         </GridItem>
@@ -160,7 +150,7 @@ export function UserDashboardContent({ stats, isLoading = false }: UserDashboard
             title="Total Actions"
             value={safeStats.totalActions}
             icon="solar:chart-2-bold"
-            color="bg-purple-100 text-purple-600"
+            color="primary"
             subtitle="Platform interactions"
           />
         </GridItem>

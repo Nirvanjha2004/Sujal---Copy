@@ -904,141 +904,136 @@ export function RealEstateLandingPage() {
           </div>
         </section>
       </div>
-      {/* <section eid="new1" className="py-16">
-        <div eid="new2" className="container mx-auto px-4">
-          <div eid="new3" className="mb-8">
-            <h2 eid="new4" className="font-heading text-3xl font-semibold tracking-tight mb-2">
+      {/* <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="mb-8">
+            <h2 className="font-heading text-3xl font-semibold tracking-tight mb-2">
               Emerging localities
             </h2>
-            <p eid="new5" className="text-muted-foreground">
+            <p className="text-muted-foreground">
               Localities with recent development in Kolkata
             </p>
           </div>
-          <div eid="new6" className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-12">
-            <Card eid="new7" className="hover:shadow-lg transition-shadow cursor-pointer">
-              <CardContent eid="new8" className="p-0">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-12">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-0">
                 <img
                   alt="Salt lake"
-                  eid="new9"
                   src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/1.webp"
                   className="w-full h-32 object-cover rounded-t-xl"
                 />
-                <div eid="new10" className="p-4">
-                  <h3 eid="new11" className="font-semibold text-sm mb-1">
+                <div className="p-4">
+                  <h3 className="font-semibold text-sm mb-1">
                     Salt lake 4.3★
                   </h3>
-                  <p eid="new12" className="text-xs text-muted-foreground mb-3">
+                  <p className="text-xs text-muted-foreground mb-3">
                     82 New Projects
                   </p>
-                  <div eid="new13" className="flex gap-2">
-                    <Button eid="new14" size="sm" variant="outline" className="text-xs h-7 px-3">
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="outline" className="text-xs h-7 px-3">
                       Insights
                     </Button>
-                    <Button eid="new15" size="sm" variant="outline" className="text-xs h-7 px-3">
+                    <Button size="sm" variant="outline" className="text-xs h-7 px-3">
                       Projects
                     </Button>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card eid="new16" className="hover:shadow-lg transition-shadow cursor-pointer">
-              <CardContent eid="new17" className="p-0">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-0">
                 <img
                   alt="Jodhpur Park"
-                  eid="new18"
                   src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/2.webp"
                   className="w-full h-32 object-cover rounded-t-xl"
                 />
-                <div eid="new19" className="p-4">
-                  <h3 eid="new20" className="font-semibold text-sm mb-1">
+                <div className="p-4">
+                  <h3 className="font-semibold text-sm mb-1">
                     Jodhpur Park 4.3★
                   </h3>
-                  <p eid="new21" className="text-xs text-muted-foreground mb-3">
+                  <p className="text-xs text-muted-foreground mb-3">
                     54 New Projects
                   </p>
-                  <div eid="new22" className="flex gap-2">
-                    <Button eid="new23" size="sm" variant="outline" className="text-xs h-7 px-3">
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="outline" className="text-xs h-7 px-3">
                       Insights
                     </Button>
-                    <Button eid="new24" size="sm" variant="outline" className="text-xs h-7 px-3">
+                    <Button size="sm" variant="outline" className="text-xs h-7 px-3">
                       Projects
                     </Button>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card eid="new25" className="hover:shadow-lg transition-shadow cursor-pointer">
-              <CardContent eid="new26" className="p-0">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-0">
                 <img
                   alt="Jadavpur"
-                  eid="new27"
                   src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/3.webp"
                   className="w-full h-32 object-cover rounded-t-xl"
                 />
-                <div eid="new28" className="p-4">
-                  <h3 eid="new29" className="font-semibold text-sm mb-1">
+                <div className="p-4">
+                  <h3 className="font-semibold text-sm mb-1">
                     Jadavpur 4.2★
                   </h3>
-                  <p eid="new30" className="text-xs text-muted-foreground mb-3">
+                  <p className="text-xs text-muted-foreground mb-3">
                     73 New Projects
                   </p>
-                  <div eid="new31" className="flex gap-2">
-                    <Button eid="new32" size="sm" variant="outline" className="text-xs h-7 px-3">
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="outline" className="text-xs h-7 px-3">
                       Insights
                     </Button>
-                    <Button eid="new33" size="sm" variant="outline" className="text-xs h-7 px-3">
+                    <Button size="sm" variant="outline" className="text-xs h-7 px-3">
                       Projects
                     </Button>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card eid="new34" className="hover:shadow-lg transition-shadow cursor-pointer">
-              <CardContent eid="new35" className="p-0">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-0">
                 <img
                   alt="Southern Avenue"
-                  eid="new36"
                   src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/4.webp"
                   className="w-full h-32 object-cover rounded-t-xl"
                 />
-                <div eid="new37" className="p-4">
-                  <h3 eid="new38" className="font-semibold text-sm mb-1">
+                <div className="p-4">
+                  <h3 className="font-semibold text-sm mb-1">
                     Southern Avenue 4.3★
                   </h3>
-                  <p eid="new39" className="text-xs text-muted-foreground mb-3">
+                  <p className="text-xs text-muted-foreground mb-3">
                     24 New Projects
                   </p>
-                  <div eid="new40" className="flex gap-2">
-                    <Button eid="new41" size="sm" variant="outline" className="text-xs h-7 px-3">
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="outline" className="text-xs h-7 px-3">
                       Insights
                     </Button>
-                    <Button eid="new42" size="sm" variant="outline" className="text-xs h-7 px-3">
+                    <Button size="sm" variant="outline" className="text-xs h-7 px-3">
                       Projects
                     </Button>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card eid="new43" className="hover:shadow-lg transition-shadow cursor-pointer">
-              <CardContent eid="new44" className="p-0">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-0">
                 <img
                   alt="Lake Gardens"
-                  eid="new45"
                   src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/landscape/1.webp"
                   className="w-full h-32 object-cover rounded-t-xl"
                 />
-                <div eid="new46" className="p-4">
-                  <h3 eid="new47" className="font-semibold text-sm mb-1">
+                <div className="p-4">
+                  <h3 className="font-semibold text-sm mb-1">
                     Lake Gardens 4.2★
                   </h3>
-                  <p eid="new48" className="text-xs text-muted-foreground mb-3">
+                  <p className="text-xs text-muted-foreground mb-3">
                     35 New Projects
                   </p>
-                  <div eid="new49" className="flex gap-2">
-                    <Button eid="new50" size="sm" variant="outline" className="text-xs h-7 px-3">
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="outline" className="text-xs h-7 px-3">
                       Insights
                     </Button>
-                    <Button eid="new51" size="sm" variant="outline" className="text-xs h-7 px-3">
+                    <Button size="sm" variant="outline" className="text-xs h-7 px-3">
                       Projects
                     </Button>
                   </div>
@@ -1046,28 +1041,25 @@ export function RealEstateLandingPage() {
               </CardContent>
             </Card>
           </div>
-          <div eid="new52" className="space-y-8">
+          <div className="space-y-8">
             <Card
-              eid="new53"
               className="bg-gradient-to-r from-green-50 to-green-100 border-green-200"
             >
-              <CardContent eid="new54" className="p-6">
-                <div eid="new55" className="flex items-center gap-4">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
                   <div
-                    eid="new56"
                     className="w-16 h-16 bg-green-200 rounded-lg flex items-center justify-center"
                   >
                     <Icon
-                      eid="new57"
                       icon="solar:shield-check-bold"
                       className="size-8 text-green-600"
                     />
                   </div>
-                  <div eid="new58" className="flex-1">
-                    <h3 eid="new59" className="font-semibold text-lg mb-2">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg mb-2">
                       View properties verified by Prop Puzzle
                     </h3>
-                    <p eid="new60" className="text-muted-foreground">
+                    <p className="text-muted-foreground">
                       Verified on site for genuineness. Check out real photos of the property
                     </p>
                   </div>
@@ -1077,137 +1069,131 @@ export function RealEstateLandingPage() {
           </div>
         </div>
       </section> */}
-      {/* <section eid="new74" className="py-16 bg-secondary/30">
-        <div eid="new75" className="container mx-auto px-4">
-          <div eid="new76" className="mb-8">
-            <h2 eid="new77" className="font-heading text-3xl font-semibold tracking-tight mb-2">
+      {/* <section className="py-16 bg-secondary/30">
+        <div className="container mx-auto px-4">
+          <div className="mb-8">
+            <h2 className="font-heading text-3xl font-semibold tracking-tight mb-2">
               Top articles on home buying
             </h2>
-            <div eid="new78" className="flex items-center justify-between">
-              <div eid="new79" className="flex gap-6">
+            <div className="flex items-center justify-between">
+              <div className="flex gap-6">
                 <Button
-                  eid="new80"
                   variant="ghost"
                   className="text-primary border-b-2 border-primary rounded-none"
                 >
                   News
                 </Button>
-                <Button eid="new81" variant="ghost" className="text-muted-foreground">
+                <Button variant="ghost" className="text-muted-foreground">
                   Tax & Legal
                 </Button>
-                <Button eid="new82" variant="ghost" className="text-muted-foreground">
+                <Button variant="ghost" className="text-muted-foreground">
                   Help Guides
                 </Button>
-                <Button eid="new83" variant="ghost" className="text-muted-foreground">
+                <Button variant="ghost" className="text-muted-foreground">
                   Investment
                 </Button>
               </div>
-              <Button eid="new84" variant="link" className="text-primary">
+              <Button variant="link" className="text-primary">
                 Read realty news, guides & articles
               </Button>
             </div>
           </div>
-          <div eid="new85" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-            <Card eid="new86" className="hover:shadow-lg transition-shadow">
-              <CardContent eid="new87" className="p-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-0">
                 <img
                   alt="Article"
-                  eid="new88"
                   src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/placeholder/landscape.png"
                   className="w-full h-32 object-cover rounded-t-xl"
                 />
-                <div eid="new89" className="p-4">
-                  <h3 eid="new90" className="font-semibold text-sm mb-1">
+                <div className="p-4">
+                  <h3 className="font-semibold text-sm mb-1">
                     PANDITIA
                   </h3>
-                  <p eid="new91" className="text-xs text-muted-foreground mb-2">
+                  <p className="text-xs text-muted-foreground mb-2">
                     3 BHK Apartment Sett lake Mahadananda Ring Road
                   </p>
-                  <p eid="new92" className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground">
                     16th Jan
                   </p>
                 </div>
               </CardContent>
             </Card>
-            <Card eid="new93" className="hover:shadow-lg transition-shadow">
-              <CardContent eid="new94" className="p-0">
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-0">
                 <img
                   alt="Article"
-                  eid="new95"
                   src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/placeholder/landscape.png"
                   className="w-full h-32 object-cover rounded-t-xl"
                 />
-                <div eid="new96" className="p-4">
-                  <h3 eid="new97" className="font-semibold text-sm mb-1">
+                <div className="p-4">
+                  <h3 className="font-semibold text-sm mb-1">
                     IBL NANDAN ROAD, NEAR TOLLYGUNGE
                   </h3>
-                  <p eid="new98" className="text-xs text-muted-foreground mb-2">
+                  <p className="text-xs text-muted-foreground mb-2">
                     3 BHK Apartment
                   </p>
-                  <p eid="new99" className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground">
                     16th Jan
                   </p>
                 </div>
               </CardContent>
             </Card>
-            <Card eid="new100" className="hover:shadow-lg transition-shadow">
-              <CardContent eid="new101" className="p-0">
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-0">
                 <img
                   alt="Article"
-                  eid="new102"
                   src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/placeholder/landscape.png"
                   className="w-full h-32 object-cover rounded-t-xl"
                 />
-                <div eid="new103" className="p-4">
-                  <h3 eid="new104" className="font-semibold text-sm mb-1">
+                <div className="p-4">
+                  <h3 className="font-semibold text-sm mb-1">
                     BIRLA MANDIR
                   </h3>
-                  <p eid="new105" className="text-xs text-muted-foreground mb-2">
+                  <p className="text-xs text-muted-foreground mb-2">
                     4 BHK Apartment NO.5, QUEENS PARK
                   </p>
-                  <p eid="new106" className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground">
                     7th Feb
                   </p>
                 </div>
               </CardContent>
             </Card>
-            <Card eid="new107" className="hover:shadow-lg transition-shadow">
-              <CardContent eid="new108" className="p-0">
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-0">
                 <img
                   alt="Article"
-                  eid="new109"
                   src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/placeholder/landscape.png"
                   className="w-full h-32 object-cover rounded-t-xl"
                 />
-                <div eid="new110" className="p-4">
-                  <h3 eid="new111" className="font-semibold text-sm mb-1">
+                <div className="p-4">
+                  <h3 className="font-semibold text-sm mb-1">
                     IBC, FERN ROAD
                   </h3>
-                  <p eid="new112" className="text-xs text-muted-foreground mb-2">
+                  <p className="text-xs text-muted-foreground mb-2">
                     2 BHK Apartment (BALLYGUNGE MOTOR TRAINING SCHOOL)
                   </p>
-                  <p eid="new113" className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground">
                     5th Feb
                   </p>
                 </div>
               </CardContent>
             </Card>
-            <Card eid="new114" className="hover:shadow-lg transition-shadow">
-              <CardContent eid="new115" className="p-0">
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-0">
                 <img
                   alt="Article"
-                  eid="new116"
                   src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/placeholder/landscape.png"
                   className="w-full h-32 object-cover rounded-t-xl"
                 />
-                <div eid="new117" className="p-4">
-                  <h3 eid="new118" className="font-semibold text-sm mb-1">
+                <div className="p-4">
+                  <h3 className="font-semibold text-sm mb-1">
                     4D, JODHPUR PARK
                   </h3>
-                  <p eid="new119" className="text-xs text-muted-foreground mb-2">
+                  <p className="text-xs text-muted-foreground mb-2">
                     3 BHK Apartment
                   </p>
-                  <p eid="new120" className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground">
                     3rd March
                   </p>
                 </div>
@@ -1216,69 +1202,66 @@ export function RealEstateLandingPage() {
           </div>
         </div>
       </section> */}
-      <section eid="new121" className="py-16 bg-gradient-to-br from-pink-50 to-pink-100">
-        <div eid="new122" className="container mx-auto px-4">
-          <Card eid="new123" className="overflow-hidden border-0 shadow-2xl">
-            <CardContent eid="new124" className="p-0">
-              <div eid="new125" className="grid md:grid-cols-2 gap-0">
-                <div eid="new126" className="p-12 flex flex-col justify-center">
-                  <div eid="new127" className="mb-6">
-                    <p eid="new128" className="text-sm text-muted-foreground mb-2">
+      <section className="py-16 bg-gradient-to-br from-pink-50 to-pink-100">
+        <div className="container mx-auto px-4">
+          <Card className="overflow-hidden border-0 shadow-2xl">
+            <CardContent className="p-0">
+              <div className="grid md:grid-cols-2 gap-0">
+                <div className="p-12 flex flex-col justify-center">
+                  <div className="mb-6">
+                    <p className="text-sm text-muted-foreground mb-2">
                       SELL OR RENT YOUR PROPERTY
                     </p>
                     <h2
-                      eid="new129"
                       className="font-heading text-4xl font-bold tracking-tight mb-4"
                     >
                       Register to post your property for
                     </h2>
-                    <p eid="new130" className="text-muted-foreground mb-6">
+                    <p className="text-muted-foreground mb-6">
                       Post your residential / commercial property
                     </p>
                   </div>
-                  <div eid="new131" className="grid grid-cols-3 gap-8 mb-8">
-                    <div eid="new132" className="text-center">
-                      <h3 eid="new133" className="text-3xl font-bold text-primary mb-1">
+                  <div className="grid grid-cols-3 gap-8 mb-8">
+                    <div className="text-center">
+                      <h3 className="text-3xl font-bold text-primary mb-1">
                         10L+
                       </h3>
-                      <p eid="new134" className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground">
                         Property Listings
                       </p>
                     </div>
-                    <div eid="new135" className="text-center">
-                      <h3 eid="new136" className="text-3xl font-bold text-primary mb-1">
+                    <div className="text-center">
+                      <h3 className="text-3xl font-bold text-primary mb-1">
                         45L+
                       </h3>
-                      <p eid="new137" className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground">
                         Monthly Searches
                       </p>
                     </div>
-                    <div eid="new138" className="text-center">
-                      <h3 eid="new139" className="text-3xl font-bold text-primary mb-1">
+                    <div className="text-center">
+                      <h3 className="text-3xl font-bold text-primary mb-1">
                         2L+
                       </h3>
-                      <p eid="new140" className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground">
                         Owner advertise monthly
                       </p>
                     </div>
                   </div>
                   <Button
-                    eid="new141"
                     size="lg"
                     className="w-fit mb-4 shadow-lg shadow-primary/20 bg-gradient-to-br from-primary to-primary/90"
                   >
                     Post your property for free
                   </Button>
-                  <p eid="new142" className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground">
                     Or post via{" "}
-                    <Icon eid="new143" icon="solar:phone-bold" className="size-4 inline" /> Whatsapp
+                    <Icon icon="solar:phone-bold" className="size-4 inline" /> Whatsapp
                     send a 'hi' to +91 7428887036
                   </p>
                 </div>
-                <div eid="new144" className="relative h-full min-h-[400px]">
+                <div className="relative h-full min-h-[400px]">
                   <img
                     alt="Happy Couple"
-                    eid="new145"
                     src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/portrait/2.webp"
                     className="absolute inset-0 w-full h-full object-cover"
                   />
@@ -1289,110 +1272,104 @@ export function RealEstateLandingPage() {
         </div>
       </section>
       <section
-        eid="e613"
         className="py-16 bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300"
       >
-        <div eid="e614" className="container mx-auto px-4">
-          <div eid="e615" className="mb-8">
-            <h2 eid="e616" className="font-heading text-3xl font-semibold tracking-tight mb-2">
+        <div className="container mx-auto px-4">
+          <div className="mb-8">
+            <h2 className="font-heading text-3xl font-semibold tracking-tight mb-2">
               Explore our services
             </h2>
           </div>
-          <div eid="e617" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            <Card eid="e618" className="hover:shadow-lg transition-shadow bg-white">
-              <CardContent eid="e619" className="p-6">
-                <div eid="e620" className="flex items-start gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            <Card className="hover:shadow-lg transition-shadow bg-white">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
                   <img
                     alt="Commercial Property"
-                    eid="e621"
                     src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/commercial-listings/square/1.webp"
                     className="w-16 h-16 rounded-lg object-cover"
                   />
-                  <div eid="e622">
-                    <h3 eid="e623" className="font-semibold text-lg mb-2">
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
                       Buying a commercial property
                     </h3>
-                    <p eid="e624" className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground">
                       Shops, offices, land, factories, warehouses and more
                     </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card eid="e625" className="hover:shadow-lg transition-shadow bg-white">
-              <CardContent eid="e626" className="p-6">
-                <div eid="e627" className="flex items-start gap-4">
+            <Card className="hover:shadow-lg transition-shadow bg-white">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
                   <img
                     alt="Leasing Property"
-                    eid="e628"
                     src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/commercial-listings/square/2.webp"
                     className="w-16 h-16 rounded-lg object-cover"
                   />
-                  <div eid="e629">
-                    <h3 eid="e630" className="font-semibold text-lg mb-2">
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
                       Leasing a commercial property
                     </h3>
-                    <p eid="e631" className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground">
                       Shops, offices, land, factories, warehouses and more
                     </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card eid="e632" className="hover:shadow-lg transition-shadow bg-white">
-              <CardContent eid="e633" className="p-6">
-                <div eid="e634" className="flex items-start gap-4">
+            <Card className="hover:shadow-lg transition-shadow bg-white">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
                   <img
                     alt="Plot/Land"
-                    eid="e635"
                     src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/4.webp"
                     className="w-16 h-16 rounded-lg object-cover"
                   />
-                  <div eid="e636">
-                    <h3 eid="e637" className="font-semibold text-lg mb-2">
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
                       Buy Plot/Land
                     </h3>
-                    <p eid="e638" className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground">
                       Residential plots, agricultural land, farm lands, etc. Lands and more
                     </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card eid="e639" className="hover:shadow-lg transition-shadow bg-white">
-              <CardContent eid="e640" className="p-6">
-                <div eid="e641" className="flex items-start gap-4">
+            <Card className="hover:shadow-lg transition-shadow bg-white">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
                   <img
                     alt="Renting Home"
-                    eid="e642"
                     src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/1.webp"
                     className="w-16 h-16 rounded-lg object-cover"
                   />
-                  <div eid="e643">
-                    <h3 eid="e644" className="font-semibold text-lg mb-2">
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
                       Renting a home
                     </h3>
-                    <p eid="e645" className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground">
                       Apartments, builder floors, villas and more
                     </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card eid="e646" className="hover:shadow-lg transition-shadow bg-white">
-              <CardContent eid="e647" className="p-6">
-                <div eid="e648" className="flex items-start gap-4">
+            <Card className="hover:shadow-lg transition-shadow bg-white">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
                   <img
                     alt="PG Co-living"
-                    eid="e649"
                     src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/3.webp"
                     className="w-16 h-16 rounded-lg object-cover"
                   />
-                  <div eid="e650">
-                    <h3 eid="e651" className="font-semibold text-lg mb-2">
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
                       PG and co-living
                     </h3>
-                    <p eid="e652" className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground">
                       Organised, owner and broker listed PGs
                     </p>
                   </div>
@@ -1402,116 +1379,105 @@ export function RealEstateLandingPage() {
           </div>
         </div>
       </section>
-      <section eid="e653" className="py-16 bg-gradient-to-br from-orange-50 to-orange-100">
-        <div eid="e654" className="container mx-auto px-4">
-          <div eid="e655" className="grid md:grid-cols-2 gap-8 items-center">
-            <div eid="e656">
-              <h2 eid="e657" className="font-heading text-4xl font-bold tracking-tight mb-4">
+      <section className="py-16 bg-gradient-to-br from-orange-50 to-orange-100">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div>
+              <h2 className="font-heading text-4xl font-bold tracking-tight mb-4">
                 Download PropPortal Mobile App
               </h2>
-              <p eid="e658" className="text-muted-foreground mb-6">
+              <p className="text-muted-foreground mb-6">
                 and never miss out any update
               </p>
-              <div eid="e659" className="space-y-4 mb-8">
-                <div eid="e660" className="flex items-center gap-3">
+              <div className="space-y-4 mb-8">
+                <div className="flex items-center gap-3">
                   <Icon
-                    eid="e661"
                     icon="solar:check-circle-bold"
                     className="size-6 text-green-600"
                   />
-                  <p eid="e662" className="text-muted-foreground">
+                  <p className="text-muted-foreground">
                     Get to know about newly posted properties as soon as they are posted
                   </p>
                 </div>
-                <div eid="e663" className="flex items-center gap-3">
+                <div className="flex items-center gap-3">
                   <Icon
-                    eid="e664"
                     icon="solar:check-circle-bold"
                     className="size-6 text-green-600"
                   />
-                  <p eid="e665" className="text-muted-foreground">
+                  <p className="text-muted-foreground">
                     Manage your properties with ease and get instant alerts about responses
                   </p>
                 </div>
               </div>
-              <div eid="e666" className="flex gap-4">
+              <div className="flex gap-4">
                 <img
                   alt="Google Play"
-                  eid="e667"
                   src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/placeholder/landscape.png"
                   className="h-12 w-auto"
                 />
                 <img
                   alt="App Store"
-                  eid="e668"
                   src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/placeholder/landscape.png"
                   className="h-12 w-auto"
                 />
               </div>
             </div>
-            <div eid="e669" className="relative">
+            <div className="relative">
               <img
                 alt="Mobile App"
-                eid="e670"
                 src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/placeholder/portrait.png"
                 className="w-full max-w-sm mx-auto"
               />
               <div
-                eid="e671"
                 className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold"
               />
             </div>
           </div>
         </div>
       </section>
-      {/* <section eid="e672" className="py-16">
-        <div eid="e673" className="container mx-auto px-4">
-          <div eid="e674" className="mb-8">
-            <h2 eid="e675" className="font-heading text-3xl font-semibold tracking-tight mb-2">
+      {/* <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="mb-8">
+            <h2 className="font-heading text-3xl font-semibold tracking-tight mb-2">
               Top Localities in Bangalore
             </h2>
-            <div eid="e676" className="flex gap-6 mb-6">
+            <div className="flex gap-6 mb-6">
               <Button
-                eid="e677"
                 variant="ghost"
                 className="text-primary border-b-2 border-primary rounded-none"
               >
                 Buy
               </Button>
-              <Button eid="e678" variant="ghost" className="text-muted-foreground">
+              <Button variant="ghost" className="text-muted-foreground">
                 Rent / Lease
               </Button>
             </div>
           </div>
-          <div eid="e679" className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div eid="e680">
-              <h3 eid="e681" className="font-semibold text-lg mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <h3 className="font-semibold text-lg mb-4">
                 New Projects in Top Localities of Bangalore
               </h3>
-              <div eid="e682" className="space-y-2">
+              <div className="space-y-2">
                 <a
-                  eid="e683"
                   href="#"
                   className="block text-sm text-muted-foreground hover:text-primary"
                 >
                   New Projects in Whitefield
                 </a>
                 <a
-                  eid="e684"
                   href="#"
                   className="block text-sm text-muted-foreground hover:text-primary"
                 >
                   New Projects in Devanahalli
                 </a>
                 <a
-                  eid="e685"
                   href="#"
                   className="block text-sm text-muted-foreground hover:text-primary"
                 >
                   New Projects in Sarjapur Road
                 </a>
                 <a
-                  eid="e686"
                   href="#"
                   className="block text-sm text-muted-foreground hover:text-primary"
                 >
@@ -1519,34 +1485,30 @@ export function RealEstateLandingPage() {
                 </a>
               </div>
             </div>
-            <div eid="e687">
-              <h3 eid="e688" className="font-semibold text-lg mb-4">
+            <div>
+              <h3 className="font-semibold text-lg mb-4">
                 Flats in Top Localities of Bangalore
               </h3>
-              <div eid="e689" className="space-y-2">
+              <div className="space-y-2">
                 <a
-                  eid="e690"
                   href="#"
                   className="block text-sm text-muted-foreground hover:text-primary"
                 >
                   Flats for sale in Whitefield
                 </a>
                 <a
-                  eid="e691"
                   href="#"
                   className="block text-sm text-muted-foreground hover:text-primary"
                 >
                   Flats for sale in Sarjapur Road
                 </a>
                 <a
-                  eid="e692"
                   href="#"
                   className="block text-sm text-muted-foreground hover:text-primary"
                 >
                   Flats for sale in Marathahalli
                 </a>
                 <a
-                  eid="e693"
                   href="#"
                   className="block text-sm text-muted-foreground hover:text-primary"
                 >
@@ -1554,34 +1516,30 @@ export function RealEstateLandingPage() {
                 </a>
               </div>
             </div>
-            <div eid="e694">
-              <h3 eid="e695" className="font-semibold text-lg mb-4">
+            <div>
+              <h3 className="font-semibold text-lg mb-4">
                 House in Top Localities of Bangalore
               </h3>
-              <div eid="e696" className="space-y-2">
+              <div className="space-y-2">
                 <a
-                  eid="e697"
                   href="#"
                   className="block text-sm text-muted-foreground hover:text-primary"
                 >
                   Houses for sale in Whitefield
                 </a>
                 <a
-                  eid="e698"
                   href="#"
                   className="block text-sm text-muted-foreground hover:text-primary"
                 >
                   Houses for sale in Marathahalli
                 </a>
                 <a
-                  eid="e699"
                   href="#"
                   className="block text-sm text-muted-foreground hover:text-primary"
                 >
                   Houses for sale in Sarjapur Road
                 </a>
                 <a
-                  eid="e700"
                   href="#"
                   className="block text-sm text-muted-foreground hover:text-primary"
                 >

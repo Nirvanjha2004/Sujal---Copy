@@ -20,9 +20,7 @@ export function BuyerDashboardContent({ stats, isLoading = false }: BuyerDashboa
   const safeStats = {
     savedProperties: stats?.savedProperties || 0,
     savedSearches: stats?.savedSearches || 0,
-    messages: stats?.messages || 0,
-    recentViews: stats?.recentViews || 0,
-    totalInquiries: stats?.totalInquiries || 0
+    messages: stats?.messages || 0
   };
 
   const quickActions: QuickAction[] = [
@@ -32,7 +30,7 @@ export function BuyerDashboardContent({ stats, isLoading = false }: BuyerDashboa
       description: 'Browse available properties',
       icon: 'solar:magnifer-bold',
       action: () => navigate('/'),
-      color: 'bg-primary',
+      color: 'primary',
       isEnabled: true
     },
     {
@@ -41,7 +39,7 @@ export function BuyerDashboardContent({ stats, isLoading = false }: BuyerDashboa
       description: 'View your favorite properties',
       icon: 'solar:heart-bold',
       action: () => navigate('/favorites'),
-      color: 'bg-red-500',
+      color: 'error',
       isEnabled: true,
       badge: safeStats.savedProperties > 0 ? safeStats.savedProperties : undefined
     },
@@ -51,7 +49,7 @@ export function BuyerDashboardContent({ stats, isLoading = false }: BuyerDashboa
       description: 'Manage your saved search criteria',
       icon: 'solar:bookmark-bold',
       action: () => navigate('/saved-searches'),
-      color: 'bg-accent',
+      color: 'warning',
       isEnabled: true,
       badge: safeStats.savedSearches > 0 ? safeStats.savedSearches : undefined
     },
@@ -61,7 +59,7 @@ export function BuyerDashboardContent({ stats, isLoading = false }: BuyerDashboa
       description: 'Messages and inquiries',
       icon: 'solar:letter-bold',
       action: () => navigate('/dashboard/messages'),
-      color: 'bg-blue-500',
+      color: 'info',
       isEnabled: true,
       badge: safeStats.messages > 0 ? safeStats.messages : undefined
     },
@@ -107,20 +105,11 @@ export function BuyerDashboardContent({ stats, isLoading = false }: BuyerDashboa
       <WelcomeSection
         user={user!}
         roleSpecificMessage="Find your dream property and manage your searches"
-        primaryAction={{
-          label: 'Search Properties',
-          icon: 'solar:magnifer-bold',
-          onClick: () => navigate('/')
-        }}
-        secondaryAction={{
-          label: 'View Favorites',
-          icon: 'solar:heart-bold',
-          onClick: () => navigate('/favorites')
-        }}
-        stats={{
+        stats={[{
           label: 'Saved Properties',
-          value: safeStats.savedProperties
-        }}
+          value: safeStats.savedProperties,
+          icon: 'solar:heart-bold'
+        }]}
       />
 
       {/* Enhanced Stats Cards with Modern Design */}
@@ -130,7 +119,7 @@ export function BuyerDashboardContent({ stats, isLoading = false }: BuyerDashboa
             title="Saved Properties"
             value={safeStats.savedProperties}
             icon="solar:heart-bold"
-            color="bg-gradient-to-br from-red-50 to-red-100 text-red-600 border-red-200"
+            color="error"
             subtitle="Favorites"
             trend={{
               value: 2,
@@ -147,7 +136,7 @@ export function BuyerDashboardContent({ stats, isLoading = false }: BuyerDashboa
             title="Saved Searches"
             value={safeStats.savedSearches}
             icon="solar:bookmark-bold"
-            color="bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 border-blue-200"
+            color="info"
             subtitle="Active searches"
             trend={{
               value: 1,
@@ -161,17 +150,12 @@ export function BuyerDashboardContent({ stats, isLoading = false }: BuyerDashboa
         
         <GridItem>
           <StatsCard
-            title="Recent Views"
-            value={safeStats.recentViews}
-            icon="solar:eye-bold"
-            color="bg-gradient-to-br from-purple-50 to-purple-100 text-purple-600 border-purple-200"
-            subtitle="Properties viewed"
-            trend={{
-              value: 5,
-              direction: 'up',
-              period: 'today'
-            }}
-            onClick={() => navigate('/recent-views')}
+            title="Messages"
+            value={safeStats.messages}
+            icon="solar:chat-bold"
+            color="warning"
+            subtitle="Unread messages"
+            onClick={() => navigate('/messages')}
             className="hover:shadow-lg hover:scale-105 transition-all duration-200"
           />
         </GridItem>
@@ -181,7 +165,7 @@ export function BuyerDashboardContent({ stats, isLoading = false }: BuyerDashboa
             title="Messages"
             value={safeStats.messages}
             icon="solar:letter-bold"
-            color="bg-gradient-to-br from-green-50 to-green-100 text-green-600 border-green-200"
+            color="success"
             subtitle="Conversations"
             onClick={() => navigate('/dashboard/messages')}
             className="hover:shadow-lg hover:scale-105 transition-all duration-200"

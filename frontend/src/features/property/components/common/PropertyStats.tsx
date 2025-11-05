@@ -5,7 +5,7 @@ import { Progress } from "@/shared/components/ui/progress";
 import { PropertyStats as PropertyStatsType, Property } from "../../types";
 // Utility functions are defined inline below
 
-interface PropertyStatsProps {
+export interface PropertyStatsProps {
   property: Property;
   stats?: PropertyStatsType;
   variant?: 'compact' | 'detailed' | 'dashboard';
@@ -23,13 +23,13 @@ interface StatItem {
 }
 
 export function PropertyStats({ 
-  property, 
+  property: _property, 
   stats, 
   variant = 'detailed',
   showTrends = false,
   className = ""
 }: PropertyStatsProps) {
-  const propertyStats = stats || property.stats;
+  const propertyStats = stats;
 
   if (!propertyStats) {
     return (

@@ -39,7 +39,7 @@ class UserServiceImpl implements UserService {
           limit: params.limit,
           totalPages: response.data.totalPages
         },
-        message: 'Users retrieved successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error fetching users:', error);
@@ -52,7 +52,11 @@ class UserServiceImpl implements UserService {
           limit: params.limit,
           totalPages: 0
         },
-        message: error.response?.data?.error?.message || 'Failed to fetch users'
+        error: {
+          code: 'USER_FETCH_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to fetch users'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -63,14 +67,18 @@ class UserServiceImpl implements UserService {
       return {
         success: true,
         data: undefined,
-        message: 'User status updated successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error updating user status:', error);
       return {
         success: false,
         data: undefined,
-        message: error.response?.data?.error?.message || 'Failed to update user status'
+        error: {
+          code: 'USER_UPDATE_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to update user status'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -81,14 +89,18 @@ class UserServiceImpl implements UserService {
       return {
         success: true,
         data: undefined,
-        message: 'User deleted successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error deleting user:', error);
       return {
         success: false,
         data: undefined,
-        message: error.response?.data?.error?.message || 'Failed to delete user'
+        error: {
+          code: 'USER_DELETE_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to delete user'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }

@@ -207,7 +207,7 @@ export const calculateStampDuty = (
  */
 export const calculateTotalOwnershipCost = (
   propertyPrice: number,
-  downPayment: number,
+  _downPayment: number,
   loanAmount: number,
   interestRate: number,
   tenureYears: number,
@@ -261,10 +261,10 @@ export const calculatePriceComparison = (
   pricePerSqftData: Array<{ id: number; pricePerSqft: number; title: string }>;
 } => {
   const pricePerSqftData = properties
-    .filter(p => p.area && p.area > 0)
+    .filter(p => p.area_sqft && p.area_sqft > 0)
     .map(p => ({
       id: p.id,
-      pricePerSqft: Math.round(p.price / p.area),
+      pricePerSqft: Math.round(p.price / p.area_sqft!),
       title: p.title
     }));
   
@@ -363,7 +363,7 @@ export const calculateBreakEvenPoint = (
 export const calculateInvestmentScore = (
   property: Property,
   monthlyRent?: number,
-  marketAppreciationRate: number = 0.05
+  _marketAppreciationRate: number = 0.05
 ): number => {
   let score = 50; // Base score
   
@@ -379,9 +379,9 @@ export const calculateInvestmentScore = (
   }
   
   // Property type score
-  if (property.propertyType === 'apartment') {
+  if (property.property_type === 'apartment') {
     score += 10; // High liquidity
-  } else if (property.propertyType === 'house') {
+  } else if (property.property_type === 'house') {
     score += 5;
   }
   
@@ -394,8 +394,8 @@ export const calculateInvestmentScore = (
   }
   
   // Price per sqft reasonableness
-  if (property.area) {
-    const pricePerSqft = property.price / property.area;
+  if (property.area_sqft) {
+    const pricePerSqft = property.price / property.area_sqft;
     // Reasonable price per sqft varies by city, this is simplified
     if (pricePerSqft < 8000) score += 10;
     else if (pricePerSqft > 15000) score -= 10;

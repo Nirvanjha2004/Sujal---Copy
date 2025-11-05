@@ -147,7 +147,7 @@ export function Header({ variant = 'default' }: HeaderProps) {
         {authState.isAuthenticated ? (
           <>
             <span className="text-sm hidden md:block">
-              Welcome, {authState.user?.name || authState.user?.email}
+              Welcome, {authState.user?.first_name || authState.user?.email}
             </span>
             <Button 
               size="sm" 

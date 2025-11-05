@@ -157,13 +157,13 @@ export const formatAddress = (
   
   switch (format) {
     case 'full':
-      if (property.location?.address || property.address) {
-        parts.push(property.location?.address || property.address || '');
+      if (property.address) {
+        parts.push(property.address);
       }
       if (property.city) parts.push(property.city);
       if (property.state) parts.push(property.state);
-      if (property.postalCode || property.postal_code) {
-        parts.push(property.postalCode || property.postal_code || '');
+      if (property.postal_code) {
+        parts.push(property.postal_code);
       }
       break;
       
@@ -192,7 +192,7 @@ export const formatPropertyStatus = (
     resale: { label: 'Resale', color: 'text-blue-600', bgColor: 'bg-blue-100' },
     under_construction: { label: 'Under Construction', color: 'text-orange-600', bgColor: 'bg-orange-100' },
     active: { label: 'Active', color: 'text-green-600', bgColor: 'bg-green-100' },
-    inactive: { label: 'Inactive', color: 'text-gray-600', bgColor: 'bg-gray-100' },
+    pending: { label: 'Pending', color: 'text-yellow-600', bgColor: 'bg-yellow-100' },
     sold: { label: 'Sold', color: 'text-red-600', bgColor: 'bg-red-100' },
     rented: { label: 'Rented', color: 'text-purple-600', bgColor: 'bg-purple-100' }
   };

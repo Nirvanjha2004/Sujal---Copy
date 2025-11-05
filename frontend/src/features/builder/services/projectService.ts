@@ -163,6 +163,32 @@ class ProjectService {
     }
   }
 
+  async getUnit(projectId: string, unitId: number) {
+    try {
+      console.log(`ProjectService: Fetching unit ${unitId} from project ${projectId}`);
+      const response = await api.projects.units.getUnit(parseInt(projectId), unitId);
+      console.log('ProjectService: Get unit response:', response);
+      
+      return response;
+    } catch (error) {
+      console.error(`ProjectService: Error fetching unit ${unitId} from project ${projectId}:`, error);
+      throw error;
+    }
+  }
+
+  async updateUnit(projectId: string, unitId: number, unitData: any) {
+    try {
+      console.log(`ProjectService: Updating unit ${unitId} in project ${projectId}:`, unitData);
+      const response = await api.projects.units.updateUnit(parseInt(projectId), unitId, unitData);
+      console.log('ProjectService: Update unit response:', response);
+      
+      return response;
+    } catch (error) {
+      console.error(`ProjectService: Error updating unit ${unitId} in project ${projectId}:`, error);
+      throw error;
+    }
+  }
+
   async deleteUnit(projectId: string, unitId: number) {
     try {
       console.log(`ProjectService: Deleting unit ${unitId} from project ${projectId}`);

@@ -116,7 +116,7 @@ class ContentServiceImpl implements ContentService {
           limit: params.limit,
           totalPages: response.data.totalPages
         },
-        message: 'Content retrieved successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error fetching content:', error);
@@ -129,7 +129,11 @@ class ContentServiceImpl implements ContentService {
           limit: params.limit,
           totalPages: 0
         },
-        message: error.response?.data?.error?.message || 'Failed to fetch content'
+        error: {
+          code: 'CONTENT_LIST_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to fetch content'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -144,14 +148,18 @@ class ContentServiceImpl implements ContentService {
       return {
         success: true,
         data: response.data,
-        message: 'Content retrieved successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error fetching content:', error);
       return {
         success: false,
         data: null as any,
-        message: error.response?.data?.error?.message || 'Failed to fetch content'
+        error: {
+          code: 'CONTENT_FETCH_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to fetch content'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -166,14 +174,18 @@ class ContentServiceImpl implements ContentService {
       return {
         success: true,
         data: response.data,
-        message: 'Content created successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error creating content:', error);
       return {
         success: false,
         data: null as any,
-        message: error.response?.data?.error?.message || 'Failed to create content'
+        error: {
+          code: 'CONTENT_CREATE_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to create content'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -188,14 +200,18 @@ class ContentServiceImpl implements ContentService {
       return {
         success: true,
         data: response.data,
-        message: 'Content updated successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error updating content:', error);
       return {
         success: false,
         data: null as any,
-        message: error.response?.data?.error?.message || 'Failed to update content'
+        error: {
+          code: 'CONTENT_UPDATE_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to update content'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -210,14 +226,18 @@ class ContentServiceImpl implements ContentService {
       return {
         success: true,
         data: response.data,
-        message: 'Content status toggled successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error toggling content status:', error);
       return {
         success: false,
         data: null as any,
-        message: error.response?.data?.error?.message || 'Failed to toggle content status'
+        error: {
+          code: 'CONTENT_STATUS_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to toggle content status'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -228,14 +248,18 @@ class ContentServiceImpl implements ContentService {
       return {
         success: true,
         data: undefined,
-        message: 'Content deleted successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error deleting content:', error);
       return {
         success: false,
         data: undefined,
-        message: error.response?.data?.error?.message || 'Failed to delete content'
+        error: {
+          code: 'CONTENT_DELETE_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to delete content'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -255,14 +279,18 @@ class ContentServiceImpl implements ContentService {
       return {
         success: true,
         data: response.data,
-        message: 'SEO settings retrieved successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error fetching SEO settings:', error);
       return {
         success: false,
-        data: [],
-        message: error.response?.data?.error?.message || 'Failed to fetch SEO settings'
+        data: [] as SeoSetting[],
+        error: {
+          code: 'SEO_FETCH_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to fetch SEO settings'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -276,14 +304,18 @@ class ContentServiceImpl implements ContentService {
       return {
         success: true,
         data: response.data,
-        message: 'SEO setting created successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error creating SEO setting:', error);
       return {
         success: false,
         data: null as any,
-        message: error.response?.data?.error?.message || 'Failed to create SEO setting'
+        error: {
+          code: 'SEO_CREATE_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to create SEO setting'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -297,14 +329,18 @@ class ContentServiceImpl implements ContentService {
       return {
         success: true,
         data: response.data,
-        message: 'SEO setting updated successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error updating SEO setting:', error);
       return {
         success: false,
         data: null as any,
-        message: error.response?.data?.error?.message || 'Failed to update SEO setting'
+        error: {
+          code: 'SEO_UPDATE_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to update SEO setting'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -315,14 +351,18 @@ class ContentServiceImpl implements ContentService {
       return {
         success: true,
         data: undefined,
-        message: 'SEO setting deleted successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error deleting SEO setting:', error);
       return {
         success: false,
         data: undefined,
-        message: error.response?.data?.error?.message || 'Failed to delete SEO setting'
+        error: {
+          code: 'SEO_DELETE_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to delete SEO setting'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -336,14 +376,18 @@ class ContentServiceImpl implements ContentService {
       return {
         success: true,
         data: response.data,
-        message: 'Sitemap generated successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error generating sitemap:', error);
       return {
         success: false,
         data: null as any,
-        message: error.response?.data?.error?.message || 'Failed to generate sitemap'
+        error: {
+          code: 'SITEMAP_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to generate sitemap'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -359,14 +403,18 @@ class ContentServiceImpl implements ContentService {
       return {
         success: true,
         data: response.data || [],
-        message: 'Redirects retrieved successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error fetching redirects:', error);
       return {
         success: false,
         data: [],
-        message: error.response?.data?.error?.message || 'Failed to fetch redirects'
+        error: {
+          code: 'REDIRECT_FETCH_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to fetch redirects'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -380,14 +428,18 @@ class ContentServiceImpl implements ContentService {
       return {
         success: true,
         data: response.data,
-        message: 'Redirect created successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error creating redirect:', error);
       return {
         success: false,
         data: null as any,
-        message: error.response?.data?.error?.message || 'Failed to create redirect'
+        error: {
+          code: 'REDIRECT_CREATE_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to create redirect'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -401,14 +453,18 @@ class ContentServiceImpl implements ContentService {
       return {
         success: true,
         data: response.data,
-        message: 'Redirect updated successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error updating redirect:', error);
       return {
         success: false,
         data: null as any,
-        message: error.response?.data?.error?.message || 'Failed to update redirect'
+        error: {
+          code: 'REDIRECT_UPDATE_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to update redirect'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -419,14 +475,18 @@ class ContentServiceImpl implements ContentService {
       return {
         success: true,
         data: undefined,
-        message: 'Redirect deleted successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error deleting redirect:', error);
       return {
         success: false,
         data: undefined,
-        message: error.response?.data?.error?.message || 'Failed to delete redirect'
+        error: {
+          code: 'REDIRECT_DELETE_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to delete redirect'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -462,7 +522,7 @@ class ContentServiceImpl implements ContentService {
           limit: filters?.limit || 20,
           totalPages: response.data?.totalPages || 0
         },
-        message: 'Reviews retrieved successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error fetching reviews:', error);
@@ -475,7 +535,11 @@ class ContentServiceImpl implements ContentService {
           limit: filters?.limit || 20,
           totalPages: 0
         },
-        message: error.response?.data?.error?.message || 'Failed to fetch reviews'
+        error: {
+          code: 'REVIEW_FETCH_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to fetch reviews'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -490,14 +554,18 @@ class ContentServiceImpl implements ContentService {
       return {
         success: true,
         data: response.data,
-        message: 'Review updated successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error updating review:', error);
       return {
         success: false,
         data: null as any,
-        message: error.response?.data?.error?.message || 'Failed to update review'
+        error: {
+          code: 'REVIEW_UPDATE_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to update review'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -512,14 +580,18 @@ class ContentServiceImpl implements ContentService {
       return {
         success: true,
         data: undefined,
-        message: `Review ${action}d successfully`
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error moderating review:', error);
       return {
         success: false,
         data: undefined,
-        message: error.response?.data?.error?.message || 'Failed to moderate review'
+        error: {
+          code: 'REVIEW_MODERATE_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to moderate review'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }
@@ -530,14 +602,18 @@ class ContentServiceImpl implements ContentService {
       return {
         success: true,
         data: undefined,
-        message: 'Review deleted successfully'
+        timestamp: new Date().toISOString()
       };
     } catch (error: any) {
       console.error('Error deleting review:', error);
       return {
         success: false,
         data: undefined,
-        message: error.response?.data?.error?.message || 'Failed to delete review'
+        error: {
+          code: 'REVIEW_DELETE_ERROR',
+          message: error.response?.data?.error?.message || 'Failed to delete review'
+        },
+        timestamp: new Date().toISOString()
       };
     }
   }

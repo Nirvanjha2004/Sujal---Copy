@@ -2,60 +2,51 @@ import { createPreloadableLazyComponent } from '@/shared/utils/lazyImports';
 
 // Lazy load profile pages
 export const LazyProfilePage = createPreloadableLazyComponent(
-  () => import('../../pages/ProfilePage'),
-  'ProfilePage'
+  () => import('../../pages/ProfilePage')
 );
 
 // Lazy load profile components
 export const LazyProfileLayout = createPreloadableLazyComponent(
-  () => import('../layout/ProfileLayout'),
-  'ProfileLayout'
+  () => import('../layout/ProfileLayout')
 );
 
 export const LazyProfileSection = createPreloadableLazyComponent(
-  () => import('../layout/ProfileSection'),
-  'ProfileSection'
+  () => import('../layout/ProfileSection')
 );
 
 export const LazyProfileSidebar = createPreloadableLazyComponent(
-  () => import('../layout/ProfileSidebar'),
-  'ProfileSidebar'
+  () => import('../layout/ProfileSidebar')
 );
 
 export const LazyProfileForm = createPreloadableLazyComponent(
-  () => import('../forms/ProfileForm'),
-  'ProfileForm'
+  () => import('../forms/ProfileForm')
 );
 
 // Lazy load auth pages
 export const LazyLoginPage = createPreloadableLazyComponent(
-  () => import('../../pages/LoginPage'),
-  'LoginPage'
+  () => import('../../pages/LoginPage')
 );
 
 export const LazyRegisterPage = createPreloadableLazyComponent(
-  () => import('../../pages/RegisterPage'),
-  'RegisterPage'
+  () => import('../../pages/RegisterPage')
 );
 
 export const LazyOTPVerificationPage = createPreloadableLazyComponent(
-  () => import('../../pages/OTPVerificationPage'),
-  'OTPVerificationPage'
+  () => import('../../pages/OTPVerificationPage')
 );
 
 export const LazyPasswordResetPage = createPreloadableLazyComponent(
-  () => import('../../pages/PasswordResetPage'),
-  'PasswordResetPage'
+  () => import('../../pages/PasswordResetPage')
 );
 
 // Preload functions
 export const preloadProfileComponents = () => {
-  LazyProfilePage.preload();
-  LazyProfileLayout.preload();
-  LazyProfileForm.preload();
+  (LazyProfilePage as any).preload();
+  (LazyProfileLayout as any).preload();
+  (LazyProfileForm as any).preload();
 };
 
 export const preloadAuthComponents = () => {
-  LazyLoginPage.preload();
-  LazyRegisterPage.preload();
+  (LazyLoginPage as any).preload();
+  (LazyRegisterPage as any).preload();
 };

@@ -18,8 +18,7 @@ import {
   Building,
 
   CheckCircle,
-  XCircle,
-  Star
+  XCircle
 } from 'lucide-react';
 import { formatAmenities } from '../../utils/propertyHelpers';
 
@@ -94,8 +93,8 @@ export const PropertyFeatures: React.FC<PropertyFeaturesProps> = ({
 
   const categorizedAmenities = groupAmenitiesByCategory(amenitiesList);
 
-  // Property specifications from the property object
-  const specifications = property.specifications || {};
+  // Property specifications from the property amenities
+  const specifications: Record<string, boolean> = {}; // TODO: Derive from amenities or other property fields
   
   // Common property features to check
   const commonFeatures = [
@@ -113,36 +112,7 @@ export const PropertyFeatures: React.FC<PropertyFeaturesProps> = ({
 
   return (
     <div className={`space-y-6 ${className}`}>
-      {/* Property Features */}
-      {property.features && property.features.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Star className="h-5 w-5" />
-              Property Features
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {property.features.map((feature, index) => (
-                <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  {feature.isAvailable ? (
-                    <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
-                  ) : (
-                    <XCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
-                  )}
-                  <div>
-                    <div className="font-medium text-gray-900">{feature.name}</div>
-                    {feature.category && (
-                      <div className="text-sm text-gray-600">{feature.category}</div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+
 
       {/* Common Features Checklist */}
       <Card>
@@ -252,7 +222,7 @@ export const PropertyFeatures: React.FC<PropertyFeaturesProps> = ({
       )}
 
       {/* No Features Message */}
-      {amenitiesList.length === 0 && (!property.features || property.features.length === 0) && Object.keys(specifications).length === 0 && (
+      {amenitiesList.length === 0 && Object.keys(specifications).length === 0 && (
         <Card>
           <CardContent className="text-center py-8">
             <Home className="h-12 w-12 text-gray-400 mx-auto mb-4" />

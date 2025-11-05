@@ -27,7 +27,7 @@ export interface SavedSearch {
   user_id?: number;
 }
 
-export interface SavedSearchCard {
+export interface SavedSearchCardProps {
   search: SavedSearch;
   onDelete: (id: number) => void;
   onRun: (filters: PropertyFilters) => void;

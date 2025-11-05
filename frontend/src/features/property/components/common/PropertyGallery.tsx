@@ -3,7 +3,7 @@ import { Icon } from "@iconify/react";
 import { Button } from "@/shared/components/ui/button";
 import { PropertyImage } from "../../types";
 
-interface PropertyGalleryProps {
+export interface PropertyGalleryProps {
   images: PropertyImage[];
   title: string;
   className?: string;
@@ -58,32 +58,44 @@ export function PropertyGallery({
   };
 
   const getImageUrl = (image: PropertyImage) => {
-    return image.url || image.image_url || '';
+    return image.image_url || '';
   };
 
   const getImageAlt = (image: PropertyImage, index: number) => {
-    return image.alt || image.alt_text || `${title} - Image ${index + 1}`;
+    return image.alt_text || `${title} - Image ${index + 1}`;
   };
 
   // Default images if none provided
-  const defaultImages = [
+  const defaultImages: PropertyImage[] = [
     {
       id: 1,
-      url: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/luxury-real-estate/landscape/4.webp",
-      alt: title,
-      isPrimary: true
+      property_id: 0,
+      image_url: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/luxury-real-estate/landscape/4.webp",
+      alt_text: title,
+      display_order: 1,
+      is_primary: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     },
     {
       id: 2,
-      url: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/luxury-real-estate/square/3.webp",
-      alt: "Property view",
-      isPrimary: false
+      property_id: 0,
+      image_url: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/luxury-real-estate/square/3.webp",
+      alt_text: "Property view",
+      display_order: 2,
+      is_primary: false,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     },
     {
       id: 3,
-      url: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/luxury-real-estate/square/2.webp",
-      alt: "Property view",
-      isPrimary: false
+      property_id: 0,
+      image_url: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/luxury-real-estate/square/2.webp",
+      alt_text: "Property view",
+      display_order: 3,
+      is_primary: false,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     }
   ];
 

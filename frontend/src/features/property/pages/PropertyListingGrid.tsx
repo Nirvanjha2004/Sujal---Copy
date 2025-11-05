@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { useAuth } from "@/shared/contexts/AuthContext";
 import { usePropertySearch } from "../hooks/usePropertySearch";
 import { PropertyGrid } from "../components/lists/PropertyGrid";
-import { PropertyFilters } from "../components/common/PropertyFilters";
+import { PropertyType, ListingType } from "../types";
 import { Button } from "@/shared/components/ui/button";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { Badge } from "@/shared/components/ui/badge";
@@ -38,9 +38,23 @@ export function PropertyListingGrid() {
         const minPrice = searchParams.get("min_price");
         const maxPrice = searchParams.get("max_price");
 
+        // Helper function to validate PropertyType
+        const isValidPropertyType = (type: string): type is PropertyType => {
+            return ['apartment', 'house', 'villa', 'plot', 'commercial', 'land'].includes(type);
+        };
+
+        // Helper function to validate ListingType
+        const isValidListingType = (type: string): type is ListingType => {
+            return ['sale', 'rent'].includes(type);
+        };
+
         if (query) newFilters.location = query;
-        if (propertyType && propertyType !== "all") newFilters.property_type = propertyType;
-        if (listingType) newFilters.listing_type = listingType;
+        if (propertyType && propertyType !== "all" && isValidPropertyType(propertyType)) {
+            newFilters.property_type = propertyType;
+        }
+        if (listingType && isValidListingType(listingType)) {
+            newFilters.listing_type = listingType;
+        }
         if (minPrice) newFilters.min_price = parseInt(minPrice);
         if (maxPrice) newFilters.max_price = parseInt(maxPrice);
 
@@ -49,15 +63,7 @@ export function PropertyListingGrid() {
 
     const { properties, loading, error, total } = usePropertySearch(filters);
 
-    const formatPrice = (price: number) => {
-        if (price >= 10000000) {
-            return `₹ ${(price / 10000000).toFixed(2)} Cr`;
-        } else if (price >= 100000) {
-            return `₹ ${(price / 100000).toFixed(2)} Lakh`;
-        } else {
-            return `₹ ${price.toLocaleString()}`;
-        }
-    };
+
 
     const handleSaveSearchClick = () => {
         if (!authState.isAuthenticated) {
@@ -275,7 +281,7 @@ export function PropertyListingGrid() {
                 {/* Property Grid */}
                 <PropertyGrid 
                     properties={properties} 
-                    loading={loading}
+                    isLoading={loading}
                     onPropertyClick={(property) => navigate(`/property/${property.id}`)}
                 />
             </div>

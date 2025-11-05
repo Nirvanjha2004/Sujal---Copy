@@ -59,7 +59,7 @@ export function SeoManagementPage() {
         setSettings(response.data.data);
         setTotalPages(response.data.totalPages);
       } else {
-        throw new Error(response.message || 'Failed to fetch SEO settings');
+        throw new Error(response.error?.message || 'Failed to fetch SEO settings');
       }
     } catch (err: any) {
       console.error('Error fetching SEO settings:', err);
@@ -85,7 +85,7 @@ export function SeoManagementPage() {
       if (response.success) {
         fetchSettings();
       } else {
-        alert(response.message || 'Failed to update SEO setting');
+        alert(response.error?.message || 'Failed to update SEO setting');
       }
     } catch (err: any) {
       alert('Failed to update SEO setting');
@@ -100,7 +100,7 @@ export function SeoManagementPage() {
       if (response.success) {
         fetchSettings();
       } else {
-        alert(response.message || 'Failed to delete SEO setting');
+        alert(response.error?.message || 'Failed to delete SEO setting');
       }
     } catch (err: any) {
       alert('Failed to delete SEO setting');

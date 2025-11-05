@@ -16,7 +16,7 @@ interface ImagePreview {
   error?: string;
 }
 
-interface PropertyImageUploadProps {
+export interface PropertyImageUploadProps {
   images: File[];
   onImagesChange: (images: File[]) => void;
   maxImages?: number;

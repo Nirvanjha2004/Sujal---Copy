@@ -283,7 +283,7 @@ export function useUserPreferences() {
  * Hook for managing live regions
  */
 export function useLiveRegion() {
-  const liveRegionRef = useRef<HTMLDivElement>(null);
+  const liveRegionRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     // Create live region if it doesn't exist

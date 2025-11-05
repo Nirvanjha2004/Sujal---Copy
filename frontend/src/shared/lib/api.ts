@@ -1,33 +1,9 @@
 import { getValidToken } from '@/features/auth/utils';
+// Import standardized types
+import type { Property, PropertyImage, Project, ProjectImage } from '@/shared/types';
 
 // Update the API_BASE_URL to match your backend port
 const API_BASE_URL = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3001/api/v1';
-
-export interface Property {
-  id: number;
-  title: string;
-  description?: string;
-  price: number;
-  address: string;
-  city: string;
-  state: string;
-  postal_code?: string;
-  bedrooms?: number;
-  bathrooms?: number;
-  area_sqft?: number;
-  property_type: string;
-  listing_type: string;
-  status: string;
-  latitude?: number;
-  longitude?: number;
-  created_at: string;
-  updated_at: string;
-  images?: PropertyImage[];
-  owner?: any;
-  // Computed fields for backward compatibility
-  location?: string;
-  area?: number;
-}
 
 export interface ProjectFilters {
   status?: string;
@@ -78,68 +54,7 @@ export interface ProjectUnit {
   project?: Project;
 }
 
-export interface ProjectImage {
-  id: number;
-  project_id: number;
-  image_url: string;
-  alt_text?: string;
-  image_type: 'exterior' | 'interior' | 'amenity' | 'floor_plan' | 'site_plan' | 'location' | 'gallery';
-  is_primary: boolean;
-  display_order: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface Project {
-  id: number;
-  builder_id: number;
-  name: string;
-  description?: string;
-  location: string;
-  address: string;
-  city: string;
-  state: string;
-  pincode: string;
-  project_type: 'residential' | 'commercial' | 'mixed_use' | 'villa' | 'apartment' | 'office' | 'retail';
-  status: 'planning' | 'pre_launch' | 'under_construction' | 'ready_to_move' | 'completed' | 'on_hold';
-  total_units: number;
-  available_units: number;
-  sold_units: number;
-  blocked_units: number;
-  start_date?: string;
-  expected_completion?: string;
-  actual_completion?: string;
-  rera_number?: string;
-  approval_status: string;
-  amenities?: string[];
-  specifications?: Record<string, any>;
-  pricing?: Record<string, any>;
-  floor_plans?: string[];
-  brochure_url?: string;
-  video_url?: string;
-  virtual_tour_url?: string;
-  is_active: boolean;
-  featured: boolean;
-  created_at: string;
-  updated_at: string;
-  builder?: User;
-  images?: ProjectImage[];
-  units?: ProjectUnit[];
-  unitStats?: {
-    total: number;
-    available: number;
-    sold: number;
-    blocked: number;
-  };
-}
-export interface PropertyImage {
-  id: number;
-  property_id: number;
-  image_url: string;
-  alt_text?: string;
-  is_primary: boolean;
-  display_order: number;
-}
+// Types are now imported from shared/types
 
 // Add or update these types
 export interface PropertyFilters {
@@ -264,7 +179,7 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
 
 export const api = {
   // Properties
-  getProperties: async (filters?: PropertyFilters): Promise<{ data: Property[]; total: number; page: number; limit: number }> => {
+  getProperties: async (filters?: PropertyFilters, page?: number, limit?: number): Promise<{ data: Property[]; total: number; page: number; limit: number }> => {
     const params = new URLSearchParams();
 
     if (filters) {
@@ -291,6 +206,14 @@ export const api = {
           params.append(backendKey, value.toString());
         }
       });
+    }
+
+    // Add pagination parameters
+    if (page !== undefined) {
+      params.append('page', page.toString());
+    }
+    if (limit !== undefined) {
+      params.append('limit', limit.toString());
     }
 
     console.log("The params are", params.toString())
@@ -406,7 +329,7 @@ export const api = {
     return apiRequest(`/uploads/properties/${propertyId}/images`);
   },
 
-  deletePropertyImage: (propertyId: number, imageId: number): Promise<void> => {
+  deletePropertyImage: (_propertyId: number, imageId: number): Promise<void> => {
     return apiRequest(`/uploads/images/${imageId}`, {
       method: 'DELETE',
     });
@@ -1376,7 +1299,6 @@ export const api = {
         balconies?: number;
         bathrooms: number;
         bedrooms: number;
-        facing?: string;
         specifications?: Record<string, any>;
         amenities?: string[];
         isCornerUnit?: boolean;
@@ -1410,7 +1332,6 @@ export const api = {
         balconies?: number;
         bathrooms?: number;
         bedrooms?: number;
-        facing?: string;
         status?: string;
         specifications?: Record<string, any>;
         amenities?: string[];
@@ -1467,7 +1388,6 @@ export const api = {
         balconies?: number;
         bathrooms: number;
         bedrooms: number;
-        facing?: string;
         specifications?: Record<string, any>;
         amenities?: string[];
         isCornerUnit?: boolean;
@@ -1928,4 +1848,8 @@ export const api = {
 };
 export const getSavedSearches = api.getSavedSearches;
 export const deleteSavedSearch = api.deleteSavedSearch;
-export { ApiError };
+export {
+  ApiError, type
+    // Import standardized types
+    Property
+};

@@ -72,7 +72,7 @@ export function useProfile(): UseProfileReturn {
         }
         return null;
       
-      case 'avatar':
+      case 'profile_image':
         // Avatar validation could include URL validation or file type checking
         if (value && value.length > 500) {
           return 'Avatar URL is too long';
@@ -105,8 +105,8 @@ export function useProfile(): UseProfileReturn {
       if (phoneError) errors.phone = phoneError;
     }
     
-    if (userData.avatar !== undefined) {
-      const avatarError = validateField('avatar', userData.avatar);
+    if (userData.profile_image !== undefined) {
+      const avatarError = validateField('profile_image', userData.profile_image);
       if (avatarError) errors.avatar = avatarError;
     }
     
@@ -119,14 +119,14 @@ export function useProfile(): UseProfileReturn {
   const hasChanges = useCallback((userData: any): boolean => {
     if (!user) return false;
     
-    const currentFirstName = user.first_name || user.firstName;
-    const currentLastName = user.last_name || user.lastName;
+    const currentFirstName = user.first_name;
+    const currentLastName = user.last_name;
     
     return (
       (userData.first_name !== undefined && userData.first_name !== currentFirstName) ||
       (userData.last_name !== undefined && userData.last_name !== currentLastName) ||
       (userData.phone !== undefined && userData.phone !== user.phone) ||
-      (userData.avatar !== undefined && userData.avatar !== user.avatar)
+      (userData.profile_image !== undefined && userData.profile_image !== user.profile_image)
     );
   }, [user]);
 

@@ -98,15 +98,15 @@ export function DashboardSidebar({
         <div className="p-4 border-b border-border animate-in fade-in-0 slide-in-from-left-2 duration-300">
           <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
             <Avatar className="size-10 ring-2 ring-primary/20">
-              <AvatarImage src={user.avatar} alt="" />
+              <AvatarImage src={user.profile_image} alt="" />
               <AvatarFallback className="text-sm font-semibold bg-primary/10">
-                {(user.first_name || user.firstName)?.[0]}{(user.last_name || user.lastName)?.[0]}
+                {user.first_name?.[0]}{user.last_name?.[0]}
               </AvatarFallback>
             </Avatar>
             
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-sm truncate text-foreground">
-                {user.first_name || user.firstName} {user.last_name || user.lastName}
+                {user.first_name} {user.last_name}
               </p>
               <Badge 
                 variant="secondary" 
@@ -129,12 +129,12 @@ export function DashboardSidebar({
             <button
               className="focus-visible-enhanced rounded-full"
               onClick={onProfileClick}
-              aria-label={`${user.first_name || user.firstName} ${user.last_name || user.lastName}, ${user.role}. Click to view profile.`}
+              aria-label={`${user.first_name} ${user.last_name}, ${user.role}. Click to view profile.`}
             >
               <Avatar className="size-10 ring-2 ring-primary/20 transition-all duration-200 hover:ring-primary/40 cursor-pointer">
-                <AvatarImage src={user.avatar} alt="" />
+                <AvatarImage src={user.profile_image} alt="" />
                 <AvatarFallback className="text-xs font-semibold bg-primary/10">
-                  {(user.first_name || user.firstName)?.[0]}{(user.last_name || user.lastName)?.[0]}
+                  {user.first_name?.[0]}{user.last_name?.[0]}
                 </AvatarFallback>
               </Avatar>
             </button>
@@ -151,7 +151,7 @@ export function DashboardSidebar({
               role="tooltip"
               aria-hidden="true"
             >
-              {user.first_name || user.firstName} {user.last_name || user.lastName}
+              {user.first_name} {user.last_name}
               <div className="text-xs text-muted-foreground">{user.role}</div>
             </div>
           </div>

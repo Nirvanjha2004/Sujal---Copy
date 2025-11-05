@@ -12,7 +12,6 @@ export type {
   PropertyType,
   ListingType,
   PropertyStatus,
-  PropertyFilters,
   SearchCriteria,
   PropertyAnalytics,
   CreatePropertyRequest,
@@ -31,32 +30,38 @@ export {
   LISTING_TYPES,
   AMENITIES_LIST,
   VALIDATION_RULES,
-  PROPERTY_STATUS,
-  CURRENCY_OPTIONS
+  PROPERTY_STATUSES
 } from './constants';
 
 // =============================================================================
 // COMPONENTS
 // =============================================================================
-export * from './components';
+export { PropertyCard, PropertyGallery, PropertyImageUpload, PropertyFilters } from './components/common';
+export { PropertyDetails, PropertyOverview, PropertyFeatures, PropertyContact } from './components/details';
+export { AddPropertyForm, EditPropertyForm, PropertySearchForm, PropertyFiltersForm } from './components/forms';
+export { PropertyGrid, PropertyList, SearchResults, FeaturedProperties } from './components/lists';
 
 // =============================================================================
 // PAGES
 // =============================================================================
-export * from './pages';
+export { 
+  PropertyListingPage, 
+  PropertyDetailsPage, 
+  AddPropertyPage, 
+  EditPropertyPage,
+  MyPropertiesPage,
+  PropertySearchPage
+} from './pages';
 
 // =============================================================================
 // HOOKS
 // =============================================================================
-export * from './hooks';
-
-// Commonly used hooks for convenience
-export {
-  useProperty,
-  usePropertySearch,
-  usePropertyFavorites,
-  usePropertyForm,
-  usePropertyFilters
+export { 
+  useProperty, 
+  usePropertySearch, 
+  usePropertyFavorites, 
+  usePropertyForm, 
+  usePropertyFilters 
 } from './hooks';
 
 // =============================================================================
@@ -66,10 +71,10 @@ export * from './services';
 
 // Service instances for convenience
 export {
-  default as propertyService,
-  default as propertySearchService,
-  default as propertyImageService,
-  default as propertyAnalyticsService
+  propertyService,
+  propertySearchService,
+  propertyImageService,
+  propertyAnalyticsService
 } from './services';
 
 // =============================================================================

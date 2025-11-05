@@ -2,99 +2,59 @@ import { createPreloadableLazyComponent } from '@/shared/utils/lazyImports';
 
 // Lazy load dashboard pages
 export const LazyDashboardPage = createPreloadableLazyComponent(
-  () => import('../../../dashboard/pages/DashboardPage'),
-  'DashboardPage'
+  () => import('../../../dashboard/pages/DashboardPage')
 );
 
 export const LazyUserActivityPage = createPreloadableLazyComponent(
-  () => import('../../../dashboard/pages/UserActivityPage'),
-  'UserActivityPage'
+  () => import('../../../dashboard/pages/UserActivityPage')
 );
 
 export const LazyAccountSettingsPage = createPreloadableLazyComponent(
-  () => import('../../../dashboard/pages/AccountSettingsPage'),
-  'AccountSettingsPage'
+  () => import('../../../dashboard/pages/AccountSettingsPage')
 );
 
 export const LazyMessagesPage = createPreloadableLazyComponent(
-  () => import('../../../dashboard/pages/MessagesPage'),
-  'MessagesPage'
+  () => import('../../../dashboard/pages/MessagesPage')
 );
 
 // Lazy load dashboard components
 export const LazyDashboardSidebar = createPreloadableLazyComponent(
-  () => import('../common/DashboardSidebar'),
-  'DashboardSidebar'
+  () => import('../common/DashboardSidebar')
 );
 
 export const LazyStatsCard = createPreloadableLazyComponent(
-  () => import('../common/StatsCard'),
-  'StatsCard'
+  () => import('../common/StatsCard')
 );
 
 export const LazyActivityFeed = createPreloadableLazyComponent(
-  () => import('../common/ActivityFeed'),
-  'ActivityFeed'
+  () => import('../common/ActivityFeed')
 );
 
 export const LazyNotificationPanel = createPreloadableLazyComponent(
-  () => import('../common/NotificationPanel'),
-  'NotificationPanel'
+  () => import('../common/NotificationPanel')
 );
 
 export const LazyQuickActions = createPreloadableLazyComponent(
-  () => import('../common/QuickActions'),
-  'QuickActions'
+  () => import('../common/QuickActions')
 );
 
 // Lazy load role-specific dashboard content
 export const LazyBuyerDashboardContent = createPreloadableLazyComponent(
-  () => import('../role-specific/BuyerDashboardContent'),
-  'BuyerDashboardContent'
+  () => import('../role-specific/BuyerDashboardContent')
 );
 
 export const LazyAgentDashboardContent = createPreloadableLazyComponent(
-  () => import('../role-specific/AgentDashboardContent'),
-  'AgentDashboardContent'
+  () => import('../role-specific/AgentDashboardContent')
 );
 
 export const LazyBuilderDashboardContent = createPreloadableLazyComponent(
-  () => import('../role-specific/BuilderDashboardContent'),
-  'BuilderDashboardContent'
+  () => import('../role-specific/BuilderDashboardContent')
 );
 
 export const LazyAdminDashboardContent = createPreloadableLazyComponent(
-  () => import('../role-specific/AdminDashboardContent'),
-  'AdminDashboardContent'
+  () => import('../role-specific/AdminDashboardContent')
 );
 
 export const LazyUserDashboardContent = createPreloadableLazyComponent(
-  () => import('../role-specific/UserDashboardContent'),
-  'UserDashboardContent'
+  () => import('../role-specific/UserDashboardContent')
 );
-
-// Preload functions for route-based preloading
-export const preloadDashboardComponents = () => {
-  LazyDashboardPage.preload();
-  LazyDashboardSidebar.preload();
-  LazyStatsCard.preload();
-};
-
-export const preloadRoleSpecificContent = (role: string) => {
-  switch (role) {
-    case 'buyer':
-      LazyBuyerDashboardContent.preload();
-      break;
-    case 'agent':
-      LazyAgentDashboardContent.preload();
-      break;
-    case 'builder':
-      LazyBuilderDashboardContent.preload();
-      break;
-    case 'admin':
-      LazyAdminDashboardContent.preload();
-      break;
-    default:
-      LazyUserDashboardContent.preload();
-  }
-};

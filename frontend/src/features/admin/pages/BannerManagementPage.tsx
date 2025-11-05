@@ -50,7 +50,7 @@ export function BannerManagementPage() {
       if (response.success && response.data) {
         setBanners(response.data.data);
       } else {
-        throw new Error(response.message || 'Failed to fetch banners');
+        throw new Error(response.error?.message || 'Failed to fetch banners');
       }
     } catch (err: any) {
       console.error('Error fetching banners:', err);
@@ -66,7 +66,7 @@ export function BannerManagementPage() {
       if (response.success) {
         fetchBanners();
       } else {
-        alert(response.message || 'Failed to update banner');
+        alert(response.error?.message || 'Failed to update banner');
       }
     } catch (err: any) {
       alert('Failed to update banner');
@@ -81,7 +81,7 @@ export function BannerManagementPage() {
       if (response.success) {
         fetchBanners();
       } else {
-        alert(response.message || 'Failed to delete banner');
+        alert(response.error?.message || 'Failed to delete banner');
       }
     } catch (err: any) {
       alert('Failed to delete banner');

@@ -1,6 +1,50 @@
-import { api } from '@/shared/lib/api';
+import { api, PropertyFilters as ApiPropertyFilters } from '@/shared/lib/api';
 import { Property } from '@/features/property/types';
 import type { PropertyFilters } from '../types/savedSearches';
+
+/**
+ * Convert buyer PropertyFilters to API PropertyFilters format
+ * Handles arrays by converting them to comma-separated strings or taking first value
+ */
+const convertFiltersForAPI = (filters?: PropertyFilters): ApiPropertyFilters | undefined => {
+  if (!filters) return undefined;
+
+  const apiFilters: ApiPropertyFilters = {};
+
+  // Simple string/number fields
+  if (filters.location) apiFilters.location = filters.location;
+  if (filters.listing_type) apiFilters.listing_type = filters.listing_type;
+  if (filters.min_price) apiFilters.min_price = filters.min_price;
+  if (filters.max_price) apiFilters.max_price = filters.max_price;
+  if (filters.min_area) apiFilters.min_area = filters.min_area;
+  if (filters.max_area) apiFilters.max_area = filters.max_area;
+  if (filters.status) apiFilters.status = filters.status;
+  if (filters.is_featured) apiFilters.is_featured = filters.is_featured;
+  if (filters.keywords) apiFilters.keywords = filters.keywords;
+
+  // Handle property_type array
+  if (filters.property_type) {
+    apiFilters.property_type = Array.isArray(filters.property_type)
+      ? filters.property_type.join(',')
+      : filters.property_type;
+  }
+
+  // Handle bedrooms array
+  if (filters.bedrooms) {
+    apiFilters.bedrooms = Array.isArray(filters.bedrooms)
+      ? filters.bedrooms[0] // Take first value for now
+      : filters.bedrooms;
+  }
+
+  // Handle bathrooms array
+  if (filters.bathrooms) {
+    apiFilters.bathrooms = Array.isArray(filters.bathrooms)
+      ? filters.bathrooms[0] // Take first value for now
+      : filters.bathrooms;
+  }
+
+  return apiFilters;
+};
 
 export interface PropertySearchResponse {
   data: Property[];
@@ -44,7 +88,7 @@ export const propertySearchService = {
    */
   async searchProperties(filters?: PropertyFilters): Promise<PropertySearchResponse> {
     try {
-      const response = await api.getProperties(filters);
+      const response = await api.getProperties(convertFiltersForAPI(filters));
       return {
         data: response.data || [],
         total: response.total || 0,
@@ -66,7 +110,7 @@ export const propertySearchService = {
    */
   async searchPropertiesByKeyword(query: string, filters?: PropertyFilters): Promise<PropertySearchResponse> {
     try {
-      const response = await api.searchProperties(query, filters);
+      const response = await api.searchProperties(query, convertFiltersForAPI(filters));
       return {
         data: response.data || [],
         total: response.total || 0
@@ -261,12 +305,18 @@ export const propertySearchService = {
     }
     
     // Bedroom/bathroom validation
-    if (filters.bedrooms && (filters.bedrooms < 0 || filters.bedrooms > 10)) {
-      errors.push('Bedrooms must be between 0 and 10');
+    if (filters.bedrooms) {
+      const bedroomValues = Array.isArray(filters.bedrooms) ? filters.bedrooms : [filters.bedrooms];
+      if (bedroomValues.some(val => val < 0 || val > 10)) {
+        errors.push('Bedrooms must be between 0 and 10');
+      }
     }
     
-    if (filters.bathrooms && (filters.bathrooms < 0 || filters.bathrooms > 10)) {
-      errors.push('Bathrooms must be between 0 and 10');
+    if (filters.bathrooms) {
+      const bathroomValues = Array.isArray(filters.bathrooms) ? filters.bathrooms : [filters.bathrooms];
+      if (bathroomValues.some(val => val < 0 || val > 10)) {
+        errors.push('Bathrooms must be between 0 and 10');
+      }
     }
     
     return {

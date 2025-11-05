@@ -48,7 +48,7 @@ export function UrlRedirectManagementPage() {
         setRedirects(response.data.data || []);
         setTotalPages(response.data.totalPages || 0);
       } else {
-        throw new Error(response.message || 'Failed to fetch redirects');
+        throw new Error(response.error?.message || 'Failed to fetch redirects');
       }
     } catch (err: any) {
       console.error('Error fetching redirects:', err);
@@ -74,7 +74,7 @@ export function UrlRedirectManagementPage() {
       if (response.success) {
         fetchRedirects();
       } else {
-        alert(response.message || 'Failed to update redirect');
+        alert(response.error?.message || 'Failed to update redirect');
       }
     } catch (err: any) {
       alert('Failed to update redirect');
@@ -89,7 +89,7 @@ export function UrlRedirectManagementPage() {
       if (response.success) {
         fetchRedirects();
       } else {
-        alert(response.message || 'Failed to delete redirect');
+        alert(response.error?.message || 'Failed to delete redirect');
       }
     } catch (err: any) {
       alert('Failed to delete redirect');

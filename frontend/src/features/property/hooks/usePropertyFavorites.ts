@@ -171,17 +171,6 @@ export const usePropertyFavorite = (propertyId: number): UsePropertyFavoriteRetu
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const checkFavoriteStatus = useCallback(async () => {
-    try {
-      const favoriteProperties = await propertyService.getFavoriteProperties();
-      const isPropertyFavorite = favoriteProperties.some(property => property.id === propertyId);
-      setIsFavorite(isPropertyFavorite);
-    } catch (err) {
-      // Silently fail for favorite status check
-      setIsFavorite(false);
-    }
-  }, [propertyId]);
-
   const toggleFavorite = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -265,13 +254,13 @@ export const useFavoriteStats = (): UseFavoriteStatsReturn => {
       
       // Get recent favorites (last 5)
       const sortedByDate = [...favoriteProperties].sort((a, b) => 
-        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
       );
       setRecentFavorites(sortedByDate.slice(0, 5));
       
       // Calculate favorites by property type
       const typeStats = favoriteProperties.reduce((acc, property) => {
-        const type = property.propertyType;
+        const type = property.property_type;
         acc[type] = (acc[type] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);

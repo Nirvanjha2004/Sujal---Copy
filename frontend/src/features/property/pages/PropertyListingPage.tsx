@@ -93,7 +93,7 @@ export function PropertyListingPage() {
             const inquiryData = {
                 property_id: property.id,
                 message: defaultMessage,
-                name: authState.user.first_name || authState.user.firstName || "Interested Buyer",
+                name: authState.user.first_name || "Interested Buyer",
                 email: authState.user.email,
                 inquirer_id: authState.user.id,
             };
@@ -174,7 +174,7 @@ export function PropertyListingPage() {
             await api.createSiteVisit({
                 property_id: property.id,
                 scheduled_at: visitDateTime,
-                visitor_name: authState.user?.firstName || "Visitor",
+                visitor_name: authState.user?.first_name || "Visitor",
                 visitor_email: authState.user?.email || "",
                 visitor_id: authState.user?.id,
                 notes: `Site visit request for ${property.title}`

@@ -1,83 +1,111 @@
-// Core property types extracted from existing codebase
-export interface Property {
-  id: number;
-  title: string;
-  description: string;
-  propertyType: PropertyType;
-  property_type?: PropertyType; // API response field
-  listingType: ListingType;
-  listing_type?: ListingType; // API response field
-  price: number;
-  area: number;
-  areaSqft?: number; // Legacy field support
-  area_sqft?: number; // API response field
-  bedrooms?: number;
-  bathrooms?: number;
-  location: LocationData;
-  address?: string; // Additional field from forms
-  city: string;
-  state: string;
-  postalCode?: string;
-  postal_code?: string; // API response field
-  latitude?: number;
-  longitude?: number;
-  amenities: string[] | Record<string, boolean>; // Support both formats
-  images: PropertyImage[];
-  isActive: boolean;
-  is_active?: boolean; // API response field
-  isFeatured: boolean;
-  is_featured?: boolean; // API response field
-  status: PropertyStatus;
-  ownerId: number;
-  owner_id?: number; // API response field
-  agentId?: number;
-  agent_id?: number; // API response field
-  createdAt: string;
-  created_at?: string; // API response field
-  updatedAt: string;
-  updated_at?: string; // API response field
-  stats?: PropertyStats;
-  features?: PropertyFeature[];
-  specifications?: Record<string, any>;
-  owner?: any; // User object from API
-  agent?: any; // Agent object from API
-}
-
+// Enums - must match backend exactly
 export type PropertyType = 'apartment' | 'house' | 'villa' | 'plot' | 'commercial' | 'land';
 export type ListingType = 'sale' | 'rent';
-export type PropertyStatus = 'new' | 'resale' | 'under_construction' | 'active' | 'inactive' | 'sold' | 'rented';
+export type PropertyStatus = 'new' | 'resale' | 'under_construction' | 'rented' | 'sold' | 'pending' | 'active';
 export type AreaUnit = 'sqft' | 'sqm' | 'acres' | 'marla' | 'kanal';
+
+// Backend amenities interface
+export interface PropertyAmenities {
+  parking?: boolean;
+  gym?: boolean;
+  swimming_pool?: boolean;
+  garden?: boolean;
+  security?: boolean;
+  elevator?: boolean;
+  power_backup?: boolean;
+  water_supply?: boolean;
+  internet?: boolean;
+  air_conditioning?: boolean;
+  furnished?: boolean;
+  pet_friendly?: boolean;
+  balcony?: boolean;
+  terrace?: boolean;
+  club_house?: boolean;
+  playground?: boolean;
+  [key: string]: boolean | undefined;
+}
 
 export interface LocationData {
   address: string;
   city: string;
   state: string;
-  pincode?: string;
-  postalCode?: string;
+  postal_code?: string;
   latitude?: number;
   longitude?: number;
 }
 
+// Property Image - matches backend
 export interface PropertyImage {
   id: number;
-  propertyId?: number;
-  property_id?: number; // API response field
-  url: string;
-  image_url?: string; // API response field
-  thumbnailUrl?: string;
-  thumbnail_url?: string; // API response field
-  alt: string;
-  alt_text?: string; // API response field
-  caption?: string;
-  order?: number;
-  display_order?: number; // API response field
-  isPrimary: boolean;
-  is_primary?: boolean; // API response field
-  uploadedAt?: string;
-  uploaded_at?: string; // API response field
-  imageType?: PropertyImageType;
-  image_type?: PropertyImageType; // API response field
+  property_id: number;
+  image_url: string;
+  alt_text?: string;
+  display_order: number;
+  is_primary: boolean;
+  created_at: string;
+  updated_at: string;
 }
+
+// Core Property interface - matches backend API response
+export interface Property {
+  id: number;
+  user_id: number;          // Backend field name
+  title: string;
+  description?: string;
+  property_type: PropertyType;  // Backend field name
+  listing_type: ListingType;    // Backend field name
+  status: PropertyStatus;
+  price: number;
+  area_sqft?: number;       // Backend field name
+  bedrooms?: number;
+  bathrooms?: number;
+  address: string;
+  city: string;
+  state: string;
+  postal_code?: string;     // Backend field name
+  latitude?: number;
+  longitude?: number;
+  amenities: PropertyAmenities;  // JSON field in backend
+  is_active: boolean;       // Backend field name
+  is_featured: boolean;     // Backend field name
+  created_at: string;       // Backend field name
+  updated_at: string;       // Backend field name
+  expires_at?: string;      // Backend field name
+  
+  // Related data
+  images?: PropertyImage[];
+  owner?: any;
+  inquiries?: any[];
+}
+
+// For form submissions - uses backend naming for consistency
+export interface CreatePropertyRequest {
+  title: string;
+  description?: string;
+  property_type: PropertyType;
+  listing_type: ListingType;
+  price: number;
+  area_sqft?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  address: string;
+  city: string;
+  state: string;
+  postal_code?: string;
+  latitude?: number;
+  longitude?: number;
+  amenities: PropertyAmenities;
+}
+
+// Utility functions for backward compatibility
+export const getPropertyUserId = (property: Property): number => property.user_id;
+export const getPropertyType = (property: Property): PropertyType => property.property_type;
+export const getPropertyListingType = (property: Property): ListingType => property.listing_type;
+export const getPropertyAreaSqft = (property: Property): number | undefined => property.area_sqft;
+export const getPropertyIsActive = (property: Property): boolean => property.is_active;
+export const getPropertyIsFeatured = (property: Property): boolean => property.is_featured;
+export const getPropertyCreatedAt = (property: Property): string => property.created_at;
+export const getPropertyUpdatedAt = (property: Property): string => property.updated_at;
 
 export type PropertyImageType = 'exterior' | 'interior' | 'amenity' | 'floor_plan' | 'gallery' | 'virtual_tour';
 
@@ -97,23 +125,7 @@ export interface PropertyFeature {
   isAvailable: boolean;
 }
 
-// Form and API types
-export interface CreatePropertyRequest {
-  title: string;
-  description: string;
-  propertyType: PropertyType;
-  listingType: ListingType;
-  status: PropertyStatus;
-  price: number;
-  areaSqft: number;
-  bedrooms: number;
-  bathrooms: number;
-  address: string;
-  city: string;
-  state: string;
-  postalCode?: string;
-  amenities: Record<string, boolean>;
-}
+// Additional property types
 
 export interface UpdatePropertyRequest extends Partial<CreatePropertyRequest> {
   id: number;

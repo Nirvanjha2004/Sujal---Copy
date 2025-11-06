@@ -118,7 +118,7 @@ export function PropertyListingGrid() {
                         <div className="flex items-center gap-8">
                             <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
                                 <Icon icon="solar:home-smile-bold" className="size-8" />
-                                <span className="text-xl font-bold">PropHuzzles</span>
+                                <span className="text-xl font-bold">PropPuzzles</span>
                             </div>
                             <nav className="hidden md:flex items-center gap-6 text-sm">
                                 <button
@@ -316,7 +316,7 @@ export function PropertyListingGrid() {
                 <div className="max-w-7xl mx-auto px-4 py-12">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                         <div>
-                            <h3 className="font-semibold text-white mb-4">PropHuzzles</h3>
+                            <h3 className="font-semibold text-white mb-4">PropPuzzles</h3>
                             <div className="space-y-2">
                                 <a href="#" className="block text-sm text-gray-300 hover:text-white">
                                     Mobile Apps

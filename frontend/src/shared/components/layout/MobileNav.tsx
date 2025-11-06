@@ -100,7 +100,7 @@ export function MobileNav({ isOpen, onToggle }: MobileNavProps) {
             <div className="bg-primary-foreground/10 p-1.5 rounded-md">
               <Icon icon="solar:home-smile-bold" className="size-6" />
             </div>
-            <span className="text-lg font-bold">PropPortal</span>
+            <span className="text-lg font-bold">PropPuzzle</span>
           </div>
           <Button
             size="icon"

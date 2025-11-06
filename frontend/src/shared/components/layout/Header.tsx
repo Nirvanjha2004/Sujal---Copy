@@ -45,7 +45,7 @@ export function Header({ variant = 'default' }: HeaderProps) {
             <div className="flex items-center gap-8">
               <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
                 <Icon icon="solar:home-smile-bold" className="size-8" />
-                <span className="text-xl font-bold">PropPortal</span>
+                <span className="text-xl font-bold">PropPuzzle</span>
               </div>
               <nav className="hidden md:flex items-center gap-6 text-sm">
                 <button 
@@ -154,7 +154,7 @@ export function Header({ variant = 'default' }: HeaderProps) {
               <Icon icon="solar:home-smile-bold" className="size-8 text-primary" />
             </div>
             <h1 className="text-lg font-heading font-semibold tracking-tight">
-              PropPortal
+              PropPuzzle
             </h1>
           </div>
         </div>

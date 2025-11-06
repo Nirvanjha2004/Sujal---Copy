@@ -261,7 +261,7 @@ export function PropertySearchPage() {
                         className="text-2xl font-bold text-primary-foreground cursor-pointer"
                         onClick={() => navigate('/')}
                     >
-                        PropHuzzles
+                        PropPuzzles
                     </h1>
                     <div className="flex-1 flex items-center gap-4 bg-background rounded-lg px-2 py-2">
                         <Select value={listingType} onValueChange={handleListingTypeChange}>

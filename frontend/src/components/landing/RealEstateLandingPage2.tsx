@@ -185,7 +185,7 @@ export function RealEstateLandingPage() {
               <div className="flex items-center gap-8">
                 <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
                   <Icon icon="solar:home-smile-bold" className="size-8" />
-                  <span className="text-xl font-bold">PropPortal</span>
+                  <span className="text-xl font-bold">PropPuzzle</span>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -1384,7 +1384,7 @@ export function RealEstateLandingPage() {
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div>
               <h2 className="font-heading text-4xl font-bold tracking-tight mb-4">
-                Download PropPortal Mobile App
+                Download PropPuzzle Mobile App
               </h2>
               <p className="text-muted-foreground mb-6">
                 and never miss out any update
@@ -1554,7 +1554,7 @@ export function RealEstateLandingPage() {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-6 gap-8">
             <div>
-              <h3 className="font-semibold text-lg mb-4 text-white">PropPortal</h3>
+              <h3 className="font-semibold text-lg mb-4 text-white">PropPuzzle</h3>
               <div className="space-y-2">
                 <a href="#" className="block text-sm text-gray-300 hover:text-white">
                   Mobile Apps
@@ -1672,7 +1672,7 @@ export function RealEstateLandingPage() {
               <div className="space-y-2">
                 <p className="text-sm text-gray-300">Toll Free - 1800 41 99099</p>
                 <p className="text-sm text-gray-300">9:30 AM to 6:30 PM (Mon-Sun)</p>
-                <p className="text-sm text-gray-300">Email - feedback@PropPortal.com</p>
+                <p className="text-sm text-gray-300">Email - feedback@PropPuzzle.com</p>
                 <p className="text-sm text-gray-300">Connect with us</p>
                 <div className="flex gap-3 mt-4">
                   <Icon

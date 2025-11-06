@@ -174,7 +174,7 @@ export function ResponsiveDashboardLayout({
               <div className="bg-primary-foreground/10 p-1 rounded">
                 <Icon icon="solar:home-smile-bold" className="size-6" />
               </div>
-              <span className="font-semibold text-lg">PropPortal</span>
+              <span className="font-semibold text-lg">PropPuzzle</span>
             </div>
           </div>
           

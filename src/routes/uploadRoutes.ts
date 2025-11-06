@@ -19,7 +19,7 @@ router.post(
   authenticate,
   uploadPropertyImages,
   handleUploadError,
-  UploadController.uploadPropertyImage
+  UploadController.uploadPropertyImages
 );
 
 router.post(

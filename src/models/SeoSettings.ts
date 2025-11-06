@@ -1,122 +1,128 @@
-import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from '../config/database';
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  PrimaryKey,
+  AutoIncrement,
+  AllowNull,
+  Default,
+  CreatedAt,
+  UpdatedAt,
+  Index,
+} from 'sequelize-typescript';
 
-interface SeoSettingsAttributes {
-  id: number;
-  page: string;
-  entityType?: string;        // Add this
-  entityId?: number;          // Add this  
-  pageType?: string;          // Add this
-  isActive?: boolean;         // Add this
+@Table({
+  tableName: 'seo_settings',
+  timestamps: true,
+  underscored: true,
+  indexes: [
+    {
+      fields: ['page_type'],
+      unique: false,
+    },
+    {
+      fields: ['entity_type', 'entity_id'],
+    },
+  ],
+})
+export class SeoSettings extends Model {
+  @PrimaryKey
+  @AutoIncrement
+  @Column(DataType.INTEGER)
+  id!: number;
+
+  @AllowNull(false)
+  @Column({
+    type: DataType.ENUM('property', 'page', 'global'),
+    field: 'entity_type'
+  })
+  entityType!: 'property' | 'page' | 'global';
+
+  @Column({
+    type: DataType.INTEGER,
+    field: 'entity_id'
+  })
+  entityId?: number;
+
+  @Column({
+    type: DataType.STRING(100),
+    field: 'page_type'
+  })
+  pageType?: string;
+
+  @Default(true)
+  @Column({
+    type: DataType.BOOLEAN,
+    field: 'is_active'
+  })
+  isActive!: boolean;
+
+  @Column(DataType.STRING(255))
   title?: string;
+
+  @Column(DataType.TEXT)
   description?: string;
+
+  @Column(DataType.TEXT)
   keywords?: string;
+
+  @Column({
+    type: DataType.STRING(255),
+    field: 'og_title'
+  })
   ogTitle?: string;
+
+  @Column({
+    type: DataType.TEXT,
+    field: 'og_description'
+  })
   ogDescription?: string;
+
+  @Column({
+    type: DataType.STRING(500),
+    field: 'og_image'
+  })
   ogImage?: string;
+
+  @Column({
+    type: DataType.STRING(500),
+    field: 'canonical_url'
+  })
   canonicalUrl?: string;
-  metaRobots?: string;
-  structuredData?: object;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
 
-interface SeoSettingsCreationAttributes extends Optional<SeoSettingsAttributes, 'id' | 'createdAt' | 'updatedAt'> {}
+  @Default('index,follow')
+  @Column({
+    type: DataType.STRING(100),
+    field: 'meta_robots'
+  })
+  metaRobots!: string;
 
-class SeoSettings extends Model<SeoSettingsAttributes, SeoSettingsCreationAttributes> implements SeoSettingsAttributes {
-  public id!: number;
-  public page!: string;
-  public entityType?: string;        // Add this
-  public entityId?: number;          // Add this  
-  public pageType?: string;          // Add this
-  public isActive?: boolean;         // Add this
-  public title?: string;
-  public description?: string;
-  public keywords?: string;
-  public ogTitle?: string;
-  public ogDescription?: string;
-  public ogImage?: string;
-  public canonicalUrl?: string;
-  public metaRobots?: string;
-  public structuredData?: object;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  @Column({
+    type: DataType.JSON,
+    field: 'schema_markup'
+  })
+  schemaMarkup?: object;
+
+  @Column({
+    type: DataType.JSON,
+    field: 'custom_meta'
+  })
+  customMeta?: object;
+
+  @CreatedAt
+  @Column({
+    type: DataType.DATE,
+    field: 'created_at'
+  })
+  createdAt!: Date;
+
+  @UpdatedAt
+  @Column({
+    type: DataType.DATE,
+    field: 'updated_at'
+  })
+  updatedAt!: Date;
 }
 
 export default SeoSettings;
-
-// Export an initialization function
-export const initializeSeoSettings = () => {
-  SeoSettings.init(
-    {
-      id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-      },
-      page: {
-        type: DataTypes.STRING(255),
-        allowNull: false,
-        unique: true,
-      },
-      entityType: {
-        type: DataTypes.STRING(255),
-        allowNull: true,
-      },
-      entityId: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-      },
-      pageType: {
-        type: DataTypes.STRING(255),
-        allowNull: true,
-      },
-      isActive: {
-        type: DataTypes.BOOLEAN,
-        allowNull: true,
-      },
-      title: {
-        type: DataTypes.STRING(255),
-        allowNull: true,
-      },
-      description: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-      },
-      keywords: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-      },
-      ogTitle: {
-        type: DataTypes.STRING(255),
-        allowNull: true,
-      },
-      ogDescription: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-      },
-      ogImage: {
-        type: DataTypes.STRING(500),
-        allowNull: true,
-      },
-      canonicalUrl: {
-        type: DataTypes.STRING(500),
-        allowNull: true,
-      },
-      metaRobots: {
-        type: DataTypes.STRING(100),
-        allowNull: true,
-      },
-      structuredData: {
-        type: DataTypes.JSON,
-        allowNull: true,
-      },
-    },
-    {
-      sequelize,
-      tableName: 'seo_settings',
-      timestamps: true,
-      underscored: true,
-    }
-  );
-};

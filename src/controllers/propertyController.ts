@@ -1,8 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import PropertyService, { PropertySearchFilters, PropertyCreateData, PropertyUpdateData } from '../services/propertyService';
 import { AuthenticatedRequest } from '../middleware/auth';
-import { PropertyType, ListingType, PropertyStatus } from '../models/Property';
+import { Property, PropertyType, ListingType, PropertyStatus } from '../models/Property';
+import { PropertyImage } from '../models/PropertyImage';
+import { Op } from 'sequelize';
 import { body, query, param, validationResult } from 'express-validator';
+import { transformPropertiesWithImages } from '../utils/imageUtils';
 
 class PropertyController {
   private propertyService: PropertyService;
@@ -222,16 +225,18 @@ class PropertyController {
         return;
       }
 
+      console.log("The data coming from the frontend is :", req.body)
+
       const userId = req.user!.userId;
       const body = req.body as any;
       const propertyData: PropertyCreateData = {
         title: body.title,
         description: body.description,
-        propertyType: body.propertyType,
-        listingType: body.listingType,
+        propertyType: body.property_type,
+        listingType: body.listing_type,
         status: body.status,
         price: parseFloat(body.price),
-        areaSqft: body.areaSqft ? parseInt(body.areaSqft) : undefined,
+        areaSqft: body.area_sqft ? parseInt(body.area_sqft) : undefined,
         bedrooms: body.bedrooms ? parseInt(body.bedrooms) : undefined,
         bathrooms: body.bathrooms ? parseInt(body.bathrooms) : undefined,
         address: body.address,
@@ -241,7 +246,7 @@ class PropertyController {
         latitude: body.latitude ? parseFloat(body.latitude) : undefined,
         longitude: body.longitude ? parseFloat(body.longitude) : undefined,
         amenities: body.amenities,
-        isFeatured: body.isFeatured || false,
+        isFeatured: body.is_featured || false,
         expiresAt: body.expiresAt ? new Date(body.expiresAt) : undefined,
         autoRenew: body.autoRenew || false,
         renewalPeriodDays: body.renewalPeriodDays ? parseInt(body.renewalPeriodDays) : undefined,
@@ -258,6 +263,60 @@ class PropertyController {
       next(error);
     }
   };
+
+  // Get recommended properties (featured, popular, etc.)
+  getRecommendedProperties = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 8;
+      
+      // Get properties that are featured or have high engagement
+      // For now, we'll prioritize featured properties and recently created ones
+      const properties = await Property.findAll({
+        where: {
+          status: 'active',
+          [Op.or]: [
+            { is_featured: true },
+            { created_at: { [Op.gte]: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } } // Last 30 days
+          ]
+        },
+        order: [
+          ['is_featured', 'DESC'], // Featured properties first
+          ['created_at', 'DESC'], // Then by newest
+        ],
+        limit,
+        include: [
+          {
+            model: PropertyImage,
+            as: 'images',
+            required: false,
+          },
+        ],
+      });
+
+      const formattedProperties = properties.map(property => {
+        const propertyData = property.toJSON() as any;
+        return {
+          ...propertyData,
+          images: propertyData.images || [],
+        };
+      });
+
+      res.json({
+        success: true,
+        data: formattedProperties,
+        total: formattedProperties.length,
+      });
+    } catch (error) {
+      console.error('Get recommended properties error:', error);
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'Failed to retrieve recommended properties',
+        },
+      });
+    }
+  }
 
   // Get all properties with search and filtering
   getProperties = async (req: Request, res: Response, next: NextFunction): Promise<void> => {

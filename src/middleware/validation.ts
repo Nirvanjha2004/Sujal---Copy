@@ -76,7 +76,7 @@ export const commonSchemas = {
   // Search query schema
   search: Joi.object({
     q: Joi.string().min(1).max(100).optional(),
-    propertyType: Joi.string().valid('apartment', 'house', 'commercial', 'land').optional(),
+    propertyType: Joi.string().valid('apartment', 'house', 'villa', 'plot', 'commercial', 'land').optional(),
     listingType: Joi.string().valid('sale', 'rent').optional(),
     minPrice: Joi.number().min(0).optional(),
     maxPrice: Joi.number().min(0).optional(),
@@ -108,7 +108,7 @@ export const userSchemas = {
       }),
     firstName: Joi.string().min(2).max(50).required(),
     lastName: Joi.string().min(2).max(50).required(),
-    phone: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/).optional(),
+    phone: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/).allow('').optional(),
     role: Joi.string().valid('buyer', 'owner', 'agent', 'builder').required(),
   }),
 
@@ -120,7 +120,7 @@ export const userSchemas = {
   updateProfile: Joi.object({
     firstName: Joi.string().min(2).max(50).optional(),
     lastName: Joi.string().min(2).max(50).optional(),
-    phone: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/).optional(),
+    phone: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/).allow('').optional(),
     profileImage: Joi.string().uri().optional(),
   }),
 
@@ -137,7 +137,7 @@ export const propertySchemas = {
   create: Joi.object({
     title: Joi.string().min(5).max(255).required(),
     description: Joi.string().max(2000).optional(),
-    propertyType: Joi.string().valid('apartment', 'house', 'commercial', 'land').required(),
+    propertyType: Joi.string().valid('apartment', 'house', 'villa', 'plot', 'commercial', 'land').required(),
     listingType: Joi.string().valid('sale', 'rent').required(),
     status: Joi.string().valid('new', 'resale', 'under_construction').required(),
     price: Joi.number().positive().required(),
@@ -156,7 +156,7 @@ export const propertySchemas = {
   update: Joi.object({
     title: Joi.string().min(5).max(255).optional(),
     description: Joi.string().max(2000).optional(),
-    propertyType: Joi.string().valid('apartment', 'house', 'commercial', 'land').optional(),
+    propertyType: Joi.string().valid('apartment', 'house', 'villa', 'plot', 'commercial', 'land').optional(),
     listingType: Joi.string().valid('sale', 'rent').optional(),
     status: Joi.string().valid('new', 'resale', 'under_construction').optional(),
     price: Joi.number().positive().optional(),
@@ -182,7 +182,7 @@ export const inquirySchemas = {
     propertyId: Joi.number().integer().positive().required(),
     name: Joi.string().min(2).max(100).required(),
     email: Joi.string().email().required(),
-    phone: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/).optional(),
+    phone: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/).allow('').optional(),
     message: Joi.string().min(10).max(1000).required(),
   }),
 
@@ -227,7 +227,7 @@ export const savedSearchSchemas = {
   create: Joi.object({
     searchName: Joi.string().min(1).max(100).required(),
     searchCriteria: Joi.object({
-      propertyType: Joi.string().valid('apartment', 'house', 'commercial', 'land').optional(),
+      propertyType: Joi.string().valid('apartment', 'house', 'villa', 'plot', 'commercial', 'land').optional(),
       listingType: Joi.string().valid('sale', 'rent').optional(),
       minPrice: Joi.number().min(0).optional(),
       maxPrice: Joi.number().min(0).optional(),
@@ -242,7 +242,7 @@ export const savedSearchSchemas = {
   update: Joi.object({
     searchName: Joi.string().min(1).max(100).optional(),
     searchCriteria: Joi.object({
-      propertyType: Joi.string().valid('apartment', 'house', 'commercial', 'land').optional(),
+      propertyType: Joi.string().valid('apartment', 'house', 'villa', 'plot', 'commercial', 'land').optional(),
       listingType: Joi.string().valid('sale', 'rent').optional(),
       minPrice: Joi.number().min(0).optional(),
       maxPrice: Joi.number().min(0).optional(),

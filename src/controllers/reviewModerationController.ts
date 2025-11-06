@@ -32,7 +32,7 @@ export class ReviewModerationController {
       }
 
       const result = await this.reviewService.getReviewsForModeration(page, limit, filters);
-      
+      console.log(result);
       res.json(result);
     } catch (error) {
       console.error('Error fetching reviews:', error);

@@ -10,6 +10,13 @@ const propertyController = new PropertyController();
 const cacheMiddleware = new CacheMiddleware();
 
 // Public routes with optional authentication for tracking
+// Get recommended properties
+router.get(
+  '/recommended',
+  optionalAuthenticate,
+  propertyController.getRecommendedProperties
+);
+
 // Base route to get all properties (with optional filters)
 router.get(
   '/',
@@ -171,8 +178,8 @@ router.post(
   (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
-      message: 'Image upload routes are handled by /api/upload/properties/:propertyId/images',
-      redirectTo: '/api/upload/properties/' + req.params.id + '/images'
+      message: 'Image upload routes are handled by /api/uploads/properties/:propertyId/images',
+      redirectTo: '/api/uploads/properties/' + req.params.id + '/images'
     });
   }
 );

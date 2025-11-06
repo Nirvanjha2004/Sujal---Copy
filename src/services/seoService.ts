@@ -58,7 +58,7 @@ class SeoService {
     ogImage?: string;
     canonicalUrl?: string;
     metaRobots?: string;
-    structuredData?: object;
+    schemaMarkup?: object;
   }): Promise<SeoSettings> {
     const [seoSettings] = await SeoSettings.upsert({
       ...data,
@@ -112,7 +112,7 @@ class SeoService {
       ogImage: customSeo?.ogImage || (property.images?.[0]?.imageUrl ? `${baseUrl}${property.images[0].imageUrl}` : undefined),
       canonicalUrl: customSeo?.canonicalUrl || `${baseUrl}/property/${propertyId}`,
       metaRobots: customSeo?.metaRobots || 'index,follow',
-      schemaMarkup: customSeo?.structuredData || schemaMarkup,
+      schemaMarkup: customSeo?.schemaMarkup || schemaMarkup,
     };
   }
 
@@ -128,8 +128,8 @@ class SeoService {
       case 'home':
         defaultMetadata = {
           title: 'Find Your Dream Property - Real Estate Portal',
-          description: 'Discover the best properties for sale and rent. Browse apartments, houses, commercial spaces, and land with advanced search filters.',
-          keywords: 'real estate, property, buy, sell, rent, apartment, house, commercial, land',
+          description: 'Discover the best properties for sale and rent. Browse apartments, houses, villas, plots, commercial spaces, and land with advanced search filters.',
+          keywords: 'real estate, property, buy, sell, rent, apartment, house, villa, plot, commercial, land',
           ogTitle: 'Real Estate Portal - Find Your Perfect Property',
           ogDescription: 'Browse thousands of properties for sale and rent. Find your dream home today!',
         };
@@ -161,7 +161,7 @@ class SeoService {
       ogImage: customSeo?.ogImage,
       canonicalUrl: customSeo?.canonicalUrl || `${baseUrl}/${pageType}`,
       metaRobots: customSeo?.metaRobots || 'index,follow',
-      schemaMarkup: customSeo?.structuredData,
+      schemaMarkup: customSeo?.schemaMarkup,
     };
   }
 
@@ -171,8 +171,8 @@ class SeoService {
   async generateSitemap(baseUrl: string): Promise<string> {
     const properties = await Property.findAll({
       where: { is_active: true },
-      attributes: ['id', 'updatedAt'],
-      order: [['updatedAt', 'DESC']],
+      attributes: ['id', 'updated_at'],
+      order: [['updated_at', 'DESC']],
     });
 
     const staticPages = [
@@ -199,7 +199,7 @@ class SeoService {
     for (const property of properties) {
       sitemap += '  <url>\n';
       sitemap += `    <loc>${baseUrl}/property/${property.id}</loc>\n`;
-      sitemap += `    <lastmod>${property.updatedAt.toISOString().split('T')[0]}</lastmod>\n`;
+      sitemap += `    <lastmod>${property.updated_at.toISOString().split('T')[0]}</lastmod>\n`;
       sitemap += '    <changefreq>weekly</changefreq>\n';
       sitemap += '    <priority>0.7</priority>\n';
       sitemap += '  </url>\n';
@@ -457,16 +457,11 @@ class SeoService {
       throw new Error('SEO setting not found');
     }
 
-    // Create page identifier based on entityType and other params
-    let pageIdentifier = data.entityType || seoSetting.page;
-    if (data.entityId) {
-      pageIdentifier = `${data.entityType}-${data.entityId}`;
-    } else if (data.pageType) {
-      pageIdentifier = data.pageType;
-    }
-
+    // Update the SEO setting with the provided data
     await seoSetting.update({
-      page: pageIdentifier,
+      entityType: data.entityType || seoSetting.entityType,
+      entityId: data.entityId || seoSetting.entityId,
+      pageType: data.pageType || seoSetting.pageType,
       title: data.title,
       description: data.description,
       keywords: data.keywords,
@@ -475,11 +470,7 @@ class SeoService {
       ogImage: data.ogImage,
       canonicalUrl: data.canonicalUrl,
       metaRobots: data.metaRobots,
-      structuredData: data.schemaMarkup,
-      // Note: Add these fields to your model if they don't exist
-      entityType: data.entityType,
-      entityId: data.entityId,
-      pageType: data.pageType,
+      schemaMarkup: data.schemaMarkup,
       isActive: data.isActive,
     });
 
@@ -549,8 +540,7 @@ class SeoService {
       ogImage: data.ogImage,
       canonicalUrl: data.canonicalUrl,
       metaRobots: data.metaRobots,
-      structuredData: data.schemaMarkup,
-      // Note: Add these fields to your model if they don't exist
+      schemaMarkup: data.schemaMarkup,
       entityType: data.entityType,
       entityId: data.entityId,
       pageType: data.pageType,

@@ -243,7 +243,9 @@ export class SavedSearchService {
         is_featured: property.is_featured,
         views_count: property.views_count,
         created_at: property.created_at,
-        main_image: property.images?.[0]?.image_url || null,
+        main_image: property.images?.[0]?.image_url 
+          ? `${process.env.BASE_URL || 'http://localhost:3001'}/uploads/properties/${property.images[0].image_url}` 
+          : null,
         owner: (property as any).owner,
       })),
       searchInfo: {

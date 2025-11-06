@@ -139,7 +139,7 @@ class SeoController {
         ogImage,
         canonicalUrl,
         metaRobots,
-        structuredData: schemaMarkup,
+        schemaMarkup,
       });
 
       res.json({

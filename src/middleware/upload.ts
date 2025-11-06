@@ -291,7 +291,7 @@ export const uploadCSV = multer({
 export interface PropertyCSVRow {
   title: string;
   description: string;
-  property_type: 'apartment' | 'house' | 'commercial' | 'land';
+  property_type: 'apartment' | 'house' | 'villa' | 'plot' | 'commercial' | 'land';
   listing_type: 'sale' | 'rent';
   status: 'new' | 'resale' | 'under_construction';
   price: string;
@@ -336,7 +336,7 @@ const validateCSVRow = (row: any, rowIndex: number): Array<{ row: number; field:
   }
 
   // Property type validation
-  const validPropertyTypes = ['apartment', 'house', 'commercial', 'land'];
+  const validPropertyTypes = ['apartment', 'house', 'villa', 'plot', 'commercial', 'land'];
   if (row.property_type && !validPropertyTypes.includes(row.property_type.toLowerCase())) {
     errors.push({
       row: rowIndex,

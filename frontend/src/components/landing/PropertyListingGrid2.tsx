@@ -1,15 +1,15 @@
 import { Icon } from "@iconify/react";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
-import { useProperties } from "@/hooks/useProperties";
-import { PropertyGridSkeleton } from "@/components/ui/loading";
+import { Button } from "@/shared/components/ui/button";
+import { Alert, AlertDescription } from "@/shared/components/ui/alert";
+import { Badge } from "@/shared/components/ui/badge";
+import { Card } from "@/shared/components/ui/card";
+import { useProperties } from "@/shared/hooks/useProperties";
+import { PropertyGridSkeleton } from "@/shared/components/ui/loading";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
-import { PropertyFilters } from "@/lib/api";
-import { useAuth } from '@/contexts/AuthContext';
-import { api } from '@/lib/api';
+import { PropertyFilters, PropertyType, ListingType } from "@/features/property/types";
+import { useAuth } from '@/shared/contexts/AuthContext';
+import { api } from '@/shared/lib/api';
 import {
   Dialog,
   DialogContent,
@@ -17,8 +17,8 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+} from '@/shared/components/ui/dialog';
+import { Input } from '@/shared/components/ui/input';
 import { toast } from 'sonner'; // Assuming you use a toast library like sonner
 
 export function PropertyListingGrid() {
@@ -37,9 +37,23 @@ export function PropertyListingGrid() {
     const minPrice = searchParams.get("min_price");
     const maxPrice = searchParams.get("max_price");
 
+    // Helper function to validate PropertyType
+    const isValidPropertyType = (type: string): type is PropertyType => {
+      return ['apartment', 'house', 'villa', 'plot', 'commercial', 'land'].includes(type);
+    };
+
+    // Helper function to validate ListingType
+    const isValidListingType = (type: string): type is ListingType => {
+      return ['sale', 'rent'].includes(type);
+    };
+
     if (query) newFilters.location = query;
-    if (propertyType && propertyType !== "all") newFilters.property_type = propertyType;
-    if (listingType) newFilters.listing_type = listingType;
+    if (propertyType && propertyType !== "all" && isValidPropertyType(propertyType)) {
+      newFilters.property_type = propertyType;
+    }
+    if (listingType && isValidListingType(listingType)) {
+      newFilters.listing_type = listingType;
+    }
     if (minPrice) newFilters.min_price = parseInt(minPrice);
     if (maxPrice) newFilters.max_price = parseInt(maxPrice);
 
@@ -566,7 +580,7 @@ export function PropertyListingGrid() {
         <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="font-semibold text-white mb-4">99acres</h3>
+              <h3 className="font-semibold text-white mb-4">PropPortal</h3>
               <div className="space-y-2">
                 <a href="#" className="block text-sm text-gray-300 hover:text-white">
                   Mobile Apps
@@ -690,7 +704,7 @@ export function PropertyListingGrid() {
               <div className="space-y-2">
                 <p className="text-sm text-gray-300">Toll Free - 1800 41 99099</p>
                 <p className="text-sm text-gray-300">9:30 AM to 6:30 PM (Mon-Sun)</p>
-                <p className="text-sm text-gray-300">Email - feedback@99acres.com</p>
+                <p className="text-sm text-gray-300">Email - feedback@PropPortal.com</p>
                 <p className="text-sm text-white font-medium">Connect with us</p>
                 <div className="flex gap-3 mt-3">
                   <Button

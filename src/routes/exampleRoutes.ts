@@ -32,7 +32,7 @@ const router = Router();
  *           example: Spacious apartment with modern amenities
  *         propertyType:
  *           type: string
- *           enum: [apartment, house, commercial, land]
+ *           enum: [apartment, house, villa, plot, commercial, land]
  *           example: apartment
  *         listingType:
  *           type: string
@@ -198,7 +198,7 @@ router.post(
  *         name: propertyType
  *         schema:
  *           type: string
- *           enum: [apartment, house, commercial, land]
+ *           enum: [apartment, house, villa, plot, commercial, land]
  *         description: Filter by property type
  *       - in: query
  *         name: city

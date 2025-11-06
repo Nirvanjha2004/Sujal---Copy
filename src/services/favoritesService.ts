@@ -4,6 +4,7 @@ import { User } from '../models/User';
 import { PropertyImage } from '../models/PropertyImage';
 import RedisConnection from '../config/redis';
 import CacheService from './cacheService';
+import config from '../config';
 
 export class FavoritesService {
   private redis: RedisConnection;
@@ -153,7 +154,9 @@ export class FavoritesService {
           is_featured: fav.property.is_featured,
           views_count: fav.property.views_count,
           created_at: fav.property.created_at,
-          main_image: fav.property.images?.[0]?.image_url || null,
+          main_image: fav.property.images?.[0]?.image_url 
+            ? `${process.env.BASE_URL || `http://localhost:${config.server.port}`}/uploads/properties/${fav.property.images[0].image_url}` 
+            : null,
           owner: fav.property.owner,
         },
       })),

@@ -1,36 +1,35 @@
 import { Routes, Route } from 'react-router-dom'
-import { ErrorBoundary } from './components/layout/ErrorBoundary'
-import { ProtectedRoute } from './components/auth/ProtectedRoute'
+import { ErrorBoundary } from '@/shared/components/layout/ErrorBoundary'
+import { ProtectedRoute } from '@/features/auth/components/guards/ProtectedRoute'
+import { Toaster } from 'sonner'
 import { RealEstateLandingPage } from './components/landing/RealEstateLandingPage2'
-import { PropertyListingPage } from './components/landing/PropertyListingPage'
-import { PropertyListingGrid } from './components/landing/PropertyListingGrid2'
-import { LoginPage } from './components/auth/LoginPage'
-import { RegisterPage } from './components/auth/RegisterPage'
-import { OTPVerificationPage } from './components/auth/OTPVerificationPage'
-import { ProfilePage } from './components/auth/ProfilePage'
-import { DashboardPage } from './components/dashboard/DashboardPage'
-import { FavoritesPage } from './components/dashboard/FavoritesPage'
-import { SavedSearchesPage } from './components/dashboard/SavedSearchesPage'
-import { UserActivityPage } from './components/dashboard/UserActivityPage'
-import { AccountSettingsPage } from './components/dashboard/AccountSettingsPage'
-import { CalculatorsPage } from './components/calculators'
-import { AdminPanel } from './components/admin'
-import { AddPropertyPage } from './components/property/AddPropertyPage'
-import { MyPropertiesPage } from './components/property/MyPropertiesPage'
-import AgentDashboard from './components/properties/AgentDashboard'
-import { PropertyListingSearchPage } from './components/landing/PropertyListingSearchPage'
+import { PropertyDetailsPage } from '@/features/property/pages'
+import { PropertyListingGrid } from '@/features/property/pages/PropertyListingGrid'
+import { LoginPage } from '@/features/auth/pages/LoginPage'
+import { RegisterPage } from '@/features/auth/pages/RegisterPage'
+import { OTPVerificationPage } from '@/features/auth/pages/OTPVerificationPage'
+import { ProfilePage } from '@/features/auth/pages/ProfilePage'
+import { DashboardPage, UserActivityPage, AccountSettingsPage, MessagesPage } from '@/features/dashboard/pages'
+import { FavoritesPage } from '@/features/buyer/pages/FavoritesPage'
+import { SavedSearchesPage } from '@/features/buyer/pages/SavedSearchesPage'
+// import { CalculatorsPage } from '@/features/calculators'
+import { AdminPanelPage } from '@/features/admin'
+import { AddPropertyPage, MyPropertiesPage } from '@/features/property/pages'
+import { AgentPropertyDashboard } from '@/features/agent/components'
+import { PropertySearchPage } from '@/features/property/pages/PropertySearchPage'
 import { PropertySearchDashboard } from './components/landing/SearchViewedDashboard'
-import { Messages } from './components/dashboard/Messages'
+import { ProjectDetailsPage as PublicProjectDetailsPage } from './pages/ProjectDetailsPage'
+
 import { BulkUploadPage } from '@/pages/agent/BulkUploadPage'
 
 // Builder Pages
-import { ProjectsPage } from './pages/builder/ProjectsPage'
-import { NewProjectPage } from './pages/builder/NewProjectPage'
-import { ProjectDetailsPage } from './pages/builder/ProjectDetailsPage'
-import { ProjectUnitsPage } from './pages/builder/ProjectUnitsPage'
-import { BulkUnitsPage } from './pages/builder/BulkUnitsPage'
-import LeadManagementPage from './pages/agent/LeadManagementPage'
-import { NewUnitPage } from './pages/builder/NewUnitPage'
+import { ProjectsPage } from '@/features/builder/pages/ProjectsPage'
+import { NewProjectPage } from '@/features/builder/pages/NewProjectPage'
+import { ProjectDetailsPage } from '@/features/builder/pages/ProjectDetailsPage'
+import { ProjectUnitsPage } from '@/features/builder/pages/ProjectUnitsPage'
+import { BulkUnitsPage } from '@/features/builder/pages/BulkUnitsPage'
+import { LeadManagementPage } from '@/features/agent/pages/LeadManagementPage'
+import { NewUnitPage } from '@/features/builder/pages/NewUnitPage'
 // import { BulkListingPage } from './pages/builder/BulkListingPage'
 
 
@@ -42,9 +41,10 @@ function App() {
                     {/* Public routes */}
                     <Route path="/" element={<RealEstateLandingPage />} />
                     <Route path="/properties" element={<PropertyListingGrid />} />
-                    <Route path="/search" element={<PropertyListingSearchPage />} />
-                    <Route path="/property/:id" element={<PropertyListingPage />} />
-                    <Route path="/calculators" element={<CalculatorsPage />} />
+                    <Route path="/search" element={<PropertySearchPage />} />
+                    <Route path="/property/:id" element={<PropertyDetailsPage />} />
+                    <Route path="/project/:id" element={<PublicProjectDetailsPage />} />
+                    {/* <Route path="/calculators" element={<CalculatorsPage />} /> */}
 
                     {/* Search & Activity Dashboard - Can be accessed by both authenticated and unauthenticated users */}
                     <Route path="/search-dashboard" element={<PropertySearchDashboard />} />
@@ -115,7 +115,7 @@ function App() {
                         path="/admin"
                         element={
                             <ProtectedRoute requiredRole="admin">
-                                <AdminPanel />
+                                <AdminPanelPage />
                             </ProtectedRoute>
                         }
                     />
@@ -139,7 +139,7 @@ function App() {
                         path="/agent-dashboard"
                         element={
                             <ProtectedRoute requiredRole="agent">
-                                <AgentDashboard />
+                                <AgentPropertyDashboard />
                             </ProtectedRoute>
                         }
                     />
@@ -147,7 +147,7 @@ function App() {
                         path="/dashboard/messages/:conversationId?"
                         element={
                             <ProtectedRoute>
-                                <Messages />
+                                <MessagesPage />
                             </ProtectedRoute>
                         }
                     />
@@ -185,15 +185,6 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
-                    <Route
-                        path="/builder/projects/:id/bulk-units"
-                        element={
-                            <ProtectedRoute requiredRole="builder">
-                                <BulkUnitsPage />
-                            </ProtectedRoute>
-                        }
-                    />
-
                     <Route path="/builder/projects/:id/units/new" element={<ProtectedRoute requiredRole="builder"><NewUnitPage /></ProtectedRoute>} />
                     <Route path="/builder/projects/:id/units/bulk" element={<ProtectedRoute requiredRole="builder"><BulkUnitsPage /></ProtectedRoute>} />
                     {/* <Route
@@ -214,6 +205,7 @@ function App() {
                     />
                 </Routes>
             </div>
+            <Toaster position="top-right" richColors />
         </ErrorBoundary>
     )
 }

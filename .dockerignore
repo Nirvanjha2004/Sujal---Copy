@@ -1,0 +1,92 @@
+# Docker ignore file to exclude unnecessary files from build context
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Frontend build
+frontend/dist/
+frontend/node_modules/
+frontend/.next/
+
+# Database
+*.db
+*.sqlite
+
+# Uploads (will be handled by volumes)
+public/uploads/*
+!public/uploads/.gitkeep
+
+# Git
+.git/
+.gitignore
+
+# Docker
+docker-compose.override.yml
+Dockerfile*
+.dockerignore
+
+# Documentation
+README.md
+docs/
+
+# Test files
+test/
+tests/
+__tests__/
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts

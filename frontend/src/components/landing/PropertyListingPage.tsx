@@ -1,18 +1,18 @@
 import { Icon } from "@iconify/react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { useProperty } from "@/hooks/useProperties";
-import { useFavorites } from "@/hooks/useFavorites";
+import { Button } from "@/shared/components/ui/button";
+import { Badge } from "@/shared/components/ui/badge";
+import { Card, CardHeader, CardTitle, CardContent } from "@/shared/components/ui/card";
+import { Separator } from "@/shared/components/ui/separator";
+import { useProperty } from "@/shared/hooks/useProperties";
+import { useFavorites } from "@/features/buyer/hooks/useFavorites";
 import { useParams, useNavigate } from "react-router-dom";
-import { PropertyGridSkeleton } from "@/components/ui/loading";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ImageGallery } from "@/components/property/ImageGallery";
-import { PropertyShare } from "@/components/property/PropertyShare";
-import { PropertyOwnerProfile } from "@/components/property/PropertyOwnerProfile";
-import { useAuth } from "@/contexts/AuthContext";
-import { api } from "@/lib/api"; // 1. Import api
+import { PropertyGridSkeleton } from "@/shared/components/ui/loading";
+import { Alert, AlertDescription } from "@/shared/components/ui/alert";
+import { PropertyGallery } from "@/features/property/components/common/PropertyGallery";
+import { PropertyShare } from "@/shared/components/property/PropertyShare";
+import { PropertyOwnerProfile } from "@/shared/components/property/PropertyOwnerProfile";
+import { useAuth } from "@/shared/contexts/AuthContext";
+import { api } from "@/shared/lib/api"; // 1. Import api
 import { toast } from "sonner"; // 2. Import toast for notifications
 import { useState } from "react";
 import {
@@ -22,15 +22,16 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from "@/components/ui/dialog";
-import { Calendar } from "@/components/ui/calendar";
+} from "@/shared/components/ui/dialog";
+import { Calendar } from "@/shared/components/ui/calendar";
 import { format } from "date-fns";
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
+} from "@/shared/components/ui/popover";
+import { cn } from "@/shared/lib/utils";
+import { ImageGallery } from "../property/ImageGallery";
 
 export function PropertyListingPage() {
     const { id } = useParams<{ id: string }>();
@@ -712,7 +713,7 @@ export function PropertyListingPage() {
                             <div className="space-y-2">
                                 <p className="text-sm text-gray-300">Toll Free - 1800 41 99099</p>
                                 <p className="text-sm text-gray-300">9:30 AM to 6:30 PM (Mon-Sun)</p>
-                                <p className="text-sm text-gray-300">Email - feedback@99acres.com</p>
+                                <p className="text-sm text-gray-300">Email - feedback@PropPortal.com</p>
                                 <p className="text-sm text-gray-300">Connect with us</p>
                                 <div className="flex gap-3 mt-4">
                                     <Icon

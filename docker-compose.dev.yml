@@ -1,0 +1,38 @@
+# Development-specific overrides
+services:
+  # Development Backend with hot reload
+  backend:
+    build:
+      target: development
+    environment:
+      NODE_ENV: development
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - uploads_data:/app/public/uploads
+    command: ["npm", "run", "dev"]
+    ports:
+      - "3000:3000"
+      - "9229:9229"  # Debug port
+
+  # Development MySQL with exposed port
+  mysql:
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: real_estate_portal_dev
+      
+  # Development Redis with exposed port  
+  redis:
+    ports:
+      - "6379:6379"
+
+  # Development tools (PhpMyAdmin) - Always enabled in dev
+  phpmyadmin:
+    ports:
+      - "8080:80"
+
+  # Development tools (Redis Commander) - Always enabled in dev
+  redis-commander:
+    ports:
+      - "8081:8081"

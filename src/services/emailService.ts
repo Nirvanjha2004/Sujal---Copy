@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import config from '../config';
+import logger from '../utils/logger';
 
 export interface EmailOptions {
   to: string;
@@ -44,6 +45,18 @@ export interface SavedSearchMatchEmailData {
   ownerName: string;
 }
 
+export interface VerificationOTPData {
+  userName: string;
+  otp: string;
+  expirationMinutes: number;
+}
+
+export interface PasswordResetOTPData {
+  userName: string;
+  otp: string;
+  expirationMinutes: number;
+}
+
 class EmailService {
   private transporter: nodemailer.Transporter;
 
@@ -59,32 +72,49 @@ class EmailService {
     });
   }
 
-  async sendEmail(options: EmailOptions): Promise<void> {
+  async sendEmail(options: EmailOptions, emailType: string = 'generic'): Promise<void> {
     try {
-      await this.transporter.sendMail({
+      const result = await this.transporter.sendMail({
         from: `"Real Estate Portal" <${config.email.user}>`,
         to: options.to,
         subject: options.subject,
         html: options.html,
         text: options.text,
       });
+
+      // Log successful email delivery
+      logger.logEmailDelivery({
+        email: options.to,
+        emailType,
+        success: true,
+        additionalContext: {
+          messageId: result.messageId,
+          subject: options.subject,
+        },
+      });
     } catch (error) {
-      console.error('Failed to send email:', error);
+      // Log failed email delivery
+      logger.logEmailDelivery({
+        email: options.to,
+        emailType,
+        success: false,
+        error: error instanceof Error ? error : new Error('Unknown email error'),
+        additionalContext: {
+          subject: options.subject,
+        },
+      });
+
       throw new Error('Failed to send email');
     }
   }
 
   async sendInquiryNotification(data: InquiryEmailData): Promise<void> {
-    const subject = `New Inquiry for ${data.propertyTitle}`;
-    const html = this.generateInquiryEmailTemplate(data);
-    const text = this.generateInquiryEmailText(data);
-
     await this.sendEmail({
       to: data.inquirerEmail, // Send confirmation to inquirer
       subject: `Inquiry Confirmation - ${data.propertyTitle}`,
       html: this.generateInquiryConfirmationTemplate(data),
       text: this.generateInquiryConfirmationText(data),
-    });
+    }, 'inquiry_confirmation');
   }
 
   async sendInquiryToOwner(ownerEmail: string, data: InquiryEmailData): Promise<void> {
@@ -97,7 +127,7 @@ class EmailService {
       subject,
       html,
       text,
-    });
+    }, 'inquiry_notification');
   }
 
   async sendRegistrationConfirmation(email: string, data: RegistrationEmailData): Promise<void> {
@@ -110,7 +140,7 @@ class EmailService {
       subject,
       html,
       text,
-    });
+    }, 'registration_confirmation');
   }
 
   async sendPasswordResetEmail(email: string, data: PasswordResetEmailData): Promise<void> {
@@ -123,7 +153,7 @@ class EmailService {
       subject,
       html,
       text,
-    });
+    }, 'password_reset_link');
   }
 
   async sendSavedSearchMatch(email: string, data: SavedSearchMatchEmailData): Promise<void> {
@@ -136,7 +166,33 @@ class EmailService {
       subject,
       html,
       text,
-    });
+    }, 'saved_search_match');
+  }
+
+  async sendVerificationOTP(email: string, data: VerificationOTPData): Promise<void> {
+    const subject = 'Email Verification Code - Real Estate Portal';
+    const html = this.generateVerificationOTPTemplate(data);
+    const text = this.generateVerificationOTPText(data);
+
+    await this.sendEmail({
+      to: email,
+      subject,
+      html,
+      text,
+    }, 'verification_otp');
+  }
+
+  async sendPasswordResetOTP(email: string, data: PasswordResetOTPData): Promise<void> {
+    const subject = 'Password Reset Code - Real Estate Portal';
+    const html = this.generatePasswordResetOTPTemplate(data);
+    const text = this.generatePasswordResetOTPText(data);
+
+    await this.sendEmail({
+      to: email,
+      subject,
+      html,
+      text,
+    }, 'password_reset_otp');
   }
 
   private generateInquiryEmailTemplate(data: InquiryEmailData): string {
@@ -490,12 +546,206 @@ This email was sent from Real Estate Portal because you have an active saved sea
     `;
   }
 
+  private generateVerificationOTPTemplate(data: VerificationOTPData): string {
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Email Verification Code</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background-color: #2563eb; color: white; padding: 20px; text-align: center; }
+          .content { padding: 20px; background-color: #f9f9f9; }
+          .otp-box { background-color: white; padding: 30px; margin: 20px 0; border-radius: 8px; text-align: center; border: 2px solid #2563eb; }
+          .otp-code { font-size: 36px; font-weight: bold; color: #2563eb; letter-spacing: 8px; margin: 20px 0; font-family: 'Courier New', monospace; }
+          .instructions { background-color: white; padding: 20px; margin: 15px 0; border-radius: 5px; }
+          .security-warning { background-color: #fef3c7; padding: 15px; border-radius: 5px; margin: 15px 0; border-left: 4px solid #f59e0b; }
+          .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+          .expiry { color: #dc2626; font-weight: bold; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>🔐 Email Verification</h1>
+          </div>
+          <div class="content">
+            <p>Hello ${data.userName}!</p>
+            <p>Thank you for registering with Real Estate Portal. Please use the verification code below to verify your email address.</p>
+            
+            <div class="otp-box">
+              <h2>Your Verification Code</h2>
+              <div class="otp-code">${data.otp}</div>
+              <p class="expiry">This code expires in ${data.expirationMinutes} minutes</p>
+            </div>
+
+            <div class="instructions">
+              <h3>How to verify your email:</h3>
+              <ol>
+                <li>Go back to the verification page in your browser</li>
+                <li>Enter the 6-digit code shown above</li>
+                <li>Click "Verify Email" to complete the process</li>
+              </ol>
+            </div>
+
+            <div class="security-warning">
+              <h4>🛡️ Security Notice</h4>
+              <p><strong>Important:</strong> Never share this verification code with anyone. Our team will never ask for your verification code via phone or email.</p>
+              <p>If you didn't request this verification, please ignore this email and contact our support team.</p>
+            </div>
+
+            <p>Once verified, you'll have full access to all Real Estate Portal features including property listings, saved searches, and direct communication with property owners.</p>
+          </div>
+          <div class="footer">
+            <p>This email was sent from Real Estate Portal. Please do not reply to this email.</p>
+            <p>© 2024 Real Estate Portal. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+  }
+
+  private generatePasswordResetOTPTemplate(data: PasswordResetOTPData): string {
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Password Reset Code</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background-color: #dc2626; color: white; padding: 20px; text-align: center; }
+          .content { padding: 20px; background-color: #f9f9f9; }
+          .otp-box { background-color: white; padding: 30px; margin: 20px 0; border-radius: 8px; text-align: center; border: 2px solid #dc2626; }
+          .otp-code { font-size: 36px; font-weight: bold; color: #dc2626; letter-spacing: 8px; margin: 20px 0; font-family: 'Courier New', monospace; }
+          .instructions { background-color: white; padding: 20px; margin: 15px 0; border-radius: 5px; }
+          .security-warning { background-color: #fef3c7; padding: 15px; border-radius: 5px; margin: 15px 0; border-left: 4px solid #f59e0b; }
+          .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+          .expiry { color: #dc2626; font-weight: bold; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>🔑 Password Reset</h1>
+          </div>
+          <div class="content">
+            <p>Hello ${data.userName}!</p>
+            <p>We received a request to reset your password for your Real Estate Portal account. Please use the code below to proceed with resetting your password.</p>
+            
+            <div class="otp-box">
+              <h2>Your Password Reset Code</h2>
+              <div class="otp-code">${data.otp}</div>
+              <p class="expiry">This code expires in ${data.expirationMinutes} minutes</p>
+            </div>
+
+            <div class="instructions">
+              <h3>How to reset your password:</h3>
+              <ol>
+                <li>Go back to the password reset page in your browser</li>
+                <li>Enter the 6-digit code shown above</li>
+                <li>Enter your new password</li>
+                <li>Click "Reset Password" to complete the process</li>
+              </ol>
+            </div>
+
+            <div class="security-warning">
+              <h4>🛡️ Security Notice</h4>
+              <p><strong>Important:</strong> Never share this reset code with anyone. Our team will never ask for your reset code via phone or email.</p>
+              <p>If you didn't request this password reset, please ignore this email and consider changing your password if you suspect unauthorized access.</p>
+            </div>
+
+            <p>After resetting your password, you'll be able to log in with your new credentials and access all your account features.</p>
+          </div>
+          <div class="footer">
+            <p>This email was sent from Real Estate Portal. Please do not reply to this email.</p>
+            <p>© 2024 Real Estate Portal. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+  }
+
+  private generateVerificationOTPText(data: VerificationOTPData): string {
+    return `
+Email Verification Code - Real Estate Portal
+
+Hello ${data.userName}!
+
+Thank you for registering with Real Estate Portal. Please use the verification code below to verify your email address.
+
+Your Verification Code: ${data.otp}
+
+This code expires in ${data.expirationMinutes} minutes.
+
+How to verify your email:
+1. Go back to the verification page in your browser
+2. Enter the 6-digit code: ${data.otp}
+3. Click "Verify Email" to complete the process
+
+SECURITY NOTICE:
+Never share this verification code with anyone. Our team will never ask for your verification code via phone or email.
+
+If you didn't request this verification, please ignore this email and contact our support team.
+
+Once verified, you'll have full access to all Real Estate Portal features including property listings, saved searches, and direct communication with property owners.
+
+This email was sent from Real Estate Portal.
+© 2024 Real Estate Portal. All rights reserved.
+    `;
+  }
+
+  private generatePasswordResetOTPText(data: PasswordResetOTPData): string {
+    return `
+Password Reset Code - Real Estate Portal
+
+Hello ${data.userName}!
+
+We received a request to reset your password for your Real Estate Portal account. Please use the code below to proceed with resetting your password.
+
+Your Password Reset Code: ${data.otp}
+
+This code expires in ${data.expirationMinutes} minutes.
+
+How to reset your password:
+1. Go back to the password reset page in your browser
+2. Enter the 6-digit code: ${data.otp}
+3. Enter your new password
+4. Click "Reset Password" to complete the process
+
+SECURITY NOTICE:
+Never share this reset code with anyone. Our team will never ask for your reset code via phone or email.
+
+If you didn't request this password reset, please ignore this email and consider changing your password if you suspect unauthorized access.
+
+After resetting your password, you'll be able to log in with your new credentials and access all your account features.
+
+This email was sent from Real Estate Portal.
+© 2024 Real Estate Portal. All rights reserved.
+    `;
+  }
+
   async testConnection(): Promise<boolean> {
     try {
       await this.transporter.verify();
+      logger.info('Email service connection verified successfully', {
+        service: 'email',
+        action: 'connection_test',
+        success: true,
+      });
       return true;
     } catch (error) {
-      console.error('Email service connection failed:', error);
+      logger.error('Email service connection failed', {
+        service: 'email',
+        action: 'connection_test',
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
       return false;
     }
   }

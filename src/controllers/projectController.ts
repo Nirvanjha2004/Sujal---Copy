@@ -4,6 +4,7 @@ import { Project, ProjectStatus, ProjectType } from '../models/Project';
 import { ProjectImage } from '../models/ProjectImage';
 import { ProjectUnit, UnitStatus } from '../models/ProjectUnit';
 import { User, UserRole } from '../models/User';
+import { Inquiry, InquiryStatus } from '../models/Inquiry';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { Op } from 'sequelize';
 import fs from 'fs';
@@ -55,6 +56,18 @@ class ProjectController {
         return;
       }
 
+      // Validate user ID
+      if (!req.user.userId || isNaN(req.user.userId) || req.user.userId <= 0) {
+        res.status(401).json({
+          success: false,
+          error: {
+            code: 'INVALID_USER',
+            message: 'Invalid user ID in authentication',
+          },
+        });
+        return;
+      }
+
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
       const offset = (page - 1) * limit;
@@ -81,7 +94,7 @@ class ProjectController {
           });
 
           const projectData = project.toJSON() as any;
-          
+
           const stats = {
             total: units.length,
             available: units.filter((u: any) => u.status === UnitStatus.AVAILABLE).length,
@@ -142,6 +155,18 @@ class ProjectController {
       const projectId = parseInt(req.params.id);
       const userId = req.user?.userId;
 
+      // Validate projectId
+      if (isNaN(projectId) || projectId <= 0) {
+        res.status(400).json({
+          success: false,
+          error: {
+            code: 'INVALID_ID',
+            message: 'Invalid project ID',
+          },
+        });
+        return;
+      }
+
       const project = await Project.findOne({
         where: {
           id: projectId,
@@ -179,7 +204,7 @@ class ProjectController {
 
       res.json({
         success: true,
-        data: { 
+        data: {
           project: {
             ...projectData,
             builder,
@@ -363,7 +388,7 @@ class ProjectController {
       }
 
       const projectId = parseInt(req.params.projectId);
-      
+
       if (!req.user || req.user.role !== 'builder') {
         res.status(403).json({
           success: false,
@@ -465,38 +490,66 @@ class ProjectController {
   async getProjectUnits(req: ProjectRequest, res: Response): Promise<void> {
     try {
       const projectId = parseInt(req.params.projectId);
-      
+
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
       const offset = (page - 1) * limit;
       const status = req.query.status as UnitStatus;
       const unitType = req.query.unitType as string;
+      const all = req.query.all === 'true'; // New parameter to get all units
 
       const whereClause: any = { project_id: projectId };
       if (status) whereClause.status = status;
       if (unitType) whereClause.unit_type = unitType;
 
-      const { rows: units, count: total } = await ProjectUnit.findAndCountAll({
-        where: whereClause,
-        order: [['floor_number', 'ASC'], ['unit_number', 'ASC']],
-        limit,
-        offset,
-      });
+      let units, total;
 
-      const totalPages = Math.ceil(total / limit);
+      if (all) {
+        // Get all units without pagination
+        units = await ProjectUnit.findAll({
+          where: whereClause,
+          order: [['floor_number', 'ASC'], ['unit_number', 'ASC']],
+        });
+        total = units.length;
 
-      res.json({
-        success: true,
-        data: {
-          units,
-          pagination: {
-            page,
-            limit,
-            total,
-            totalPages,
+        res.json({
+          success: true,
+          data: {
+            units,
+            pagination: {
+              page: 1,
+              limit: total,
+              total,
+              totalPages: 1,
+            },
           },
-        },
-      });
+        });
+      } else {
+        // Use pagination
+        const result = await ProjectUnit.findAndCountAll({
+          where: whereClause,
+          order: [['floor_number', 'ASC'], ['unit_number', 'ASC']],
+          limit,
+          offset,
+        });
+
+        units = result.rows;
+        total = result.count;
+        const totalPages = Math.ceil(total / limit);
+
+        res.json({
+          success: true,
+          data: {
+            units,
+            pagination: {
+              page,
+              limit,
+              total,
+              totalPages,
+            },
+          },
+        });
+      }
     } catch (error) {
       console.error('Get project units error:', error);
       res.status(500).json({
@@ -513,7 +566,7 @@ class ProjectController {
   async bulkCreateUnits(req: ProjectRequest, res: Response): Promise<void> {
     try {
       const projectId = parseInt(req.params.projectId);
-      
+
       if (!req.user || req.user.role !== 'builder') {
         res.status(403).json({
           success: false,
@@ -557,13 +610,59 @@ class ProjectController {
         return;
       }
 
+      // Check for existing unit numbers to prevent duplicates
+      const unitNumbers = units.map(unit => unit.unit_number);
+      const existingUnits = await ProjectUnit.findAll({
+        where: {
+          project_id: projectId,
+          unit_number: unitNumbers,
+        },
+        attributes: ['unit_number'],
+      });
+
+      if (existingUnits.length > 0) {
+        const duplicateNumbers = existingUnits.map(unit => unit.unit_number);
+        res.status(409).json({
+          success: false,
+          error: {
+            code: 'DUPLICATE_UNITS',
+            message: `Units with these numbers already exist: ${duplicateNumbers.join(', ')}`,
+            details: duplicateNumbers,
+          },
+        });
+        return;
+      }
+
+      // Validate unit data
+      const validationErrors: string[] = [];
+      units.forEach((unit, index) => {
+        if (!unit.unit_number) validationErrors.push(`Unit ${index + 1}: unit_number is required`);
+        if (!unit.unit_type) validationErrors.push(`Unit ${index + 1}: unit_type is required`);
+        if (!unit.area_sqft || unit.area_sqft <= 0) validationErrors.push(`Unit ${index + 1}: valid area_sqft is required`);
+        if (!unit.price || unit.price <= 0) validationErrors.push(`Unit ${index + 1}: valid price is required`);
+        if (!unit.bedrooms && unit.bedrooms !== 0) validationErrors.push(`Unit ${index + 1}: bedrooms is required`);
+        if (!unit.bathrooms || unit.bathrooms <= 0) validationErrors.push(`Unit ${index + 1}: bathrooms is required`);
+      });
+
+      if (validationErrors.length > 0) {
+        res.status(400).json({
+          success: false,
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'Invalid unit data',
+            details: validationErrors,
+          },
+        });
+        return;
+      }
+
       // Add project_id to each unit
       const unitsToCreate = units.map(unit => ({
         ...unit,
         project_id: projectId,
         status: UnitStatus.AVAILABLE,
         area_sqm: unit.area_sqm || (unit.area_sqft * 0.092903),
-        price_per_sqft: unit.price_per_sqft || (unit.price / unit.area_sqft),
+        price_per_sqft: unit.price_per_sqft || Math.round(unit.price / unit.area_sqft),
       }));
 
       const createdUnits = await ProjectUnit.bulkCreate(unitsToCreate);
@@ -577,13 +676,51 @@ class ProjectController {
         data: { units: createdUnits, count: createdUnits.length },
         message: `${createdUnits.length} units created successfully`,
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Bulk create units error:', error);
+
+      // Handle specific database errors
+      if (error.name === 'SequelizeUniqueConstraintError') {
+        const duplicateField = error.errors?.[0]?.path || 'unknown field';
+        const duplicateValue = error.errors?.[0]?.value || 'unknown value';
+
+        res.status(409).json({
+          success: false,
+          error: {
+            code: 'DUPLICATE_ENTRY',
+            message: `Duplicate entry detected: ${duplicateValue} already exists`,
+            details: error.errors?.map((err: any) => ({
+              field: err.path,
+              value: err.value,
+              message: err.message,
+            })) || [],
+          },
+        });
+        return;
+      }
+
+      if (error.name === 'SequelizeValidationError') {
+        res.status(400).json({
+          success: false,
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'Data validation failed',
+            details: error.errors?.map((err: any) => ({
+              field: err.path,
+              value: err.value,
+              message: err.message,
+            })) || [],
+          },
+        });
+        return;
+      }
+
       res.status(500).json({
         success: false,
         error: {
           code: 'INTERNAL_ERROR',
           message: 'Failed to create units',
+          details: process.env.NODE_ENV === 'development' ? error.message : undefined,
         },
       });
     }
@@ -591,7 +728,7 @@ class ProjectController {
   async bulkCreateUnitsFromCSV(req: ProjectRequest, res: Response): Promise<void> {
     try {
       const projectId = parseInt(req.params.projectId);
-      
+
       if (!req.user || req.user.role !== 'builder') {
         res.status(403).json({
           success: false,
@@ -637,7 +774,7 @@ class ProjectController {
       const csvData = req.file.buffer.toString('utf-8');
       const lines = csvData.split('\n');
       const headers = lines[0].split(',').map(h => h.trim());
-      
+
       const unitsToCreate: any[] = [];
       const errors: string[] = [];
 
@@ -701,8 +838,8 @@ class ProjectController {
 
       res.status(201).json({
         success: true,
-        data: { 
-          units: createdUnits, 
+        data: {
+          units: createdUnits,
           count: createdUnits.length,
           errors: errors.length > 0 ? errors : undefined
         },
@@ -844,6 +981,275 @@ class ProjectController {
     }
   }
 
+  // Get recent projects for public display (landing page)
+  async getRecentProjects(req: Request, res: Response): Promise<void> {
+    try {
+      const limit = parseInt(req.query.limit as string) || 6;
+
+      const projects = await Project.findAll({
+        where: {
+          is_active: true,
+          approval_status: 'approved',
+        },
+        order: [['created_at', 'DESC']], // Sort by creation date, not launch date
+        limit,
+      });
+
+      // Manually fetch images and builder data for each project
+      const projectsWithImages = await Promise.all(
+        projects.map(async (project) => {
+          const [images, builder] = await Promise.all([
+            ProjectImage.findAll({
+              where: { project_id: project.id },
+              order: [['is_primary', 'DESC'], ['display_order', 'ASC']],
+              limit: 2, // Only get first 2 images for performance
+            }),
+            User.findByPk(project.builder_id, {
+              attributes: ['id', 'first_name', 'last_name', 'email'],
+            })
+          ]);
+
+          const projectData = project.toJSON() as any;
+
+          return {
+            id: projectData.id,
+            name: projectData.name,
+            description: projectData.description,
+            location: projectData.location,
+            city: projectData.city,
+            state: projectData.state,
+            project_type: projectData.project_type,
+            total_units: projectData.total_units,
+            available_units: projectData.available_units,
+            pricing: projectData.pricing,
+            amenities: projectData.amenities,
+            images: images.map(img => img.image_url),
+            builder: builder ? {
+              id: builder.id,
+              first_name: builder.first_name,
+              last_name: builder.last_name,
+              email: builder.email,
+            } : null,
+            created_at: projectData.created_at,
+            status: projectData.status,
+          };
+        })
+      );
+
+      res.json({
+        success: true,
+        data: projectsWithImages,
+        total: projectsWithImages.length,
+      });
+    } catch (error) {
+      console.error('Get recent projects error:', error);
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'Failed to retrieve recent projects',
+        },
+      });
+    }
+  }
+
+  // Get public project by ID
+  async getPublicProjectById(req: Request, res: Response): Promise<void> {
+    try {
+      const projectId = parseInt(req.params.id);
+
+      if (isNaN(projectId)) {
+        res.status(400).json({
+          success: false,
+          error: {
+            code: 'INVALID_ID',
+            message: 'Invalid project ID',
+          },
+        });
+        return;
+      }
+
+      const project = await Project.findOne({
+        where: {
+          id: projectId,
+          is_active: true,
+          approval_status: 'approved',
+        },
+      });
+
+      if (!project) {
+        res.status(404).json({
+          success: false,
+          error: {
+            code: 'NOT_FOUND',
+            message: 'Project not found',
+          },
+        });
+        return;
+      }
+
+      // Manually fetch related data
+      const [builder, images, units] = await Promise.all([
+        User.findByPk(project.builder_id, {
+          attributes: ['id', 'first_name', 'last_name', 'email'],
+        }),
+        ProjectImage.findAll({
+          where: { project_id: projectId },
+          order: [['is_primary', 'DESC'], ['display_order', 'ASC']],
+        }),
+        ProjectUnit.findAll({
+          where: { project_id: projectId },
+          order: [['floor_number', 'ASC'], ['unit_number', 'ASC']],
+        }),
+      ]);
+
+      const projectData = project.toJSON() as any;
+
+      res.json({
+        success: true,
+        data: {
+          project: {
+            ...projectData,
+            builder: builder ? {
+              id: builder.id,
+              first_name: builder.first_name,
+              last_name: builder.last_name,
+              email: builder.email,
+            } : null,
+            images: images.map(img => img.image_url),
+            units,
+          }
+        },
+      });
+    } catch (error) {
+      console.error('Get public project error:', error);
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'Failed to retrieve project',
+        },
+      });
+    }
+  }
+
+  // Get all public projects with filtering
+  async getPublicProjects(req: Request, res: Response): Promise<void> {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const offset = (page - 1) * limit;
+
+      const {
+        location,
+        city,
+        project_type,
+        min_price,
+        max_price,
+        status,
+        sortBy = 'created_at',
+        sortOrder = 'desc',
+      } = req.query;
+
+      const whereClause: any = {
+        is_active: true,
+        approval_status: 'approved',
+      };
+
+      // Apply filters
+      if (location) {
+        whereClause.location = { [Op.iLike]: `%${location}%` };
+      }
+      if (city) {
+        whereClause.city = { [Op.iLike]: `%${city}%` };
+      }
+      if (project_type) {
+        whereClause.project_type = project_type;
+      }
+      if (status) {
+        whereClause.status = status;
+      }
+
+      // Price filtering (assuming pricing object has min/max fields)
+      if (min_price || max_price) {
+        const priceFilter: any = {};
+        if (min_price) priceFilter['pricing.min'] = { [Op.gte]: parseFloat(min_price as string) };
+        if (max_price) priceFilter['pricing.max'] = { [Op.lte]: parseFloat(max_price as string) };
+        // Note: This is a simplified approach. In a real app, you'd need proper JSON querying
+      }
+
+      const { rows: projects, count: total } = await Project.findAndCountAll({
+        where: whereClause,
+        order: [[sortBy as string, (sortOrder as string).toUpperCase()]],
+        limit,
+        offset,
+      });
+
+      // Manually fetch images and builder data for each project
+      const projectsWithImages = await Promise.all(
+        projects.map(async (project) => {
+          const [images, builder] = await Promise.all([
+            ProjectImage.findAll({
+              where: { project_id: project.id },
+              order: [['is_primary', 'DESC'], ['display_order', 'ASC']],
+              limit: 3,
+            }),
+            User.findByPk(project.builder_id, {
+              attributes: ['id', 'first_name', 'last_name', 'email'],
+            })
+          ]);
+
+          const projectData = project.toJSON() as any;
+
+          return {
+            id: projectData.id,
+            name: projectData.name,
+            description: projectData.description,
+            location: projectData.location,
+            city: projectData.city,
+            state: projectData.state,
+            project_type: projectData.project_type,
+            total_units: projectData.total_units,
+            available_units: projectData.available_units,
+            pricing: projectData.pricing,
+            amenities: projectData.amenities,
+            images: images.map(img => img.image_url),
+            builder: builder ? {
+              id: builder.id,
+              first_name: builder.first_name,
+              last_name: builder.last_name,
+              email: builder.email,
+            } : null,
+            created_at: projectData.created_at,
+            status: projectData.status,
+          };
+        })
+      );
+
+      const totalPages = Math.ceil(total / limit);
+
+      res.json({
+        success: true,
+        data: projectsWithImages,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+        },
+      });
+    } catch (error) {
+      console.error('Get public projects error:', error);
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'Failed to retrieve projects',
+        },
+      });
+    }
+  }
+
   // Download CSV template
   async downloadCSVTemplate(req: ProjectRequest, res: Response): Promise<void> {
     try {
@@ -906,7 +1312,7 @@ class ProjectController {
 
       const projectId = parseInt(req.params.projectId);
       const unitId = parseInt(req.params.unitId);
-      
+
       if (!req.user || req.user.role !== 'builder') {
         res.status(403).json({
           success: false,
@@ -1045,7 +1451,7 @@ class ProjectController {
     try {
       const projectId = parseInt(req.params.projectId);
       const unitId = parseInt(req.params.unitId);
-      
+
       if (!req.user || req.user.role !== 'builder') {
         res.status(403).json({
           success: false,
@@ -1233,6 +1639,7 @@ class ProjectController {
 
   // Get project statistics
   async getProjectStats(req: ProjectRequest, res: Response): Promise<void> {
+    console.log("Inside the stats function")
     try {
       if (!req.user || req.user.role !== 'builder') {
         res.status(403).json({
@@ -1245,41 +1652,59 @@ class ProjectController {
         return;
       }
 
+      // Validate user ID
+      if (!req.user.userId || isNaN(req.user.userId) || req.user.userId <= 0) {
+        res.status(401).json({
+          success: false,
+          error: {
+            code: 'INVALID_USER',
+            message: 'Invalid user ID in authentication',
+          },
+        });
+        return;
+      }
+
       const builderId = req.user.userId;
+
+      // Get project IDs for this builder first
+      const builderProjects = await Project.findAll({
+        where: { builder_id: builderId },
+        attributes: ['id']
+      });
+
+      const projectIds = builderProjects.map(p => p.id);
 
       const [totalProjects, activeProjects, totalUnits, soldUnits, availableUnits] = await Promise.all([
         Project.count({ where: { builder_id: builderId } }),
-        Project.count({ 
-          where: { 
-            builder_id: builderId, 
+        Project.count({
+          where: {
+            builder_id: builderId,
             status: {
               [Op.in]: [ProjectStatus.PRE_LAUNCH, ProjectStatus.UNDER_CONSTRUCTION]
             }
-          } 
+          }
         }),
-        ProjectUnit.count({
-          include: [{
-            model: Project,
-            as: 'project',
-            where: { builder_id: builderId },
-          }],
-        }),
-        ProjectUnit.count({
-          where: { status: UnitStatus.SOLD },
-          include: [{
-            model: Project,
-            as: 'project',
-            where: { builder_id: builderId },
-          }],
-        }),
-        ProjectUnit.count({
-          where: { status: UnitStatus.AVAILABLE },
-          include: [{
-            model: Project,
-            as: 'project',
-            where: { builder_id: builderId },
-          }],
-        }),
+        projectIds.length > 0 ? ProjectUnit.count({
+          where: { project_id: { [Op.in]: projectIds } }
+        }) : 0,
+        projectIds.length > 0 ? ProjectUnit.count({
+          where: {
+            project_id: { [Op.in]: projectIds },
+            status: UnitStatus.SOLD
+          }
+        }) : 0,
+        projectIds.length > 0 ? ProjectUnit.count({
+          where: {
+            project_id: { [Op.in]: projectIds },
+            status: UnitStatus.AVAILABLE
+          }
+        }) : 0,
+        // TODO: Enable after running migration
+        // projectIds.length > 0 ? Inquiry.count({
+        //   where: {
+        //     project_id: { [Op.in]: projectIds }
+        //   }
+        // }) : 0,
       ]);
 
       res.json({
@@ -1291,6 +1716,8 @@ class ProjectController {
           soldUnits,
           availableUnits,
           blockedUnits: totalUnits - soldUnits - availableUnits,
+          // TODO: Enable after running migration
+          // totalInquiries,
         },
       });
     } catch (error) {
@@ -1304,6 +1731,219 @@ class ProjectController {
       });
     }
   }
+
+  // Get project inquiries
+  async getProjectInquiries(req: ProjectRequest, res: Response): Promise<void> {
+    try {
+      const projectId = parseInt(req.params.projectId);
+
+      if (isNaN(projectId)) {
+        res.status(400).json({
+          success: false,
+          error: {
+            code: 'INVALID_PROJECT_ID',
+            message: 'Invalid project ID',
+          },
+        });
+        return;
+      }
+
+      // Check if project exists and user has access
+      const project = await Project.findByPk(projectId);
+      if (!project) {
+        res.status(404).json({
+          success: false,
+          error: {
+            code: 'PROJECT_NOT_FOUND',
+            message: 'Project not found',
+          },
+        });
+        return;
+      }
+
+      // Check if user is the builder of this project
+      if (req.user && req.user.role === 'builder' && project.builder_id !== req.user.userId) {
+        res.status(403).json({
+          success: false,
+          error: {
+            code: 'FORBIDDEN',
+            message: 'Access denied. You can only view inquiries for your own projects.',
+          },
+        });
+        return;
+      }
+
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const offset = (page - 1) * limit;
+      const status = req.query.status as InquiryStatus;
+
+      const whereClause: any = { project_id: projectId };
+      if (status && Object.values(InquiryStatus).includes(status)) {
+        whereClause.status = status;
+      }
+
+      const { count, rows: inquiries } = await Inquiry.findAndCountAll({
+        where: whereClause,
+        include: [
+          {
+            model: User,
+            as: 'inquirer',
+            attributes: ['id', 'name', 'email'],
+          },
+        ],
+        order: [['created_at', 'DESC']],
+        limit,
+        offset,
+      });
+
+      res.json({
+        success: true,
+        data: {
+          inquiries,
+          pagination: {
+            page,
+            limit,
+            total: count,
+            pages: Math.ceil(count / limit),
+          },
+        },
+      });
+    } catch (error) {
+      console.error('Get project inquiries error:', error);
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'Failed to retrieve project inquiries',
+        },
+      });
+    }
+  }
+
+  // Create project inquiry
+  async createProjectInquiry(req: Request, res: Response): Promise<void> {
+    try {
+      const projectId = parseInt(req.params.projectId);
+
+      if (isNaN(projectId)) {
+        res.status(400).json({
+          success: false,
+          error: {
+            code: 'INVALID_PROJECT_ID',
+            message: 'Invalid project ID',
+          },
+        });
+        return;
+      }
+
+      // Check if project exists and is active
+      const project = await Project.findOne({
+        where: {
+          id: projectId,
+          is_active: true,
+        },
+      });
+
+      if (!project) {
+        res.status(404).json({
+          success: false,
+          error: {
+            code: 'PROJECT_NOT_FOUND',
+            message: 'Project not found or not active',
+          },
+        });
+        return;
+      }
+
+      const { name, email, phone, message } = req.body;
+
+      // Validate required fields
+      if (!name || !email || !message) {
+        res.status(400).json({
+          success: false,
+          error: {
+            code: 'MISSING_FIELDS',
+            message: 'Name, email, and message are required',
+          },
+        });
+        return;
+      }
+
+      // Create inquiry
+      const inquiry = await Inquiry.create({
+        project_id: projectId,
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        phone: phone?.trim(),
+        message: message.trim(),
+        status: InquiryStatus.NEW,
+      });
+
+      // Load the created inquiry with associations
+      const createdInquiry = await Inquiry.findByPk(inquiry.id, {
+        include: [
+          {
+            model: Project,
+            as: 'project',
+            attributes: ['id', 'name', 'location'],
+          },
+        ],
+      });
+
+      res.status(201).json({
+        success: true,
+        data: {
+          inquiry: createdInquiry,
+        },
+        message: 'Project inquiry submitted successfully',
+      });
+    } catch (error) {
+      console.error('Create project inquiry error:', error);
+
+      if (error instanceof Error && error.message.includes('validation')) {
+        res.status(400).json({
+          success: false,
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: error.message,
+          },
+        });
+        return;
+      }
+
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'Failed to create project inquiry',
+        },
+      });
+    }
+  }
+
+  // Validation rules for project inquiry creation
+  static createProjectInquiryValidation = [
+    param('projectId').isInt({ min: 1 }).withMessage('Valid project ID is required'),
+    body('name')
+      .trim()
+      .isLength({ min: 2, max: 100 })
+      .withMessage('Name must be between 2 and 100 characters'),
+    body('email')
+      .trim()
+      .isEmail()
+      .normalizeEmail()
+      .withMessage('Valid email is required'),
+    body('phone')
+      .optional()
+      .trim()
+      .matches(/^\+?[\d\s\-\(\)]{10,}$/)
+      .withMessage('Valid phone number is required'),
+    body('message')
+      .trim()
+      .isLength({ min: 10, max: 1000 })
+      .withMessage('Message must be between 10 and 1000 characters'),
+  ];
 }
 
 const projectController = new ProjectController();

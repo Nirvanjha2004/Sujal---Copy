@@ -9,7 +9,6 @@ import { UserRole } from '../models/User';
 export interface AuthenticatedRequest extends Request {
   user?: {
     userId: number;
-    id: number;
     email: string;
     role: UserRole;
   };
@@ -59,7 +58,7 @@ class MessageController {
       const offset = (page - 1) * limit;
 
       // Use consistent user ID field
-      const userId = req.user.userId || req.user.id;
+      const userId = req.user.userId;
 
       // Check if user is a participant in this conversation
       const participant = await ConversationParticipant.findOne({
@@ -150,7 +149,7 @@ class MessageController {
       const { content } = req.body;
 
       // Use consistent user ID field
-      const userId = req.user.userId || req.user.id;
+      const userId = req.user.userId;
 
       console.log('Sending message:', { conversationId, userId, content });
 

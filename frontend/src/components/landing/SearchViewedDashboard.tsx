@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Icon } from "@iconify/react";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { useAuth } from '@/contexts/AuthContext';
-import { useFavorites } from '@/hooks/useFavorites';
-import { api, Property, SavedSearch } from '@/lib/api';
+import { Button } from "@/shared/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/components/ui/tabs";
+import { Card, CardContent } from "@/shared/components/ui/card";
+import { Badge } from "@/shared/components/ui/badge";
+import { useAuth } from '@/shared/contexts/AuthContext';
+import { useFavorites } from '@/features/buyer/hooks/useFavorites';
+import { api, SavedSearch } from '@/shared/lib/api';
+import { Property } from '@/features/property/types';
 import { useNavigate } from 'react-router-dom';
-import { PropertyCard } from '@/components/property/PropertyCard';
+import { PropertyCard } from '@/features/property/components/common/PropertyCard';
 
 interface ActivityItem {
   id: number;
@@ -76,7 +77,7 @@ export function PropertySearchDashboard() {
     try {
       // Get saved searches as proxy for recent searches
       const response = await api.getSavedSearches();
-      const searches: SearchHistory[] = response.data.map((search: SavedSearch) => ({
+      const searches: SearchHistory[] = response.data.savedSearches.map((search: SavedSearch) => ({
         id: search.id.toString(),
         searchQuery: search.name,
         filters: search.filters,
@@ -94,7 +95,7 @@ export function PropertySearchDashboard() {
     try {
       // This would ideally come from a dedicated endpoint for viewed properties
       // For now, we'll use recent properties or implement based on user activity
-      const response = await api.getProperties({ limit: 8 });
+      const response = await api.getProperties({}, 1, 8);
       setViewedProperties(response.data);
     } catch (err) {
       console.error('Failed to fetch viewed properties:', err);
@@ -104,8 +105,8 @@ export function PropertySearchDashboard() {
   const fetchContactedProperties = async () => {
     try {
       // This would come from inquiries API
-      const response = await api.communication?.getInquiries?.() || { data: [] };
-      const contacted: ContactedProperty[] = response.data.map((inquiry: any) => ({
+      const response = await api.communication?.getInquiries?.() || { data: { inquiries: [] } };
+      const contacted: ContactedProperty[] = response.data.inquiries.map((inquiry: any) => ({
         id: inquiry.id,
         property: inquiry.property,
         contactedAt: inquiry.created_at,
@@ -459,7 +460,7 @@ export function PropertySearchDashboard() {
                             className="w-full h-40 object-cover"
                           />
                           <Badge className="absolute top-2 left-2 bg-green-600 text-white text-xs">
-                            {property.is_verified ? 'Verified' : 'New'}
+                            {property.is_featured ? 'Featured' : 'New'}
                           </Badge>
                           <div className="absolute bottom-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-sm font-semibold">
                             ₹{(property.price / 100000).toFixed(2)} L

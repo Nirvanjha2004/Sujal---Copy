@@ -1,9 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { api, User } from '@/lib/api';
-import { setToken, clearToken, getValidToken } from '@/utils/tokenUtils';
+import { api } from '@/shared/lib/api';
+import { User, UserApiResponse } from '@/features/auth/types';
+import { setToken, clearToken, getValidToken } from '@/features/auth/utils';
 
 interface AuthState {
-  user: User | null;
+  user: UserApiResponse | null;  // Use backend format
   token: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
@@ -18,14 +19,18 @@ const initialState: AuthState = {
   error: null,
 };
 
-// Async thunks for authentication actions
+// Update async thunks to handle backend response format
 export const loginUser = createAsyncThunk(
   'auth/login',
   async ({ email, password }: { email: string; password: string }, { rejectWithValue }) => {
     try {
       const response = await api.login(email, password);
+      // API already returns { user, token } format
       setToken(response.token);
-      return response;
+      return {
+        user: response.user,
+        token: response.token
+      };
     } catch (error: any) {
       return rejectWithValue(error.message || 'Login failed');
     }

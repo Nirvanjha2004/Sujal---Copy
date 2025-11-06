@@ -12,14 +12,13 @@ import {
   Index,
   BeforeCreate,
   BeforeUpdate,
-  HasMany,
 } from 'sequelize-typescript';
-import { Conversation } from './Conversation';
-// Forward declarations to avoid circular imports
 
 export enum PropertyType {
   APARTMENT = 'apartment',
   HOUSE = 'house',
+  VILLA = 'villa',
+  PLOT = 'plot',
   COMMERCIAL = 'commercial',
   LAND = 'land',
 }
@@ -184,12 +183,15 @@ export class Property extends Model {
   @UpdatedAt
   updated_at!: Date;
 
-  // Associations - will be defined in database configuration
+  // Associations - will be defined in associations.ts
   user!: any;
+  owner!: any;
   images!: any[];
   inquiries!: any[];
   favorites!: any[];
-  conversations!: Conversation[];
+  messages!: any[];
+  propertyConversations!: any[];
+  propertyReviews!: any[];
 
 
 

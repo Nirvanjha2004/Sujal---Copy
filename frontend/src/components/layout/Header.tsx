@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Icon } from "@iconify/react";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/shared/components/ui/button";
+import { useAuth } from "@/shared/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { MobileNav } from "./MobileNav";
 
@@ -147,7 +147,7 @@ export function Header({ variant = 'default' }: HeaderProps) {
         {authState.isAuthenticated ? (
           <>
             <span className="text-sm hidden md:block">
-              Welcome, {authState.user?.name || authState.user?.email}
+              Welcome, {authState.user?.first_name || authState.user?.email}
             </span>
             <Button 
               size="sm" 

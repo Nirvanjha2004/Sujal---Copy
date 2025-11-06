@@ -8,8 +8,6 @@ import {
   Unique,
   AllowNull,
   Default,
-  HasMany,
-  BelongsToMany,
   CreatedAt,
   UpdatedAt,
   Index,
@@ -18,12 +16,6 @@ import {
 } from 'sequelize-typescript';
 import bcrypt from 'bcrypt';
 import config from '../config';
-// Forward declarations to avoid circular imports
-class Review {} // Will be replaced by actual import at runtime
-class UrlRedirect {} // Will be replaced by actual import at runtime
-class Conversation {} // Will be replaced by actual import at runtime
-class ConversationParticipant {} // Will be replaced by actual import at runtime
-// These will be properly associated in the database configuration
 
 export enum UserRole {
   BUYER = 'buyer',
@@ -92,13 +84,18 @@ export class User extends Model {
   @UpdatedAt
   updated_at!: Date;
 
-  // Associations - will be defined in database configuration
+  // Associations - will be defined in associations.ts
   properties!: any[];
   inquiries!: any[];
   favorites!: any[];
   saved_searches!: any[];
-  conversations!: Conversation[];
-  participations!: ConversationParticipant[];
+  conversations!: any[];
+  participations!: any[];
+  sent_messages!: any[];
+  received_messages!: any[];
+  createdContent!: any[];
+  userReviews!: any[];
+  createdRedirects!: any[];
 
 
 
@@ -134,8 +131,17 @@ export class User extends Model {
   }
 
   static validatePhone(phone: string): boolean {
-    const phoneRegex = /^\+?[\d\s\-\(\)]{10,}$/;
-    return phoneRegex.test(phone);
+    // Allow empty phone numbers
+    if (!phone || phone.trim() === '') {
+      return true;
+    }
+    
+    // Clean the phone number (remove non-digits)
+    const cleanPhone = phone.replace(/\D/g, '');
+    
+    // Check if it's a valid 10-digit Indian mobile number
+    const phoneRegex = /^[6-9]\d{9}$/;
+    return phoneRegex.test(cleanPhone);
   }
 
   static validateRole(role: string): boolean {

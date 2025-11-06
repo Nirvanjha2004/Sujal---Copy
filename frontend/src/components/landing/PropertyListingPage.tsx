@@ -466,24 +466,6 @@ export function PropertyListingPage() {
                             Download Brochure
                         </Button>
                     </div>
-                    <div className="space-y-6">
-                        {/* Property Owner/Agent Profile */}
-                        {property.owner && (
-                            <PropertyOwnerProfile
-                                owner={property.owner}
-                                propertyCount={5} // This would come from API
-                                onContact={() => {
-                                    // Handle contact action
-                                    console.log('Contact owner:', property.owner);
-                                }}
-                            />
-                        )}
-                        {/*                         
-                        <PropertyShare 
-                            propertyId={property.id} 
-                            propertyTitle={property.title}
-                        /> */}
-                    </div>
                 </div>
                 <div className="mt-12">
                     <h2 className="text-xl font-heading font-bold mb-8">Top facilities</h2>

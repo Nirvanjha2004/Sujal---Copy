@@ -1,0 +1,201 @@
+{
+  "version": 2,
+  "name": "real-estate-portal-frontend",
+  "framework": "vite",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "installCommand": "npm install",
+  "devCommand": "npm run dev",
+  
+  "build": {
+    "env": {
+      "VITE_API_URL": "@vite_api_url",
+      "VITE_APP_NAME": "PropHuzzles Real Estate Portal",
+      "VITE_APP_VERSION": "1.0.0"
+    }
+  },
+  
+  "env": {
+    "VITE_API_URL": {
+      "development": "http://localhost:3000/api/v1",
+      "preview": "https://your-backend-staging.herokuapp.com/api/v1",
+      "production": "https://your-backend-domain.com/api/v1"
+    }
+  },
+  
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "$VITE_API_URL/$1",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization"
+      }
+    },
+    
+    {
+      "src": "/uploads/(.*)",
+      "dest": "$VITE_API_URL/../uploads/$1"
+    },
+    
+    {
+      "src": "/(.*\\.(js|css|ico|png|jpg|jpeg|svg|gif|webp|woff|woff2|ttf|eot))",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    
+    {
+      "src": "/",
+      "dest": "/index.html"
+    },
+    
+    {
+      "src": "/login",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/register",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/properties",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/properties/(.*)",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/property/(.*)",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/projects",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/projects/(.*)",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/dashboard",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/dashboard/(.*)",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/profile",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/insights",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/calculators/(.*)",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/admin/(.*)",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/agent/(.*)",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/builder/(.*)",
+      "dest": "/index.html"
+    },
+    
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Credentials",
+          "value": "true"
+        }
+      ]
+    }
+  ],
+  
+  "redirects": [
+    {
+      "source": "/home",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/listings",
+      "destination": "/properties",
+      "permanent": true
+    },
+    {
+      "source": "/search",
+      "destination": "/properties",
+      "permanent": false
+    }
+  ],
+  
+  "rewrites": [
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    },
+    {
+      "source": "/robots.txt", 
+      "destination": "/api/robots"
+    }
+  ],
+  
+  "functions": {
+    "frontend/src/pages/**": {
+      "maxDuration": 30
+    }
+  },
+  
+  "regions": ["iad1", "sfo1"],
+  
+  "github": {
+    "silent": true
+  },
+  
+  "cleanUrls": true,
+  "trailingSlash": false
+}

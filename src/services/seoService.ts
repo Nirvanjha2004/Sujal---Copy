@@ -58,7 +58,7 @@ class SeoService {
     ogImage?: string;
     canonicalUrl?: string;
     metaRobots?: string;
-    structuredData?: object;
+    schemaMarkup?: object;
   }): Promise<SeoSettings> {
     const [seoSettings] = await SeoSettings.upsert({
       ...data,
@@ -112,7 +112,7 @@ class SeoService {
       ogImage: customSeo?.ogImage || (property.images?.[0]?.imageUrl ? `${baseUrl}${property.images[0].imageUrl}` : undefined),
       canonicalUrl: customSeo?.canonicalUrl || `${baseUrl}/property/${propertyId}`,
       metaRobots: customSeo?.metaRobots || 'index,follow',
-      schemaMarkup: customSeo?.structuredData || schemaMarkup,
+      schemaMarkup: customSeo?.schemaMarkup || schemaMarkup,
     };
   }
 
@@ -161,7 +161,7 @@ class SeoService {
       ogImage: customSeo?.ogImage,
       canonicalUrl: customSeo?.canonicalUrl || `${baseUrl}/${pageType}`,
       metaRobots: customSeo?.metaRobots || 'index,follow',
-      schemaMarkup: customSeo?.structuredData,
+      schemaMarkup: customSeo?.schemaMarkup,
     };
   }
 
@@ -457,16 +457,11 @@ class SeoService {
       throw new Error('SEO setting not found');
     }
 
-    // Create page identifier based on entityType and other params
-    let pageIdentifier = data.entityType || seoSetting.page;
-    if (data.entityId) {
-      pageIdentifier = `${data.entityType}-${data.entityId}`;
-    } else if (data.pageType) {
-      pageIdentifier = data.pageType;
-    }
-
+    // Update the SEO setting with the provided data
     await seoSetting.update({
-      page: pageIdentifier,
+      entityType: data.entityType || seoSetting.entityType,
+      entityId: data.entityId || seoSetting.entityId,
+      pageType: data.pageType || seoSetting.pageType,
       title: data.title,
       description: data.description,
       keywords: data.keywords,
@@ -475,11 +470,7 @@ class SeoService {
       ogImage: data.ogImage,
       canonicalUrl: data.canonicalUrl,
       metaRobots: data.metaRobots,
-      structuredData: data.schemaMarkup,
-      // Note: Add these fields to your model if they don't exist
-      entityType: data.entityType,
-      entityId: data.entityId,
-      pageType: data.pageType,
+      schemaMarkup: data.schemaMarkup,
       isActive: data.isActive,
     });
 
@@ -549,8 +540,7 @@ class SeoService {
       ogImage: data.ogImage,
       canonicalUrl: data.canonicalUrl,
       metaRobots: data.metaRobots,
-      structuredData: data.schemaMarkup,
-      // Note: Add these fields to your model if they don't exist
+      schemaMarkup: data.schemaMarkup,
       entityType: data.entityType,
       entityId: data.entityId,
       pageType: data.pageType,

@@ -8,8 +8,6 @@ import {
   Unique,
   AllowNull,
   Default,
-  HasMany,
-  BelongsToMany,
   CreatedAt,
   UpdatedAt,
   Index,
@@ -18,12 +16,6 @@ import {
 } from 'sequelize-typescript';
 import bcrypt from 'bcrypt';
 import config from '../config';
-// Forward declarations to avoid circular imports
-class Review {} // Will be replaced by actual import at runtime
-class UrlRedirect {} // Will be replaced by actual import at runtime
-class Conversation {} // Will be replaced by actual import at runtime
-class ConversationParticipant {} // Will be replaced by actual import at runtime
-// These will be properly associated in the database configuration
 
 export enum UserRole {
   BUYER = 'buyer',
@@ -92,13 +84,18 @@ export class User extends Model {
   @UpdatedAt
   updated_at!: Date;
 
-  // Associations - will be defined in database configuration
+  // Associations - will be defined in associations.ts
   properties!: any[];
   inquiries!: any[];
   favorites!: any[];
   saved_searches!: any[];
-  conversations!: Conversation[];
-  participations!: ConversationParticipant[];
+  conversations!: any[];
+  participations!: any[];
+  sent_messages!: any[];
+  received_messages!: any[];
+  createdContent!: any[];
+  userReviews!: any[];
+  createdRedirects!: any[];
 
 
 

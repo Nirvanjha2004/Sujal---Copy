@@ -1,95 +1,88 @@
-import { Model, DataTypes } from 'sequelize';
-import sequelize from '../config/database';
-import {User} from './User';
-import {Property} from './Property';
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  PrimaryKey,
+  AutoIncrement,
+  AllowNull,
+  Default,
+  CreatedAt,
+  UpdatedAt,
+  Index,
+} from 'sequelize-typescript';
 
-class SiteVisit extends Model {
-  public id!: number;
-  public property_id!: number;
-  public visitor_id?: number;
-  public visitor_name!: string;
-  public visitor_email!: string;
-  public visitor_phone?: string;
-  public scheduled_at!: Date;
-  public status!: 'scheduled' | 'completed' | 'cancelled' | 'no_show';
-  public notes?: string;
-  public agent_notes?: string;
-  public created_at!: Date;
-  public updated_at!: Date;
+export enum SiteVisitStatus {
+  SCHEDULED = 'scheduled',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled',
+  NO_SHOW = 'no_show',
 }
 
-SiteVisit.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
+@Table({
+  tableName: 'site_visits',
+  timestamps: true,
+  indexes: [
+    {
+      fields: ['property_id'],
     },
-    property_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'properties',
-        key: 'id',
-      },
+    {
+      fields: ['visitor_id'],
     },
-    visitor_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'users',
-        key: 'id',
-      },
+    {
+      fields: ['scheduled_at'],
     },
-    visitor_name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    visitor_email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    visitor_phone: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    scheduled_at: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    status: {
-      type: DataTypes.ENUM('scheduled', 'completed', 'cancelled', 'no_show'),
-      defaultValue: 'scheduled',
-      allowNull: false,
-    },
-    notes: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    agent_notes: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    created_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-    },
-    updated_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-    },
-  },
-  {
-    sequelize,
-    tableName: 'site_visits',
-    timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
-  }
-);
+  ],
+})
+export class SiteVisit extends Model {
+  @PrimaryKey
+  @AutoIncrement
+  @Column(DataType.INTEGER)
+  id!: number;
 
-// Setup associations
-SiteVisit.belongsTo(Property, { foreignKey: 'property_id', as: 'property' });
-SiteVisit.belongsTo(User, { foreignKey: 'visitor_id', as: 'visitor' });
+  @AllowNull(false)
+  @Column(DataType.INTEGER)
+  @Index
+  property_id!: number;
+
+  @Column(DataType.INTEGER)
+  @Index
+  visitor_id?: number;
+
+  @AllowNull(false)
+  @Column(DataType.STRING(255))
+  visitor_name!: string;
+
+  @AllowNull(false)
+  @Column(DataType.STRING(255))
+  visitor_email!: string;
+
+  @Column(DataType.STRING(20))
+  visitor_phone?: string;
+
+  @AllowNull(false)
+  @Column(DataType.DATE)
+  scheduled_at!: Date;
+
+  @Default(SiteVisitStatus.SCHEDULED)
+  @Column(DataType.ENUM(...Object.values(SiteVisitStatus)))
+  status!: SiteVisitStatus;
+
+  @Column(DataType.TEXT)
+  notes?: string;
+
+  @Column(DataType.TEXT)
+  agent_notes?: string;
+
+  @CreatedAt
+  created_at!: Date;
+
+  @UpdatedAt
+  updated_at!: Date;
+
+  // Associations - will be defined in associations.ts
+  property!: any;
+  visitor!: any;
+}
 
 export default SiteVisit;

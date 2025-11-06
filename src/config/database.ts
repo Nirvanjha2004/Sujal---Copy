@@ -1,15 +1,22 @@
 import { Sequelize } from 'sequelize-typescript';
 import config from './index';
-import path from 'path';
 import { defineAssociations } from '../models/associations';
-import { initializeCmsContent } from '../models/CmsContent';
-import { initializeSeoSettings } from '../models/SeoSettings';
+
+// Import all models
 import { User } from '../models/User';
 import { Property } from '../models/Property';
+import { PropertyImage } from '../models/PropertyImage';
 import { Inquiry } from '../models/Inquiry';
+import { UserFavorite } from '../models/UserFavorite';
+import { SavedSearch } from '../models/SavedSearch';
+import { Message } from '../models/Message';
 import { Conversation } from '../models/Conversation';
 import { ConversationParticipant } from '../models/ConversationParticipant';
-import { Message } from '../models/Message'; // If you have this
+import Review from '../models/Review';
+import UrlRedirect from '../models/UrlRedirect';
+import CmsContent from '../models/CmsContent';
+import SeoSettings, { SeoSettings as SeoSettingsClass } from '../models/SeoSettings';
+import SiteVisitDefault, { SiteVisit } from '../models/SiteVisit';
 
 const sequelize = new Sequelize({
   database: config.database.name,
@@ -18,8 +25,6 @@ const sequelize = new Sequelize({
   password: config.database.password,
   host: config.database.host,
   port: config.database.port,
-  // Don't auto-load models from directory to avoid loading non-model files
-  // models: [path.join(__dirname, '../models')],
   logging: config.database.logging ? (sql: string) => {
     // Only log important operations, not routine queries
     const importantOperations = [
@@ -44,14 +49,6 @@ const sequelize = new Sequelize({
     underscored: true,
     freezeTableName: true,
   },
-  models: [
-    User,
-    Property,
-    Inquiry,
-    Conversation,
-    ConversationParticipant,
-    Message, // If you have this
-  ],
 });
 
 export default sequelize;
@@ -62,31 +59,42 @@ export const connectDatabase = async (): Promise<void> => {
     await sequelize.authenticate();
     console.log('🗄️  Database connection established successfully.');
     
-    // Add models to sequelize manually (excluding associations.ts)
+    console.log('📋 Loading models...');
+    // Add models to sequelize instance - import them directly
     sequelize.addModels([
-      path.join(__dirname, '../models/User.ts'),
-      path.join(__dirname, '../models/Property.ts'),
-      path.join(__dirname, '../models/PropertyImage.ts'),
-      path.join(__dirname, '../models/Inquiry.ts'),
-      path.join(__dirname, '../models/UserFavorite.ts'),
-      path.join(__dirname, '../models/SavedSearch.ts'),
-      path.join(__dirname, '../models/Message.ts'),
-      path.join(__dirname, '../models/Review.ts'),
-      path.join(__dirname, '../models/UrlRedirect.ts'),
+      User,
+      Property,
+      PropertyImage,
+      Inquiry,
+      UserFavorite,
+      SavedSearch,
+      Message,
+      Conversation,
+      ConversationParticipant,
+      Review,
+      UrlRedirect,
+      CmsContent,
+      SeoSettingsClass,
+      SiteVisit,
     ]);
+    console.log('📋 Models loaded successfully.');
     
-    // Initialize models after connection is established
-    initializeCmsContent();
-    initializeSeoSettings();
-    console.log('📋 Models initialized successfully.');
+    // Log registered models for debugging
+    console.log('🔍 Registered models:', Object.keys(sequelize.models));
     
-    // Define model associations
-    defineAssociations();
-    console.log('🔗 Model associations defined successfully.');
+    // Wait a moment for models to be fully registered
+    await new Promise(resolve => setTimeout(resolve, 100));
     
-    // Remove force: true and use alter: true instead
-    await sequelize.sync();
-    console.log('🔄 Database synchronized successfully.');
+    // Define model associations with the sequelize instance
+    console.log('🔗 Defining model associations...');
+    defineAssociations(sequelize);
+    console.log('✅ Model associations defined successfully.');
+    
+    // Test database connection without altering schema
+    console.log('🔄 Testing database connection...');
+    await sequelize.authenticate();
+    console.log('✅ Database connection verified successfully.');
+    
   } catch (error) {
     console.error('❌ Unable to connect to the database:', error);
     throw error;

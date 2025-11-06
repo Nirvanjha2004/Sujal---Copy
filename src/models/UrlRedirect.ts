@@ -4,6 +4,7 @@ import { User } from './User';
 @Table({
   tableName: 'url_redirects',
   timestamps: true,
+  underscored: true,
 })
 export class UrlRedirect extends Model<UrlRedirect> {
   @PrimaryKey
@@ -11,7 +12,7 @@ export class UrlRedirect extends Model<UrlRedirect> {
   @Column(DataType.INTEGER)
   id!: number;
 
-  @Column({ type: DataType.STRING(500), unique: true, field: 'from_path' })
+  @Column({ type: DataType.STRING(500), field: 'from_path' })
   fromPath!: string;
 
   @Column({ type: DataType.STRING(500), field: 'to_path' })

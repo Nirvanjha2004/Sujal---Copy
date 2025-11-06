@@ -9,24 +9,15 @@
   
   "build": {
     "env": {
-      "VITE_API_URL": "@vite_api_url",
       "VITE_APP_NAME": "PropHuzzles Real Estate Portal",
       "VITE_APP_VERSION": "1.0.0"
-    }
-  },
-  
-  "env": {
-    "VITE_API_URL": {
-      "development": "http://localhost:3000/api/v1",
-      "preview": "https://your-backend-staging.herokuapp.com/api/v1",
-      "production": "https://your-backend-domain.com/api/v1"
     }
   },
   
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "$VITE_API_URL/$1",
+      "dest": "https://your-backend-domain.com/api/v1/$1",
       "headers": {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
@@ -36,7 +27,7 @@
     
     {
       "src": "/uploads/(.*)",
-      "dest": "$VITE_API_URL/../uploads/$1"
+      "dest": "https://your-backend-domain.com/uploads/$1"
     },
     
     {
@@ -56,7 +47,7 @@
       "dest": "/index.html"
     },
     {
-      "src": "/register",
+      "src": "/register", 
       "dest": "/index.html"
     },
     {
@@ -185,7 +176,7 @@
   ],
   
   "functions": {
-    "frontend/src/pages/**": {
+    "src/pages/**": {
       "maxDuration": 30
     }
   },

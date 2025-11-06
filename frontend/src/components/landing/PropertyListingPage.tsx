@@ -8,9 +8,6 @@ import { useFavorites } from "@/features/buyer/hooks/useFavorites";
 import { useParams, useNavigate } from "react-router-dom";
 import { PropertyGridSkeleton } from "@/shared/components/ui/loading";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
-import { PropertyGallery } from "@/features/property/components/common/PropertyGallery";
-import { PropertyShare } from "@/shared/components/property/PropertyShare";
-import { PropertyOwnerProfile } from "@/shared/components/property/PropertyOwnerProfile";
 import { useAuth } from "@/shared/contexts/AuthContext";
 import { api } from "@/shared/lib/api"; // 1. Import api
 import { toast } from "sonner"; // 2. Import toast for notifications
@@ -31,7 +28,6 @@ import {
     PopoverTrigger,
 } from "@/shared/components/ui/popover";
 import { cn } from "@/shared/lib/utils";
-import { ImageGallery } from "../property/ImageGallery";
 
 export function PropertyListingPage() {
     const { id } = useParams<{ id: string }>();

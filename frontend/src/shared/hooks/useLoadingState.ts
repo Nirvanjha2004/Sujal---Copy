@@ -166,8 +166,8 @@ export function useMultipleLoadingStates<T extends string>(
     }
   }, [initialState]);
 
-  const isAnyLoading = Object.values(states).some(state => state.isLoading);
-  const hasAnyError = Object.values(states).some(state => state.error !== null);
+  const isAnyLoading = (Object.values(states) as LoadingState[]).some(state => state.isLoading);
+  const hasAnyError = (Object.values(states) as LoadingState[]).some(state => state.error !== null);
 
   return {
     ...states,

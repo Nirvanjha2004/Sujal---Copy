@@ -51,7 +51,9 @@ class App {
 
     // Security middlewares
     this.app.use(helmetConfig);
-    this.app.use(corsConfig);
+    if (process.env.NODE_ENV === 'development') {
+      this.app.use(corsConfig);
+    }
     // this.app.use(rateLimitConfig);
     this.app.use(xssProtection);
     this.app.use(sqlInjectionProtection);

@@ -59,7 +59,7 @@ export function MobileNav({ isOpen, onToggle }: MobileNavProps) {
         <div className="flex items-center justify-between p-4 border-b bg-primary text-primary-foreground">
           <div className="flex items-center gap-2">
             <Icon icon="solar:home-smile-bold" className="size-6" />
-            <span className="text-lg font-bold">PropPortal</span>
+            <span className="text-lg font-bold">PropPuzzle</span>
           </div>
           <Button
             size="icon"

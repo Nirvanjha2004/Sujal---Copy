@@ -22,7 +22,7 @@ export function AuthHeader({
       {showLogo && (
         <div className="flex items-center justify-center gap-2 mb-4">
           <Icon icon="solar:home-smile-bold" className="size-10 text-primary" />
-          <span className="text-2xl font-bold text-primary">PropPortal</span>
+          <span className="text-2xl font-bold text-primary">PropPuzzle</span>
         </div>
       )}
       <h1 className="text-2xl font-heading font-bold tracking-tight mb-2">

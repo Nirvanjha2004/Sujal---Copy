@@ -125,7 +125,7 @@ export function PropertyListingGrid() {
             <div className="flex items-center gap-8">
               <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
                 <Icon icon="solar:home-smile-bold" className="size-8" />
-                <span className="text-xl font-bold">PropHuzzles</span>
+                <span className="text-xl font-bold">PropPuzzles</span>
               </div>
               <nav className="hidden md:flex items-center gap-6 text-sm">
                 <button
@@ -580,7 +580,7 @@ export function PropertyListingGrid() {
         <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="font-semibold text-white mb-4">PropPortal</h3>
+              <h3 className="font-semibold text-white mb-4">PropPuzzle</h3>
               <div className="space-y-2">
                 <a href="#" className="block text-sm text-gray-300 hover:text-white">
                   Mobile Apps
@@ -704,7 +704,7 @@ export function PropertyListingGrid() {
               <div className="space-y-2">
                 <p className="text-sm text-gray-300">Toll Free - 1800 41 99099</p>
                 <p className="text-sm text-gray-300">9:30 AM to 6:30 PM (Mon-Sun)</p>
-                <p className="text-sm text-gray-300">Email - feedback@PropPortal.com</p>
+                <p className="text-sm text-gray-300">Email - feedback@PropPuzzle.com</p>
                 <p className="text-sm text-white font-medium">Connect with us</p>
                 <div className="flex gap-3 mt-3">
                   <Button

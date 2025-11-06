@@ -45,7 +45,7 @@ export function Footer() {
               <li><a href="#" className="hover:text-white">Naukri.com - Jobs in India</a></li>
               <li><a href="#" className="hover:text-white">Naukrigulf.com - Jobs in middle east</a></li>
               <li><a href="#" className="hover:text-white">Jeevansathi.com - Matrimony</a></li>
-              <li><a href="#" className="hover:text-white">PropPortal.com - Professional Networking</a></li>
+              <li><a href="#" className="hover:text-white">PropPuzzle.com - Professional Networking</a></li>
               <li><a href="#" className="hover:text-white">Policybazaar.com - Education</a></li>
               <li><a href="#" className="hover:text-white">Career Info</a></li>
               <li><a href="#" className="hover:text-white">Policybazaar.com - Insurance BFSI</a></li>
@@ -61,7 +61,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-gray-300">
               <li>Toll Free - 1800 41 99099</li>
               <li>9:30 AM to 6:30 PM (Mon-Sun)</li>
-              <li>Email - feedback@propportal.com</li>
+              <li>Email - feedback@PropPuzzle.com</li>
               <li>Connect with us</li>
             </ul>
             <div className="flex items-center gap-3 mt-4">
@@ -112,7 +112,7 @@ export function Footer() {
         </div>
         <div className="border-t border-gray-700 mt-8 pt-6 text-center text-sm text-gray-400">
           <p>
-            All trademarks are the property of their respective owners. All rights reserved - PropPortal Ltd.
+            All trademarks are the property of their respective owners. All rights reserved - PropPuzzle Ltd.
           </p>
         </div>
       </div>

@@ -20,7 +20,7 @@
       "destination": "https://your-backend-domain.com/api/v1/$1"
     },
     {
-      "source": "/uploads/(.*)",
+      "source": "/uploads/(.*)", 
       "destination": "https://your-backend-domain.com/uploads/$1"
     },
     {
@@ -64,12 +64,6 @@
     { "source": "/listings", "destination": "/properties", "permanent": true },
     { "source": "/search", "destination": "/properties", "permanent": false }
   ],
-
-  "functions": {
-    "src/pages/**": {
-      "maxDuration": 30
-    }
-  },
 
   "regions": ["iad1"],
   "github": { "silent": true },

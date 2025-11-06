@@ -76,7 +76,7 @@ export function auditAccessibility(container: HTMLElement = document.body): Acce
         type: 'warning',
         rule: 'heading-order',
         message: `Heading level skipped from h${previousLevel} to h${currentLevel}`,
-        element: heading,
+        element: heading as HTMLElement,
         severity: 'moderate'
       });
     }
@@ -196,7 +196,7 @@ export function auditAccessibility(container: HTMLElement = document.body): Acce
         type: 'error',
         rule: 'list-structure',
         message: 'List element contains no list items',
-        element: list,
+        element: list as HTMLElement,
         severity: 'moderate'
       });
     }
@@ -206,7 +206,7 @@ export function auditAccessibility(container: HTMLElement = document.body): Acce
         type: 'warning',
         rule: 'list-structure',
         message: 'List contains invalid child elements',
-        element: list,
+        element: list as HTMLElement,
         severity: 'moderate'
       });
     }

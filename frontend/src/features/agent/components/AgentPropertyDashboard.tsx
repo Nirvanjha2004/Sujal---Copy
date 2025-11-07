@@ -52,14 +52,14 @@ const AgentPropertyDashboard = () => {
       iconColor: 'text-gray-600',
       action: () => navigate('/my-properties')
     },
-    {
-      id: 'lead-management',
-      title: 'Lead Management',
-      description: 'Track and convert leads',
-      icon: 'solar:users-group-rounded-bold',
-      iconColor: 'text-orange-600',
-      action: () => navigate('/leads')
-    },
+    // {
+    //   id: 'lead-management',
+    //   title: 'Lead Management',
+    //   description: 'Track and convert leads',
+    //   icon: 'solar:users-group-rounded-bold',
+    //   iconColor: 'text-orange-600',
+    //   action: () => navigate('/leads')
+    // },
     {
       id: 'client-communication',
       title: 'Client Communication',

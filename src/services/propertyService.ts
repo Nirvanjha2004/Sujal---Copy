@@ -406,7 +406,7 @@ class PropertyService {
             if (filters.keywords) {
                 console.log(`[${requestId}] === KEYWORD SEARCH LOGIC ===`);
                 console.log(`[${requestId}] Keywords:`, filters.keywords);
-                console.log(`[${requestId}] WHERE CONDITIONS BEFORE:`, whereConditions);
+                console.log(`[${requestId}] WHERE CONDITIONS BEFORE:`, JSON.stringify(whereConditions, null, 2));
                 
                 // Create keyword OR conditions
                 const keywordConditions = {
@@ -439,30 +439,22 @@ class PropertyService {
                     ],
                 };
                 
-                // Wrap both existing conditions AND keyword conditions in Op.and
-                // This preserves all existing filters while adding keyword search
-                const existingKeys = Object.keys(whereConditions);
-                if (existingKeys.length > 0) {
-                    // Build an array of all conditions that should be ANDed together
-                    const andConditions: any[] = [];
-                    
-                    // Add each existing condition as a separate object in the AND array
-                    existingKeys.forEach(key => {
-                        andConditions.push({ [key]: (whereConditions as any)[key] });
-                    });
-                    
-                    // Add keyword conditions
-                    andConditions.push(keywordConditions);
-                    
-                    // Replace whereConditions with properly structured AND
+                // Combine existing conditions with keyword conditions using AND
+                // Check if whereConditions already has an Op.and structure
+                if ((whereConditions as any)[Op.and]) {
+                    // If already using Op.and, add keyword conditions to the array
+                    (whereConditions as any)[Op.and].push(keywordConditions);
+                } else if (Object.keys(whereConditions).length > 0) {
+                    // If we have existing conditions but not in Op.and format, wrap everything
                     whereConditions = {
-                        [Op.and]: andConditions
+                        [Op.and]: [whereConditions, keywordConditions]
                     };
                 } else {
+                    // No existing conditions, just use keyword conditions
                     whereConditions = keywordConditions;
                 }
                 
-                console.log(`[${requestId}] WHERE CONDITIONS AFTER:`, whereConditions);
+                console.log(`[${requestId}] WHERE CONDITIONS AFTER:`, JSON.stringify(whereConditions, null, 2));
                 console.log(`[${requestId}] ===========================`);
             }
 

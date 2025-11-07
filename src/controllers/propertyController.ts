@@ -268,7 +268,7 @@ class PropertyController {
   getRecommendedProperties = async (req: Request, res: Response): Promise<void> => {
     try {
       const limit = parseInt(req.query.limit as string) || 8;
-      
+
       // Get properties that are featured or have high engagement
       // For now, we'll prioritize featured properties and recently created ones
       const properties = await Property.findAll({
@@ -337,9 +337,8 @@ class PropertyController {
       }
 
 
-      console.log(`[${requestId}] Reached the search function`, (req.query.property_type as String))
+      console.log(`[${requestId}] Reached the search function`, (req.query))
 
-      const authReq = req as AuthenticatedRequest;
       const filters: PropertySearchFilters = {
         propertyType: req.query.property_type as PropertyType,
         listingType: req.query.listing_type as ListingType,
@@ -386,6 +385,8 @@ class PropertyController {
         pagination: result.pagination,
         timestamp: new Date().toISOString(),
       });
+
+      console.log("The results are:- ", result)
     } catch (error) {
       next(error);
     }

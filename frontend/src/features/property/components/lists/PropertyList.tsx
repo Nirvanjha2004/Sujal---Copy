@@ -1,8 +1,9 @@
 import React from 'react';
-import { Property } from '../../types';
+import { Property, PropertySortOption } from '../../types';
 import { PropertyCard } from '../common/PropertyCard';
+import { PropertySort } from '../common/PropertySort';
 import { Button } from '@/shared/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
+
 import { Loader2, List, Grid } from 'lucide-react';
 
 export interface PropertyListProps {
@@ -12,29 +13,21 @@ export interface PropertyListProps {
   onLoadMore?: () => void;
   onPropertyClick?: (property: Property) => void;
 
-  onSortChange?: (sortBy: string, sortOrder: 'asc' | 'desc') => void;
+  onSortChange?: (sortBy: PropertySortOption, sortOrder: 'asc' | 'desc') => void;
   showFavoriteButton?: boolean;
   showStats?: boolean;
   showAgent?: boolean;
   showDescription?: boolean;
   layout?: 'list' | 'grid';
   onLayoutChange?: (layout: 'list' | 'grid') => void;
-  sortBy?: string;
+  sortBy?: PropertySortOption;
   sortOrder?: 'asc' | 'desc';
   className?: string;
   emptyMessage?: string;
   loadingMessage?: string;
 }
 
-const SORT_OPTIONS = [
-  { value: 'relevance', label: 'Relevance' },
-  { value: 'price_low', label: 'Price: Low to High' },
-  { value: 'price_high', label: 'Price: High to Low' },
-  { value: 'date_new', label: 'Newest First' },
-  { value: 'date_old', label: 'Oldest First' },
-  { value: 'area_large', label: 'Area: Large to Small' },
-  { value: 'area_small', label: 'Area: Small to Large' }
-];
+// Sort options are now handled by the PropertySort component
 
 export const PropertyList: React.FC<PropertyListProps> = ({
   properties,
@@ -51,21 +44,12 @@ export const PropertyList: React.FC<PropertyListProps> = ({
   layout = 'list',
   onLayoutChange,
   sortBy = 'relevance',
-
+  sortOrder = 'desc',
   className = '',
   emptyMessage = 'No properties found',
   loadingMessage = 'Loading properties...'
 }) => {
-  const handleSortChange = (newSortBy: string) => {
-    if (onSortChange) {
-      // Determine sort order based on sort type
-      let newSortOrder: 'asc' | 'desc' = 'desc';
-      if (newSortBy.includes('_low') || newSortBy.includes('_small') || newSortBy === 'date_old') {
-        newSortOrder = 'asc';
-      }
-      onSortChange(newSortBy, newSortOrder);
-    }
-  };
+  // Sort handling is now done by the PropertySort component
 
   // Loading state
   if (isLoading && properties.length === 0) {
@@ -103,22 +87,17 @@ export const PropertyList: React.FC<PropertyListProps> = ({
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Sort dropdown */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">Sort by:</span>
-            <Select value={sortBy} onValueChange={handleSortChange}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {SORT_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Sort controls */}
+          {onSortChange && (
+            <PropertySort
+              sortBy={sortBy || 'relevance'}
+              sortOrder={sortOrder || 'desc'}
+              onSortChange={onSortChange}
+              isLoading={isLoading}
+              variant="select"
+              showLabel={true}
+            />
+          )}
 
           {/* Layout toggle */}
           {onLayoutChange && (

@@ -181,16 +181,16 @@ export function AgentDashboardContent({ stats, isLoading = false }: AgentDashboa
       isEnabled: true,
       badge: safeStats.totalListings > 0 ? safeStats.totalListings : undefined
     },
-    {
-      id: 'lead-management',
-      title: 'Lead Management',
-      description: 'Track and convert leads',
-      icon: 'solar:users-group-rounded-bold',
-      action: () => navigate('/leads'),
-      color: 'orange',
-      isEnabled: true,
-      badge: safeStats.messages > 0 ? safeStats.messages : undefined
-    },
+    // {
+    //   id: 'lead-management',
+    //   title: 'Lead Management',
+    //   description: 'Track and convert leads',
+    //   icon: 'solar:users-group-rounded-bold',
+    //   action: () => navigate('/leads'),
+    //   color: 'orange',
+    //   isEnabled: true,
+    //   badge: safeStats.messages > 0 ? safeStats.messages : undefined
+    // },
     {
       id: 'client-communication',
       title: 'Client Communication',

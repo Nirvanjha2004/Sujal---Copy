@@ -114,7 +114,7 @@ export interface AuthenticatedRequest extends Request {
 
 // Search and filter types
 export interface PropertySearchFilters {
-  propertyType?: PropertyType;
+  propertyType?: PropertyType | PropertyType[];
   listingType?: ListingType;
   minPrice?: number;
   maxPrice?: number;

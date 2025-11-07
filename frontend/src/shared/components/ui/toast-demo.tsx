@@ -9,7 +9,10 @@ export function ToastDemo() {
   const showSuccessToast = () => {
     success('Operation completed successfully!', {
       action: (
-        <ToastAction onClick={() => console.log('Undo clicked')}>
+        <ToastAction onClick={() => {
+          // Implement actual undo functionality
+          success('Action undone successfully!');
+        }}>
           Undo
         </ToastAction>
       )
@@ -39,10 +42,14 @@ export function ToastDemo() {
       showProgress: false,
       action: (
         <div className="flex gap-2">
-          <ToastAction onClick={() => console.log('Accept')}>
+          <ToastAction onClick={() => {
+            success('Request accepted!');
+          }}>
             Accept
           </ToastAction>
-          <ToastAction onClick={() => console.log('Decline')}>
+          <ToastAction onClick={() => {
+            info('Request declined.');
+          }}>
             Decline
           </ToastAction>
         </div>

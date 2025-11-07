@@ -11,25 +11,27 @@ import {
 } from "@/shared/components/ui/select";
 import { Input } from "@/shared/components/ui/input";
 import { Badge } from "@/shared/components/ui/badge";
-import { useFeaturedProperties, useRecentProperties, useRecommendedProperties } from "@/shared/hooks/useProperties";
+import { useLandingPageData } from "@/shared/hooks/useLandingPageData";
 import { PropertyCardSkeleton } from "@/shared/components/ui/loading";
 import { useAuth } from "@/shared/contexts/AuthContext";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { PROPERTY_TYPES } from "@/features/property/constants";
-import { api } from "@/shared/lib/api";
+
 
 export function RealEstateLandingPage() {
   const navigate = useNavigate();
   const { state: { isAuthenticated } } = useAuth();
-  const { properties: featuredProperties, loading: featuredLoading } = useFeaturedProperties(4);
-  const { properties: recentProperties, loading: recentLoading } = useRecentProperties(8);
-  const { properties: recommendedProperties, loading: recommendedLoading } = useRecommendedProperties(4);
+
+  // OPTIMIZED: Single hook with only 2 API calls instead of 4+
+  const { data, loading } = useLandingPageData();
+  const { recommendedProperties, recentProjects } = data;
+  const isLoadingProperties = loading;
+  const isLoadingProjects = loading;
+
   const [searchQuery, setSearchQuery] = useState("");
   const [propertyType, setPropertyType] = useState("all");
   const [listingType, setListingType] = useState("buy");
-  const [recentProjects, setRecentProjects] = useState<any[]>([]);
-  const [isLoadingProjects, setIsLoadingProjects] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [recommendedSlide, setRecommendedSlide] = useState(0);
   const [projectsSlide, setProjectsSlide] = useState(0);
@@ -37,44 +39,26 @@ export function RealEstateLandingPage() {
   const recommendedCarouselRef = useRef<HTMLDivElement>(null);
   const projectsCarouselRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const fetchRecentProjects = async () => {
-      try {
-        setIsLoadingProjects(true);
-        const response = await api.getRecentProjects(6);
-        if (response.success) {
-          setRecentProjects(response.data);
-        }
-      } catch (error) {
-        console.error('Error fetching recent projects:', error);
-        // Keep empty array as fallback
-        setRecentProjects([]);
-      } finally {
-        setIsLoadingProjects(false);
-      }
-    };
-
-    fetchRecentProjects();
-  }, []);
+  // Data fetching is now handled by useLandingPageData hook - no manual API calls needed!
 
   // Handle window resize for responsive carousel
   useEffect(() => {
     const handleResize = () => {
       const visibleCards = getVisibleCards();
-      
+
       // Reset property types carousel
       const maxSlide = Math.max(0, PROPERTY_TYPES.length - visibleCards);
       if (currentSlide > maxSlide) {
         setCurrentSlide(maxSlide);
       }
-      
+
       // Reset recommended properties carousel
       const totalRecommended = recommendedProperties?.length || 4;
       const maxRecommendedSlide = Math.max(0, totalRecommended - visibleCards);
       if (recommendedSlide > maxRecommendedSlide) {
         setRecommendedSlide(maxRecommendedSlide);
       }
-      
+
       // Reset projects carousel
       const totalProjects = recentProjects?.length || 4;
       const maxProjectsSlide = Math.max(0, totalProjects - visibleCards);
@@ -338,7 +322,7 @@ export function RealEstateLandingPage() {
                 </Button>
               </div>
             </div>
-            {recommendedLoading ? (
+            {isLoadingProperties ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {Array.from({ length: 4 }).map((_, index) => (
                   <PropertyCardSkeleton key={index} />
@@ -346,7 +330,7 @@ export function RealEstateLandingPage() {
               </div>
             ) : (
               <div className="relative overflow-hidden">
-                <div 
+                <div
                   ref={recommendedCarouselRef}
                   className="flex transition-transform duration-300 ease-in-out gap-6"
                   style={{
@@ -355,9 +339,9 @@ export function RealEstateLandingPage() {
                 >
                   {recommendedProperties && recommendedProperties.length > 0 ? (
                     recommendedProperties.map((property) => (
-                      <Card 
-                        key={property.id} 
-                        className="hover:shadow-lg transition-shadow cursor-pointer flex-shrink-0" 
+                      <Card
+                        key={property.id}
+                        className="hover:shadow-lg transition-shadow cursor-pointer flex-shrink-0"
                         style={{ width: `calc(${100 / getVisibleCards()}% - ${(getVisibleCards() - 1) * 1.5}rem / ${getVisibleCards()})` }}
                         onClick={() => navigate(`/property/${property.id}`)}
                       >
@@ -384,7 +368,7 @@ export function RealEstateLandingPage() {
                   ) : (
                     // Fallback to original static content if no properties available
                     <>
-                      <Card 
+                      <Card
                         className="hover:shadow-lg transition-shadow flex-shrink-0"
                         style={{ width: `calc(${100 / getVisibleCards()}% - ${(getVisibleCards() - 1) * 1.5}rem / ${getVisibleCards()})` }}
                       >
@@ -407,7 +391,7 @@ export function RealEstateLandingPage() {
                           </div>
                         </CardContent>
                       </Card>
-                      <Card 
+                      <Card
                         className="hover:shadow-lg transition-shadow flex-shrink-0"
                         style={{ width: `calc(${100 / getVisibleCards()}% - ${(getVisibleCards() - 1) * 1.5}rem / ${getVisibleCards()})` }}
                       >
@@ -428,7 +412,7 @@ export function RealEstateLandingPage() {
                           </div>
                         </CardContent>
                       </Card>
-                      <Card 
+                      <Card
                         className="hover:shadow-lg transition-shadow flex-shrink-0"
                         style={{ width: `calc(${100 / getVisibleCards()}% - ${(getVisibleCards() - 1) * 1.5}rem / ${getVisibleCards()})` }}
                       >
@@ -451,7 +435,7 @@ export function RealEstateLandingPage() {
                           </div>
                         </CardContent>
                       </Card>
-                      <Card 
+                      <Card
                         className="hover:shadow-lg transition-shadow flex-shrink-0"
                         style={{ width: `calc(${100 / getVisibleCards()}% - ${(getVisibleCards() - 1) * 1.5}rem / ${getVisibleCards()})` }}
                       >
@@ -512,7 +496,7 @@ export function RealEstateLandingPage() {
               </div>
             </div>
             <div className="relative overflow-hidden">
-              <div 
+              <div
                 ref={carouselRef}
                 className="flex transition-transform duration-300 ease-in-out gap-6"
                 style={{
@@ -696,7 +680,7 @@ export function RealEstateLandingPage() {
               </div>
             ) : (
               <div className="relative overflow-hidden mb-8">
-                <div 
+                <div
                   ref={projectsCarouselRef}
                   className="flex transition-transform duration-300 ease-in-out gap-6"
                   style={{
@@ -718,9 +702,9 @@ export function RealEstateLandingPage() {
                       };
 
                       return (
-                        <Card 
-                          key={project.id} 
-                          className="hover:shadow-lg transition-shadow bg-white cursor-pointer flex-shrink-0" 
+                        <Card
+                          key={project.id}
+                          className="hover:shadow-lg transition-shadow bg-white cursor-pointer flex-shrink-0"
                           style={{ width: `calc(${100 / getVisibleCards()}% - ${(getVisibleCards() - 1) * 1.5}rem / ${getVisibleCards()})` }}
                           onClick={() => navigate(`/project/${project.id}`)}
                         >
@@ -765,7 +749,7 @@ export function RealEstateLandingPage() {
                   ) : (
                     // Fallback to original static content
                     <>
-                      <Card 
+                      <Card
                         className="hover:shadow-lg transition-shadow bg-white flex-shrink-0"
                         style={{ width: `calc(${100 / getVisibleCards()}% - ${(getVisibleCards() - 1) * 1.5}rem / ${getVisibleCards()})` }}
                       >
@@ -802,7 +786,7 @@ export function RealEstateLandingPage() {
                           </div>
                         </CardContent>
                       </Card>
-                      <Card 
+                      <Card
                         className="hover:shadow-lg transition-shadow bg-white flex-shrink-0"
                         style={{ width: `calc(${100 / getVisibleCards()}% - ${(getVisibleCards() - 1) * 1.5}rem / ${getVisibleCards()})` }}
                       >
@@ -832,7 +816,7 @@ export function RealEstateLandingPage() {
                           </div>
                         </CardContent>
                       </Card>
-                      <Card 
+                      <Card
                         className="hover:shadow-lg transition-shadow bg-white flex-shrink-0"
                         style={{ width: `calc(${100 / getVisibleCards()}% - ${(getVisibleCards() - 1) * 1.5}rem / ${getVisibleCards()})` }}
                       >
@@ -864,7 +848,7 @@ export function RealEstateLandingPage() {
                           </div>
                         </CardContent>
                       </Card>
-                      <Card 
+                      <Card
                         className="hover:shadow-lg transition-shadow bg-white flex-shrink-0"
                         style={{ width: `calc(${100 / getVisibleCards()}% - ${(getVisibleCards() - 1) * 1.5}rem / ${getVisibleCards()})` }}
                       >

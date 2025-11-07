@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Layout } from '@/shared/components/layout/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
@@ -7,6 +7,8 @@ import { Progress } from '@/shared/components/ui/progress';
 import { Icon } from '@iconify/react';
 import { api } from '@/shared/lib/api';
 import { useNavigate } from 'react-router-dom';
+import { useErrorHandler } from '@/shared/hooks/useErrorHandler';
+import { useAsyncOperation } from '@/shared/hooks/useAsyncOperation';
 
 interface UploadProgress {
   uploadId: string;
@@ -22,44 +24,113 @@ interface UploadProgress {
 
 export function BulkUploadPage() {
   const navigate = useNavigate();
+  const { handleError, showSuccess, showValidationError } = useErrorHandler();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [pollIntervalId, setPollIntervalId] = useState<NodeJS.Timeout | null>(null);
+
+  // Cleanup polling interval on unmount
+  useEffect(() => {
+    return () => {
+      if (pollIntervalId) {
+        clearInterval(pollIntervalId);
+      }
+    };
+  }, [pollIntervalId]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      // Validate file type
       if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
-        setError('Please select a valid CSV file');
+        showValidationError('Please select a valid CSV file', 'File Type');
         return;
       }
+      
+      // Validate file size (max 10MB)
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      if (file.size > maxSize) {
+        showValidationError('File size must be less than 10MB', 'File Size');
+        return;
+      }
+      
       setSelectedFile(file);
-      setError(null);
       setUploadProgress(null);
     }
   };
 
   const handleDownloadTemplate = () => {
-    const templateUrl = api.upload.downloadPropertyTemplate();
-    const link = document.createElement('a');
-    link.href = templateUrl;
-    link.download = 'property_upload_template.csv';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      const templateUrl = api.upload.downloadPropertyTemplate();
+      const link = document.createElement('a');
+      link.href = templateUrl;
+      link.download = 'property_upload_template.csv';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showSuccess('Template downloaded successfully');
+    } catch (error) {
+      handleError(error instanceof Error ? error : new Error('Failed to download template'), {
+        context: { operation: 'download_template' }
+      });
+    }
   };
+
+  // Create async operation for file upload
+  const uploadOperation = useAsyncOperation(
+    async (file: File) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await api.upload.bulkPropertyCSV(formData);
+      
+      // Handle different response structures
+      const responseData = response.data || response;
+      const isSuccess = response.success || (responseData && responseData.success);
+      const uploadId = responseData?.uploadId || response?.data?.uploadId;
+      
+      if (!isSuccess || !uploadId) {
+        const errorMsg = 
+          responseData?.error?.message || 
+          responseData?.message || 
+          response?.error?.message || 
+          'Upload failed. Please try again.';
+        throw new Error(errorMsg);
+      }
+      
+      return { uploadId, responseData };
+    },
+    {
+      onSuccess: ({ uploadId }) => {
+        // Set initial processing state
+        setUploadProgress(prev => ({
+          ...prev!,
+          uploadId: uploadId,
+          status: 'processing',
+          progress: 10
+        }));
+        
+        // Start polling for progress updates
+        pollProgress(uploadId);
+      },
+      onError: (error) => {
+        setUploadProgress(null);
+        handleError(error, {
+          context: { operation: 'file_upload', fileName: selectedFile?.name }
+        });
+      },
+      showErrorToast: true,
+      errorMessage: 'Failed to upload file. Please try again.'
+    }
+  );
 
   const handleUpload = async () => {
     if (!selectedFile) {
-      setError('Please select a file to upload');
+      showValidationError('Please select a file to upload', 'File Selection');
       return;
     }
 
-    setUploading(true);
-    setError(null);
-    
-    // Set initial progress
+    // Set initial progress state
     setUploadProgress({
       status: 'pending',
       progress: 5,
@@ -70,65 +141,16 @@ export function BulkUploadPage() {
       uploadId: '',
     });
 
-    try {
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-      
-      // Log what we're sending
-      console.log('Uploading file:', selectedFile.name, selectedFile.size);
-
-      const response = await api.upload.bulkPropertyCSV(formData);
-      
-      // Log the response to help debug
-      console.log('Upload response:', JSON.stringify(response, null, 2));
-
-      // The response might be directly the data object if using axios or fetch with auto-parsing
-      // Check both structures to handle either case
-      const responseData = response.data || response;
-      const isSuccess = response.success || (responseData && responseData.success);
-      const uploadId = responseData?.uploadId || response?.data?.uploadId;
-      
-      if (isSuccess && uploadId) {
-        // Update with actual uploadId from response
-        setUploadProgress(prev => ({
-          ...prev!,
-          uploadId: uploadId,
-          status: 'processing',
-          progress: 10
-        }));
-        
-        // Start polling for progress updates
-        pollProgress(uploadId);
-      } else {
-        // Error handling for API errors
-        const errorMsg = 
-          responseData?.error?.message || 
-          responseData?.message || 
-          response?.error?.message || 
-          'Upload failed. Please try again.';
-        
-        setError(errorMsg);
-        setUploading(false);
-        setUploadProgress(null);
-      }
-    } catch (err: any) {
-      console.error('Upload error:', err);
-      
-      // Enhanced error extraction from various possible structures
-      const errorMessage = 
-        err.response?.data?.error?.message || 
-        err.response?.data?.message || 
-        err.message || 
-        'Failed to upload file. Please check your network connection.';
-      
-      setError(errorMessage);
-      setUploading(false);
-      setUploadProgress(null);
-    }
+    await uploadOperation.execute(selectedFile);
   };
 
   const pollProgress = (uploadId: string) => {
-    const pollInterval = setInterval(async () => {
+    // Clear any existing polling interval
+    if (pollIntervalId) {
+      clearInterval(pollIntervalId);
+    }
+
+    const intervalId = setInterval(async () => {
       try {
         const progressResponse = await api.upload.getProgress(uploadId);
         const progressData = progressResponse.data;
@@ -147,35 +169,79 @@ export function BulkUploadPage() {
 
         setUploadProgress(newProgress);
 
+        // Handle completion or failure
         if (progressData.status === 'completed' || progressData.status === 'failed') {
-          clearInterval(pollInterval);
-          setUploading(false);
-          // If the process failed, you might want to fetch the error details
-          if(progressData.status === 'failed' && !error) {
-            setError("Processing failed. Please check the error report.");
+          clearInterval(intervalId);
+          setPollIntervalId(null);
+          
+          if (progressData.status === 'completed') {
+            showSuccess(
+              `Upload completed successfully! ${progressData.successfulRows} properties processed.`,
+              progressData.failedRows > 0 
+                ? `${progressData.failedRows} rows had errors. Check the error report for details.`
+                : undefined
+            );
+          } else if (progressData.status === 'failed') {
+            handleError(new Error('Processing failed. Please check the error report.'), {
+              context: { 
+                operation: 'file_processing', 
+                uploadId,
+                processedRows: progressData.processedRows,
+                totalRows: progressData.totalRows
+              }
+            });
           }
         }
       } catch (err) {
-        console.error('Error polling progress:', err);
-        clearInterval(pollInterval);
-        setUploading(false);
-        setError('Failed to get upload progress.');
+        clearInterval(intervalId);
+        setPollIntervalId(null);
+        
+        handleError(err instanceof Error ? err : new Error('Failed to get upload progress'), {
+          context: { 
+            operation: 'progress_polling', 
+            uploadId 
+          }
+        });
       }
-    }, 2000); // Polling every 2 seconds is safer
+    }, 2000); // Poll every 2 seconds
+
+    setPollIntervalId(intervalId);
   };
 
   const handleDownloadErrorReport = () => {
-    if (uploadProgress?.uploadId) {
+    if (!uploadProgress?.uploadId) {
+      showValidationError('No error report available', 'Download Error');
+      return;
+    }
+
+    try {
       const reportUrl = api.upload.getReportUri(uploadProgress.uploadId);
       window.open(reportUrl, '_blank');
+      showSuccess('Error report downloaded successfully');
+    } catch (error) {
+      handleError(error instanceof Error ? error : new Error('Failed to download error report'), {
+        context: { 
+          operation: 'download_error_report', 
+          uploadId: uploadProgress.uploadId 
+        }
+      });
     }
   };
 
   const handleReset = () => {
+    // Clear any ongoing polling
+    if (pollIntervalId) {
+      clearInterval(pollIntervalId);
+      setPollIntervalId(null);
+    }
+    
+    // Cancel any ongoing upload operation
+    uploadOperation.cancel();
+    
+    // Reset state
     setSelectedFile(null);
     setUploadProgress(null);
-    setError(null);
-    setUploading(false);
+    uploadOperation.reset();
   };
 
   const getStatusColor = (status: string) => {
@@ -256,7 +322,7 @@ export function BulkUploadPage() {
                         variant="outline"
                         size="sm"
                         onClick={() => setSelectedFile(null)}
-                        disabled={uploading}
+                        disabled={uploadOperation.loading}
                       >
                         Change File
                       </Button>
@@ -272,7 +338,7 @@ export function BulkUploadPage() {
                         onChange={handleFileSelect}
                         className="hidden"
                         id="file-upload"
-                        disabled={uploading}
+                        disabled={uploadOperation.loading}
                       />
                       <label htmlFor="file-upload">
                         <Button variant="outline" asChild>
@@ -286,34 +352,53 @@ export function BulkUploadPage() {
                   )}
                 </div>
 
-                {/* Error Alert */}
-                {error && !uploadProgress && (
+                {/* Upload Error Alert - Only show if there's an upload operation error and no progress */}
+                {uploadOperation.isError && !uploadProgress && (
                   <Alert variant="destructive">
                     <Icon icon="solar:danger-circle-bold" className="size-4" />
-                    <AlertDescription>{error}</AlertDescription>
+                    <AlertDescription>
+                      Upload failed. Please check your file and try again.
+                    </AlertDescription>
                   </Alert>
                 )}
 
                 {/* Upload Progress */}
                 {uploadProgress && (
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Icon
-                          icon={getStatusIcon(uploadProgress.status)}
-                          className={`size-5 ${getStatusColor(uploadProgress.status)} ${
-                            uploadProgress.status === 'processing' || uploadProgress.status === 'pending' ? 'animate-spin' : ''
-                          }`}
-                        />
-                        <span className="font-medium capitalize">
-                          {uploadProgress.status}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Icon
+                            icon={getStatusIcon(uploadProgress.status)}
+                            className={`size-5 ${getStatusColor(uploadProgress.status)} ${
+                              uploadProgress.status === 'processing' || uploadProgress.status === 'pending' ? 'animate-spin' : ''
+                            }`}
+                          />
+                          <span className="font-medium capitalize">
+                            {uploadProgress.status === 'pending' ? 'Initializing' : 
+                             uploadProgress.status === 'processing' ? 'Processing' :
+                             uploadProgress.status}
+                          </span>
+                        </div>
+                        <span className="text-sm text-muted-foreground">
+                          {uploadProgress.processedRows} / {uploadProgress.totalRows} rows
                         </span>
                       </div>
-                      <span className="text-sm text-muted-foreground">
-                        {uploadProgress.processedRows} / {uploadProgress.totalRows} rows
-                      </span>
+                      
+                      <div className="space-y-2">
+                        <Progress value={uploadProgress.progress || 0} />
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span>{uploadProgress.progress || 0}% complete</span>
+                          {uploadProgress.totalRows > 0 && (
+                            <span>
+                              {uploadProgress.status === 'processing' ? 'Processing...' : 
+                               uploadProgress.status === 'pending' ? 'Starting...' : 
+                               'Complete'}
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <Progress value={uploadProgress.progress} />
 
                     {uploadProgress.status === 'completed' && (
                       <div className="space-y-6">
@@ -386,12 +471,40 @@ export function BulkUploadPage() {
                     )}
                     
                     {uploadProgress.status === 'failed' && (
-                       <Alert variant="destructive">
-                        <Icon icon="solar:danger-circle-bold" className="size-4" />
-                        <AlertDescription>
-                          The upload process failed. Please check the error report.
-                        </AlertDescription>
-                      </Alert>
+                      <div className="space-y-4">
+                        <Alert variant="destructive">
+                          <Icon icon="solar:danger-circle-bold" className="size-4" />
+                          <AlertDescription>
+                            The upload process failed. Please check the error report for details.
+                          </AlertDescription>
+                        </Alert>
+                        
+                        <div className="flex gap-3">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setUploadProgress(null);
+                              handleUpload();
+                            }}
+                            disabled={uploadOperation.loading}
+                          >
+                            <Icon icon="solar:refresh-bold" className="size-4 mr-2" />
+                            Retry Upload
+                          </Button>
+                          
+                          {uploadProgress.hasErrorReport && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={handleDownloadErrorReport}
+                            >
+                              <Icon icon="solar:download-bold" className="size-4 mr-2" />
+                              Download Error Report
+                            </Button>
+                          )}
+                        </div>
+                      </div>
                     )}
 
                     {uploadProgress.hasErrorReport && (
@@ -415,10 +528,10 @@ export function BulkUploadPage() {
                     <>
                       <Button
                         onClick={handleUpload}
-                        disabled={!selectedFile || uploading}
+                        disabled={!selectedFile || uploadOperation.loading}
                         className="flex-1"
                       >
-                        {uploading ? (
+                        {uploadOperation.loading ? (
                           <>
                             <Icon
                               icon="solar:refresh-bold"
@@ -436,7 +549,7 @@ export function BulkUploadPage() {
                       <Button
                         variant="outline"
                         onClick={handleReset}
-                        disabled={uploading}
+                        disabled={uploadOperation.loading}
                       >
                         Reset
                       </Button>

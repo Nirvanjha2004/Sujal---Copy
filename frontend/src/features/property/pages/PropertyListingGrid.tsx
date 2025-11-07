@@ -1,8 +1,11 @@
+import React from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
 import { useAuth } from "@/shared/contexts/AuthContext";
 import { usePropertySearch } from "../hooks/usePropertySearch";
+import { usePropertyFilters } from "../hooks/usePropertyFilters";
 import { PropertyGrid } from "../components/lists/PropertyGrid";
+import { PropertySort } from "../components/common/PropertySort";
 import { PropertyType, ListingType } from "../types";
 import { Button } from "@/shared/components/ui/button";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
@@ -61,7 +64,28 @@ export function PropertyListingGrid() {
         return newFilters;
     }, [searchParams]);
 
-    const { properties, loading, error, total } = usePropertySearch(filters);
+    const {
+        sortBy,
+        sortOrder,
+        setSorting,
+        isLoading: filtersLoading
+    } = usePropertyFilters({
+        persistToUrl: true,
+        initialFilters: filters
+    });
+
+    const { properties, loading, error, total, searchProperties } = usePropertySearch();
+
+    // Trigger search when filters or sorting change
+    React.useEffect(() => {
+        const query = filters.location || '';
+        const filtersWithSort = {
+            ...filters,
+            sort_by: sortBy,
+            sort_order: sortOrder
+        } as any;
+        searchProperties(query, filtersWithSort);
+    }, [filters, sortBy, sortOrder, searchProperties]);
 
 
 
@@ -232,55 +256,102 @@ export function PropertyListingGrid() {
                     <Badge
                         variant="outline"
                         className="px-4 py-2 rounded-full cursor-pointer hover:bg-secondary"
+                        onClick={() => {
+                            // Apply filter for new launch properties
+                            const newFilters = { ...filters, features: [...(filters.features || []), 'new_launch'] };
+                            const query = newFilters.location || '';
+                            searchProperties(query, newFilters);
+                        }}
                     >
                         New Launch
                     </Badge>
                     <Badge
                         variant="outline"
                         className="px-4 py-2 rounded-full cursor-pointer hover:bg-secondary"
+                        onClick={() => {
+                            // Apply filter for owner properties
+                            const newFilters = { ...filters, features: [...(filters.features || []), 'owner'] };
+                            const query = newFilters.location || '';
+                            searchProperties(query, newFilters);
+                        }}
                     >
                         Owner
                     </Badge>
                     <Badge
                         variant="outline"
                         className="px-4 py-2 rounded-full cursor-pointer hover:bg-secondary"
+                        onClick={() => {
+                            // Apply filter for verified properties
+                            const newFilters = { ...filters, features: [...(filters.features || []), 'verified'] };
+                            const query = newFilters.location || '';
+                            searchProperties(query, newFilters);
+                        }}
                     >
                         Verified
                     </Badge>
                     <Badge
                         variant="outline"
                         className="px-4 py-2 rounded-full cursor-pointer hover:bg-secondary"
+                        onClick={() => {
+                            // Apply filter for under construction properties
+                            const newFilters = { ...filters, features: [...(filters.features || []), 'under_construction'] };
+                            const query = newFilters.location || '';
+                            searchProperties(query, newFilters);
+                        }}
                     >
                         Under Construction
                     </Badge>
                     <Badge
                         variant="outline"
                         className="px-4 py-2 rounded-full cursor-pointer hover:bg-secondary"
+                        onClick={() => {
+                            // Apply filter for ready to move properties
+                            const newFilters = { ...filters, features: [...(filters.features || []), 'ready_to_move'] };
+                            const query = newFilters.location || '';
+                            searchProperties(query, newFilters);
+                        }}
                     >
                         Ready to move
                     </Badge>
                     <Badge
                         variant="outline"
                         className="px-4 py-2 rounded-full cursor-pointer hover:bg-secondary"
+                        onClick={() => {
+                            // Apply filter for properties with photos
+                            const newFilters = { ...filters, features: [...(filters.features || []), 'with_photos'] };
+                            const query = newFilters.location || '';
+                            searchProperties(query, newFilters);
+                        }}
                     >
                         With Photos
                     </Badge>
                     <Badge
                         variant="outline"
                         className="px-4 py-2 rounded-full cursor-pointer hover:bg-secondary"
+                        onClick={() => {
+                            // Apply filter for properties with videos
+                            const newFilters = { ...filters, features: [...(filters.features || []), 'with_videos'] };
+                            const query = newFilters.location || '';
+                            searchProperties(query, newFilters);
+                        }}
                     >
                         With Videos
                     </Badge>
-                    <Button size="sm" variant="outline" className="ml-auto">
-                        <Icon icon="solar:sort-bold" className="size-4" />
-                        Sort By
-                        <Icon icon="solar:alt-arrow-down-bold" className="size-4" />
-                    </Button>
+
+                    <PropertySort
+                        sortBy={sortBy}
+                        sortOrder={sortOrder}
+                        onSortChange={setSorting}
+                        isLoading={loading || filtersLoading}
+                        variant="button"
+                        showLabel={false}
+                        className="ml-auto"
+                    />
                 </div>
 
                 {/* Property Grid */}
-                <PropertyGrid 
-                    properties={properties} 
+                <PropertyGrid
+                    properties={properties}
                     isLoading={loading}
                     onPropertyClick={(property) => navigate(`/property/${property.id}`)}
                 />

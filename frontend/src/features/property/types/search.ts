@@ -1,31 +1,41 @@
 import { PropertyType, ListingType, PropertyStatus, Property } from './property';
 
-// Search and filtering types
+// Search and filtering types - using backend field names for consistency
 export interface PropertyFilters {
   location?: string;
-  propertyType?: PropertyType | PropertyType[];
-  property_type?: PropertyType; // API field
-  listingType?: ListingType;
-  listing_type?: ListingType; // API field
+  property_type?: PropertyType | PropertyType[]; // Backend field name
+  listing_type?: ListingType; // Backend field name
   status?: PropertyStatus;
-  minPrice?: number;
-  min_price?: number; // API field
-  maxPrice?: number;
-  max_price?: number; // API field
+  min_price?: number; // Backend field name
+  max_price?: number; // Backend field name
   bedrooms?: number;
   bathrooms?: number;
-  minArea?: number;
-  min_area?: number; // API field
-  maxArea?: number;
-  max_area?: number; // API field
+  min_area?: number; // Backend field name
+  max_area?: number; // Backend field name
   amenities?: string[];
   features?: string[];
-  isActive?: boolean;
-  is_active?: boolean; // API field
-  isFeatured?: boolean;
-  is_featured?: boolean; // API field
+  is_active?: boolean; // Backend field name
+  is_featured?: boolean; // Backend field name
   sort_by?: string;
   sort_order?: 'asc' | 'desc';
+  
+  // Deprecated - use backend field names above
+  /** @deprecated Use property_type instead */
+  propertyType?: PropertyType | PropertyType[];
+  /** @deprecated Use listing_type instead */
+  listingType?: ListingType;
+  /** @deprecated Use min_price instead */
+  minPrice?: number;
+  /** @deprecated Use max_price instead */
+  maxPrice?: number;
+  /** @deprecated Use min_area instead */
+  minArea?: number;
+  /** @deprecated Use max_area instead */
+  maxArea?: number;
+  /** @deprecated Use is_active instead */
+  isActive?: boolean;
+  /** @deprecated Use is_featured instead */
+  isFeatured?: boolean;
 }
 
 export interface SearchCriteria extends PropertyFilters {

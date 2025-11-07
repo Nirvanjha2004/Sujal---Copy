@@ -2,91 +2,22 @@ import { useState, useEffect } from 'react';
 import { api } from '@/shared/lib/api';
 import { Property, PropertyFilters } from '@/features/property/types';
 
-export function useFeaturedProperties(limit: number = 10) {
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+// DEPRECATED: Individual property hooks have been removed to prevent duplicate API calls
+// Use useLandingPageData() from '@/shared/hooks/useLandingPageData' instead for optimized performance
 
-  useEffect(() => {
-    const fetchProperties = async () => {
-      try {
-        setLoading(true);
-        const response = await api.getProperties({
-          status: 'active'
-        }, 1, limit);
-        setProperties(response.data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch properties');
-        setProperties([]); // Fallback to empty array
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProperties();
-  }, [limit]);
-
-  return { properties, loading, error };
+export function useFeaturedProperties() {
+  console.error('❌ useFeaturedProperties is DEPRECATED and removed! Use useLandingPageData() instead.');
+  throw new Error('useFeaturedProperties is deprecated. Use useLandingPageData() instead.');
 }
 
-export function useRecommendedProperties(limit: number = 8) {
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchProperties = async () => {
-      try {
-        setLoading(true);
-        const response = await api.getRecommendedProperties(limit);
-        if (response.success) {
-          setProperties(response.data);
-        } else {
-          setProperties([]);
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch recommended properties');
-        setProperties([]); // Fallback to empty array
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProperties();
-  }, [limit]);
-
-  return { properties, loading, error };
+export function useRecentProperties() {
+  console.error('❌ useRecentProperties is DEPRECATED and removed! Use useLandingPageData() instead.');
+  throw new Error('useRecentProperties is deprecated. Use useLandingPageData() instead.');
 }
 
-export function useRecentProperties(limit: number = 10) {
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchProperties = async () => {
-      try {
-        setLoading(true);
-        const response = await api.getProperties({
-          status: 'active'
-        }, 1, limit);
-        // Sort by created_at descending to get most recent
-        const sortedProperties = response.data.sort((a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        );
-        setProperties(sortedProperties);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch properties');
-        setProperties([]); // Fallback to empty array
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProperties();
-  }, [limit]);
-
-  return { properties, loading, error };
+export function useRecommendedProperties() {
+  console.error('❌ useRecommendedProperties is DEPRECATED and removed! Use useLandingPageData() instead.');
+  throw new Error('useRecommendedProperties is deprecated. Use useLandingPageData() instead.');
 }
 
 export function usePopularProperties(limit: number = 10) {
@@ -99,7 +30,7 @@ export function usePopularProperties(limit: number = 10) {
       try {
         setLoading(true);
         const response = await api.getProperties({
-          status: 'active'
+          status: 'ACTIVE'
         }, 1, limit);
         // For now, just return the properties as-is
         // In the future, you could sort by view count or other popularity metrics

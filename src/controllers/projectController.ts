@@ -989,11 +989,13 @@ class ProjectController {
       const projects = await Project.findAll({
         where: {
           is_active: true,
-          approval_status: 'approved',
+          // approval_status: 'approved',
         },
         order: [['created_at', 'DESC']], // Sort by creation date, not launch date
         limit,
       });
+
+      console.log('The projects are,', projects);
 
       // Manually fetch images and builder data for each project
       const projectsWithImages = await Promise.all(
@@ -1010,7 +1012,7 @@ class ProjectController {
           ]);
 
           const projectData = project.toJSON() as any;
-
+          console.log("The project data", projectData);
           return {
             id: projectData.id,
             name: projectData.name,

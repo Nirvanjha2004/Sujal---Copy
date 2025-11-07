@@ -4,6 +4,10 @@ import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Badge } from '@/shared/components/ui/badge';
 import { contentService } from '../services/contentService';
+import { ConfirmationDialog } from '@/shared/components/ui/confirmation-dialog';
+import { useConfirmation } from '@/shared/hooks/useConfirmation';
+import { useErrorHandler } from '@/shared/hooks/useErrorHandler';
+import { useAsyncOperation } from '@/shared/hooks/useAsyncOperation';
 
 interface CmsContent {
   id: number;
@@ -29,18 +33,16 @@ interface CmsContent {
 
 export function BannerManagementPage() {
   const [banners, setBanners] = useState<CmsContent[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { handleError, showSuccess } = useErrorHandler();
+  const { confirm, isOpen, config, loading: confirmLoading, handleConfirm, handleCancel } = useConfirmation();
 
-  useEffect(() => {
-    fetchBanners();
-  }, []);
-
-  const fetchBanners = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
+  // Fetch banners operation
+  const {
+    loading,
+    error,
+    execute: fetchBanners,
+  } = useAsyncOperation(
+    async () => {
       const response = await contentService.getContent({
         page: 1,
         limit: 50,
@@ -49,42 +51,87 @@ export function BannerManagementPage() {
 
       if (response.success && response.data) {
         setBanners(response.data.data);
+        return response.data.data;
       } else {
         throw new Error(response.error?.message || 'Failed to fetch banners');
       }
-    } catch (err: any) {
-      console.error('Error fetching banners:', err);
-      setError(err.message || 'Failed to load banners');
-    } finally {
-      setLoading(false);
+    },
+    {
+      showErrorToast: true,
+      errorMessage: 'Failed to load banners',
     }
-  };
+  );
+
+  // Update banner status operation
+  const {
+    loading: updateLoading,
+    execute: executeUpdateStatus,
+  } = useAsyncOperation(
+    async ({ bannerId, isActive }: { bannerId: number; isActive: boolean }) => {
+      const response = await contentService.updateContent(bannerId, { isActive });
+      if (response.success) {
+        await fetchBanners();
+        return response;
+      } else {
+        throw new Error(response.error?.message || 'Failed to update banner');
+      }
+    },
+    {
+      showSuccessToast: true,
+      successMessage: 'Banner status updated successfully',
+      showErrorToast: true,
+    }
+  );
+
+  // Delete banner operation
+  const {
+    loading: deleteLoading,
+    execute: executeDelete,
+  } = useAsyncOperation(
+    async (bannerId: number) => {
+      const response = await contentService.deleteContent(bannerId);
+      if (response.success) {
+        await fetchBanners();
+        return response;
+      } else {
+        throw new Error(response.error?.message || 'Failed to delete banner');
+      }
+    },
+    {
+      showSuccessToast: true,
+      successMessage: 'Banner deleted successfully',
+      showErrorToast: true,
+    }
+  );
+
+  useEffect(() => {
+    fetchBanners();
+  }, [fetchBanners]);
 
   const updateBannerStatus = async (bannerId: number, isActive: boolean) => {
     try {
-      const response = await contentService.updateContent(bannerId, { isActive });
-      if (response.success) {
-        fetchBanners();
-      } else {
-        alert(response.error?.message || 'Failed to update banner');
-      }
-    } catch (err: any) {
-      alert('Failed to update banner');
+      await executeUpdateStatus({ bannerId, isActive });
+    } catch (error) {
+      // Error is already handled by useAsyncOperation
     }
   };
 
-  const deleteBanner = async (bannerId: number) => {
-    if (!confirm('Are you sure you want to delete this banner?')) return;
-
+  const deleteBanner = async (bannerId: number, bannerTitle: string) => {
     try {
-      const response = await contentService.deleteContent(bannerId);
-      if (response.success) {
-        fetchBanners();
-      } else {
-        alert(response.error?.message || 'Failed to delete banner');
+      const confirmed = await confirm({
+        title: 'Delete Banner',
+        description: `Are you sure you want to delete "${bannerTitle}"? This action cannot be undone.`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        variant: 'destructive',
+        icon: 'solar:trash-bin-trash-bold',
+      });
+
+      if (confirmed) {
+        await executeDelete(bannerId);
       }
-    } catch (err: any) {
-      alert('Failed to delete banner');
+    } catch (error) {
+      // Error is already handled by useAsyncOperation
     }
   };
 
@@ -182,21 +229,35 @@ export function BannerManagementPage() {
                   variant="outline"
                   className="flex-1"
                   onClick={() => updateBannerStatus(banner.id, !banner.isActive)}
+                  disabled={updateLoading || deleteLoading}
                 >
-                  {banner.isActive ? 'Deactivate' : 'Activate'}
+                  {updateLoading ? (
+                    <>
+                      <Icon icon="solar:loading-bold" className="size-4 animate-spin mr-1" />
+                      Updating...
+                    </>
+                  ) : (
+                    banner.isActive ? 'Deactivate' : 'Activate'
+                  )}
                 </Button>
                 <Button
                   size="sm"
                   variant="outline"
+                  disabled={updateLoading || deleteLoading}
                 >
                   <Icon icon="solar:pen-bold" className="size-4" />
                 </Button>
                 <Button
                   size="sm"
                   variant="destructive"
-                  onClick={() => deleteBanner(banner.id)}
+                  onClick={() => deleteBanner(banner.id, banner.title)}
+                  disabled={updateLoading || deleteLoading}
                 >
-                  <Icon icon="solar:trash-bin-trash-bold" className="size-4" />
+                  {deleteLoading ? (
+                    <Icon icon="solar:loading-bold" className="size-4 animate-spin" />
+                  ) : (
+                    <Icon icon="solar:trash-bin-trash-bold" className="size-4" />
+                  )}
                 </Button>
               </div>
             </CardContent>
@@ -218,17 +279,14 @@ export function BannerManagementPage() {
         </Card>
       )}
 
-      {error && (
-        <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-md">
-          <div className="flex">
-            <Icon icon="solar:danger-triangle-bold" className="size-5 text-red-400" />
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Error</h3>
-              <div className="mt-2 text-sm text-red-700">{error}</div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={isOpen}
+        onClose={handleCancel}
+        onConfirm={handleConfirm}
+        loading={confirmLoading}
+        {...config}
+      />
     </div>
   );
 }

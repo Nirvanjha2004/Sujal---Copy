@@ -11,6 +11,10 @@ import { useAuth } from '@/shared/contexts/AuthContext';
 import { Layout } from '@/shared/components/layout/Layout';
 import { DashboardLayout } from '../components/common/DashboardLayout';
 import { useNavigate } from 'react-router-dom';
+import { ConfirmationDialog } from '@/shared/components/ui/confirmation-dialog';
+import { useConfirmation } from '@/shared/hooks/useConfirmation';
+import { useErrorHandler } from '@/shared/hooks/useErrorHandler';
+import { useAsyncOperation } from '@/shared/hooks/useAsyncOperation';
 
 /**
  * Account Settings Page - migrated to dashboard feature
@@ -19,6 +23,8 @@ import { useNavigate } from 'react-router-dom';
 export function AccountSettingsPage() {
   const { state: { user, error }, updateUser, clearError } = useAuth();
   const navigate = useNavigate();
+  const { handleError, showSuccess, showValidationError } = useErrorHandler();
+  const { confirm, isOpen, config, loading: confirmLoading, handleConfirm, handleCancel } = useConfirmation();
   
   // Profile form state
   const [profileData, setProfileData] = useState({
@@ -90,13 +96,14 @@ export function AccountSettingsPage() {
     clearError();
     setSuccess('');
 
+    // Validate password fields
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert('New passwords do not match');
+      showValidationError('New passwords do not match', 'Confirm Password');
       return;
     }
 
     if (passwordData.newPassword.length < 8) {
-      alert('Password must be at least 8 characters long');
+      showValidationError('Password must be at least 8 characters long', 'New Password');
       return;
     }
 
@@ -104,14 +111,14 @@ export function AccountSettingsPage() {
     try {
       // In a real implementation, this would call an API endpoint
       // await api.changePassword(passwordData);
-      setSuccess('Password changed successfully!');
+      showSuccess('Password changed successfully!');
       setPasswordData({
         currentPassword: '',
         newPassword: '',
         confirmPassword: '',
       });
     } catch (err) {
-      // Handle error
+      handleError(err as Error, { context: { operation: 'password_change' } });
     } finally {
       setLoading(false);
     }
@@ -132,14 +139,27 @@ export function AccountSettingsPage() {
   };
 
   const handleDeleteAccount = async () => {
-    if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-      try {
-        // In a real implementation, this would call an API endpoint
-        // await api.deleteAccount();
-        alert('Account deletion requested. You will receive a confirmation email.');
-      } catch (err) {
-        alert('Failed to delete account. Please try again.');
+    try {
+      const confirmed = await confirm({
+        title: 'Delete Account',
+        description: 'Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently removed.',
+        confirmText: 'Delete Account',
+        cancelText: 'Keep Account',
+        variant: 'destructive',
+        icon: 'solar:trash-bin-trash-bold',
+      });
+
+      if (confirmed) {
+        try {
+          // In a real implementation, this would call an API endpoint
+          // await api.deleteAccount();
+          showSuccess('Account deletion requested. You will receive a confirmation email.');
+        } catch (err) {
+          handleError(err as Error, { context: { operation: 'account_deletion' } });
+        }
       }
+    } catch (error) {
+      // Error is handled by the confirmation system
     }
   };
 
@@ -534,6 +554,15 @@ export function AccountSettingsPage() {
               </div>
             </TabsContent>
           </Tabs>
+
+          {/* Confirmation Dialog */}
+          <ConfirmationDialog
+            isOpen={isOpen}
+            onClose={handleCancel}
+            onConfirm={handleConfirm}
+            loading={confirmLoading}
+            {...config}
+          />
         </DashboardLayout>
       </div>
     </Layout>

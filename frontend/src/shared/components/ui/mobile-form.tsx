@@ -445,9 +445,12 @@ export function ExampleMobileForm() {
   }
 
   const handleSubmit = async (values: typeof initialValues) => {
-    // Simulate API call
+    // Simulate API call with proper feedback
     await new Promise(resolve => setTimeout(resolve, 2000))
-    console.log('Form submitted:', values)
+    
+    // In a real app, this would make an actual API call
+    // For demo purposes, we'll show success feedback
+    alert('Form submitted successfully! Data: ' + JSON.stringify(values, null, 2))
   }
 
   return (

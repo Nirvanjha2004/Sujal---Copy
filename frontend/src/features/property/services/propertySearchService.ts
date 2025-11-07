@@ -19,24 +19,74 @@ class PropertySearchService {
   async searchProperties(
     query: string, 
     filters?: PropertyFilters
-  ): Promise<Property[]> {
+  ): Promise<{ properties: Property[]; total: number }> {
     try {
       const apiFilters = this.transformFiltersToApi(filters);
       const response = await api.searchProperties(query, apiFilters);
       
       // The API returns { data: Property[], total: number }
       const properties = response.data || [];
+      const total = response.total || 0;
       
       // Ensure we have an array to work with
       if (!Array.isArray(properties)) {
         console.warn('Expected properties array but got:', properties);
-        return [];
+        return { properties: [], total: 0 };
       }
       
-      return properties.map(this.transformApiPropertyToProperty);
+      let transformedProperties = properties.map(this.transformApiPropertyToProperty);
+      
+      // Apply client-side sorting if specified
+      if (filters?.sort_by) {
+        transformedProperties = this.sortProperties(transformedProperties, filters);
+      }
+      
+      return { 
+        properties: transformedProperties, 
+        total 
+      };
     } catch (error: any) {
       console.error('Property search error:', error);
       throw new Error(`Failed to search properties: ${error.message}`);
+    }
+  }
+
+  /**
+   * Get filtered properties with advanced filtering and sorting
+   */
+  async getFilteredProperties(
+    filters: PropertyFilters,
+    page: number = 1,
+    limit: number = 20
+  ): Promise<{ properties: Property[]; total: number; hasMore: boolean }> {
+    try {
+      const apiFilters = this.transformFiltersToApi(filters);
+      
+      // Use the general property service for filtered results
+      const { default: propertyService } = await import('./propertyService');
+      const response = await propertyService.getProperties(apiFilters as any, { page, limit });
+      
+      let properties = response.data.map(this.transformApiPropertyToProperty);
+      
+      // Apply client-side sorting if specified
+      if (filters?.sort_by) {
+        properties = this.sortProperties(properties, filters);
+      }
+      
+      // Apply client-side filtering for features not supported by API
+      properties = this.applyClientSideFilters(properties, filters);
+      
+      const total = response.total || properties.length;
+      const hasMore = page * limit < total;
+      
+      return { 
+        properties, 
+        total, 
+        hasMore 
+      };
+    } catch (error: any) {
+      console.error('Property filtering error:', error);
+      throw new Error(`Failed to filter properties: ${error.message}`);
     }
   }
 
@@ -231,7 +281,8 @@ class PropertySearchService {
       const { query, ...filters } = savedSearch.criteria;
       
       if (query) {
-        return await this.searchProperties(query, filters);
+        const result = await this.searchProperties(query, filters);
+        return result.properties;
       } else {
         // If no query, use the property service to get filtered properties
         const { default: propertyService } = await import('./propertyService');
@@ -375,6 +426,112 @@ class PropertySearchService {
   }
 
   /**
+   * Sort properties based on sort criteria
+   */
+  private sortProperties(properties: Property[], filters: PropertyFilters): Property[] {
+    const sortBy = filters.sort_by || 'relevance';
+    const sortOrder = filters.sort_order || 'desc';
+    
+    const sorted = [...properties].sort((a, b) => {
+      let comparison = 0;
+      
+      switch (sortBy) {
+        case 'price_low':
+        case 'price_high':
+        case 'price':
+          comparison = (a.price || 0) - (b.price || 0);
+          if (sortBy === 'price_high') comparison = -comparison;
+          break;
+          
+        case 'area_large':
+        case 'area_small':
+        case 'area':
+          comparison = (a.area_sqft || 0) - (b.area_sqft || 0);
+          if (sortBy === 'area_large') comparison = -comparison;
+          break;
+          
+        case 'date_new':
+        case 'date_old':
+        case 'created_at':
+          const dateA = new Date(a.created_at).getTime();
+          const dateB = new Date(b.created_at).getTime();
+          comparison = dateA - dateB;
+          if (sortBy === 'date_new') comparison = -comparison;
+          break;
+          
+        case 'relevance':
+        default:
+          // For relevance, prioritize featured properties, then by date
+          if (a.is_featured && !b.is_featured) comparison = -1;
+          else if (!a.is_featured && b.is_featured) comparison = 1;
+          else {
+            const dateA = new Date(a.created_at).getTime();
+            const dateB = new Date(b.created_at).getTime();
+            comparison = dateB - dateA; // Newer first for relevance
+          }
+          break;
+      }
+      
+      // Apply sort order
+      if (sortOrder === 'asc' && sortBy !== 'relevance') {
+        comparison = -comparison;
+      }
+      
+      return comparison;
+    });
+    
+    return sorted;
+  }
+
+  /**
+   * Apply client-side filters for features not supported by API
+   */
+  private applyClientSideFilters(properties: Property[], filters: PropertyFilters): Property[] {
+    let filtered = [...properties];
+    
+    // Filter by amenities if specified
+    if (filters.amenities && filters.amenities.length > 0) {
+      filtered = filtered.filter(property => {
+        if (!property.amenities || typeof property.amenities !== 'object') {
+          return false;
+        }
+        
+        // Check if property has all required amenities
+        return filters.amenities!.every(amenity => {
+          return property.amenities[amenity] === true;
+        });
+      });
+    }
+    
+    // Filter by features if specified
+    if (filters.features && filters.features.length > 0) {
+      filtered = filtered.filter(property => {
+        // This would depend on how features are stored in the property object
+        // For now, we'll check if the feature exists in the property description or amenities
+        const searchText = `${property.description} ${JSON.stringify(property.amenities)}`.toLowerCase();
+        
+        return filters.features!.some(feature => 
+          searchText.includes(feature.toLowerCase())
+        );
+      });
+    }
+    
+    // Filter by active status - skip for now as this field doesn't exist in PropertyFilters
+    // if (filters.isActive !== undefined) {
+    //   const isActive = filters.isActive;
+    //   filtered = filtered.filter(property => property.is_active === isActive);
+    // }
+    
+    // Filter by featured status
+    if (filters.isFeatured !== undefined) {
+      const isFeatured = filters.isFeatured;
+      filtered = filtered.filter(property => property.is_featured === isFeatured);
+    }
+    
+    return filtered;
+  }
+
+  /**
    * Transform feature filters to API filters
    */
   private transformFiltersToApi(filters?: PropertyFilters): ApiPropertyFilters | undefined {
@@ -382,22 +539,44 @@ class PropertySearchService {
 
     const apiFilters: ApiPropertyFilters = {};
 
+    // Handle both old and new filter field names
     if (filters.location) apiFilters.location = filters.location;
-    if (filters.propertyType) {
-      apiFilters.property_type = Array.isArray(filters.propertyType) 
-        ? filters.propertyType[0] 
-        : filters.propertyType;
+    
+    // Property type - handle both single and array values
+    const propertyType = filters.property_type || filters.propertyType;
+    if (propertyType) {
+      apiFilters.property_type = Array.isArray(propertyType) 
+        ? propertyType[0] 
+        : propertyType;
     }
-    if (filters.listingType) apiFilters.listing_type = filters.listingType;
-    if (filters.minPrice) apiFilters.min_price = filters.minPrice;
-    if (filters.maxPrice) apiFilters.max_price = filters.maxPrice;
+    
+    // Listing type
+    const listingType = filters.listing_type || filters.listingType;
+    if (listingType) apiFilters.listing_type = listingType;
+    
+    // Price range
+    const minPrice = filters.min_price || filters.minPrice;
+    const maxPrice = filters.max_price || filters.maxPrice;
+    if (minPrice) apiFilters.min_price = minPrice;
+    if (maxPrice) apiFilters.max_price = maxPrice;
+    
+    // Bedrooms and bathrooms
     if (filters.bedrooms) apiFilters.bedrooms = filters.bedrooms;
     if (filters.bathrooms) apiFilters.bathrooms = filters.bathrooms;
-    if (filters.minArea) apiFilters.min_area = filters.minArea;
-    if (filters.maxArea) apiFilters.max_area = filters.maxArea;
-    // Note: amenities handling would need to be implemented in API filters
-    if (filters.isActive !== undefined) apiFilters.is_featured = filters.isActive;
-    if (filters.isFeatured !== undefined) apiFilters.is_featured = filters.isFeatured;
+    
+    // Area range
+    const minArea = filters.min_area || filters.minArea;
+    const maxArea = filters.max_area || filters.maxArea;
+    if (minArea) apiFilters.min_area = minArea;
+    if (maxArea) apiFilters.max_area = maxArea;
+    
+    // Status filters
+    const isFeatured = filters.isFeatured;
+    if (isFeatured !== undefined) apiFilters.is_featured = isFeatured;
+    
+    // Sorting - these will be handled client-side, not passed to API
+    // const sortBy = filters.sort_by;
+    // const sortOrder = filters.sort_order || 'desc';
 
     return apiFilters;
   }

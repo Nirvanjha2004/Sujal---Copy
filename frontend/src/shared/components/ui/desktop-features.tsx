@@ -553,7 +553,10 @@ export function DesktopFeaturesDemo() {
       icon: 'solar:home-add-bold',
       shortcut: 'Ctrl+N',
       category: 'Actions',
-      action: () => console.log('New property')
+      action: () => {
+        // Navigate to add property page
+        window.location.href = '/add-property';
+      }
     },
     {
       id: 'search',
@@ -562,7 +565,10 @@ export function DesktopFeaturesDemo() {
       icon: 'solar:magnifer-bold',
       shortcut: '/',
       category: 'Navigation',
-      action: () => console.log('Search')
+      action: () => {
+        // Navigate to search page
+        window.location.href = '/search';
+      }
     }
   ]
 
@@ -572,7 +578,10 @@ export function DesktopFeaturesDemo() {
       label: 'Edit',
       icon: 'solar:pen-bold',
       shortcut: 'Ctrl+E',
-      action: () => console.log('Edit')
+      action: () => {
+        // Edit functionality would depend on context
+        alert('Edit functionality not implemented for this context');
+      }
     },
     {
       id: 'delete',
@@ -580,7 +589,12 @@ export function DesktopFeaturesDemo() {
       icon: 'solar:trash-bin-trash-bold',
       shortcut: 'Del',
       danger: true,
-      action: () => console.log('Delete')
+      action: () => {
+        // Delete functionality would depend on context
+        if (confirm('Are you sure you want to delete this item?')) {
+          alert('Delete functionality not implemented for this context');
+        }
+      }
     }
   ]
 
@@ -590,14 +604,20 @@ export function DesktopFeaturesDemo() {
       label: 'New Property',
       icon: 'solar:home-add-bold',
       shortcut: 'Ctrl+N',
-      action: () => console.log('New property')
+      action: () => {
+        // Navigate to add property page
+        window.location.href = '/add-property';
+      }
     },
     {
       id: 'search',
       label: 'Search',
       icon: 'solar:magnifer-bold',
       shortcut: '/',
-      action: () => console.log('Search')
+      action: () => {
+        // Navigate to search page
+        window.location.href = '/search';
+      }
     }
   ]
 

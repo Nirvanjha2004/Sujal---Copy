@@ -78,14 +78,39 @@ export const usePropertySearch = (filtersOrOptions?: PropertyFilters | UseProper
     }
     
     try {
-      const results = await propertySearchService.searchProperties(query, filters);
+      let results: Property[];
+      let total: number;
+      
+      if (query.trim()) {
+        // Use search service for query-based searches
+        const searchResult = await propertySearchService.searchProperties(query, filters);
+        results = searchResult.properties;
+        total = searchResult.total;
+      } else {
+        // Use filtered properties service for filter-only searches
+        const filterResult = await propertySearchService.getFilteredProperties(filters || {}, 1, pageSize);
+        results = filterResult.properties;
+        total = filterResult.total;
+        setHasMore(filterResult.hasMore);
+      }
+      
       setProperties(results);
-      setTotalResults(results.length);
-      setHasMore(results.length >= pageSize);
+      setTotalResults(total);
+      
+      if (!query.trim()) {
+        // hasMore is already set above for filtered searches
+      } else {
+        setHasMore(results.length >= pageSize);
+      }
       
       // Cache results if caching is enabled
       if (enableCaching) {
         setSearchCache(prev => new Map(prev).set(cacheKey, results));
+      }
+      
+      // Add to search history if there's a query
+      if (query.trim()) {
+        await propertySearchService.addToSearchHistory(query, filters || {}, total);
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to search properties';
@@ -107,7 +132,7 @@ export const usePropertySearch = (filtersOrOptions?: PropertyFilters | UseProper
   }, [initialFilters, searchProperties]);
 
   const loadMore = useCallback(async () => {
-    if (!hasMore || isLoading || !currentQuery) return;
+    if (!hasMore || isLoading) return;
     
     setIsLoading(true);
     setError(null);
@@ -116,17 +141,32 @@ export const usePropertySearch = (filtersOrOptions?: PropertyFilters | UseProper
     const cacheKey = generateCacheKey(currentQuery, currentFilters, nextPage);
     
     try {
-      // For simplicity, we'll re-search with pagination
-      // In a real implementation, you'd want proper pagination support
-      const results = await propertySearchService.searchProperties(currentQuery, currentFilters);
-      const startIndex = (nextPage - 1) * pageSize;
-      const endIndex = startIndex + pageSize;
-      const newProperties = results.slice(startIndex, endIndex);
+      let newProperties: Property[];
+      let newHasMore: boolean;
+      
+      if (currentQuery.trim()) {
+        // For query-based searches, we need to implement proper pagination
+        // For now, we'll simulate it by getting more results
+        const searchResult = await propertySearchService.searchProperties(currentQuery, currentFilters);
+        const startIndex = (nextPage - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        newProperties = searchResult.properties.slice(startIndex, endIndex);
+        newHasMore = endIndex < searchResult.total;
+      } else {
+        // For filter-only searches, use proper pagination
+        const filterResult = await propertySearchService.getFilteredProperties(
+          currentFilters || {}, 
+          nextPage, 
+          pageSize
+        );
+        newProperties = filterResult.properties;
+        newHasMore = filterResult.hasMore;
+      }
       
       if (newProperties.length > 0) {
         setProperties(prev => [...prev, ...newProperties]);
         setCurrentPage(nextPage);
-        setHasMore(endIndex < results.length);
+        setHasMore(newHasMore);
         
         // Cache the new page if caching is enabled
         if (enableCaching) {

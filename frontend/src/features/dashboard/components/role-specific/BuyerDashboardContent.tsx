@@ -113,7 +113,7 @@ export function BuyerDashboardContent({ stats, isLoading = false }: BuyerDashboa
       />
 
       {/* Enhanced Stats Cards with Modern Design */}
-      <DashboardGrid columns={4} gap="lg" className="mb-8">
+      <DashboardGrid columns={3} gap='md' className="mb-8">
         <GridItem>
           <StatsCard
             title="Saved Properties"
@@ -121,16 +121,16 @@ export function BuyerDashboardContent({ stats, isLoading = false }: BuyerDashboa
             icon="solar:heart-bold"
             color="error"
             subtitle="Favorites"
-            trend={{
-              value: 2,
-              direction: 'up',
-              period: 'this week'
-            }}
+            // trend={{
+            //   value: 2,
+            //   direction: 'up',
+            //   period: 'this week'
+            // }}
             onClick={() => navigate('/favorites')}
             className="hover:shadow-lg hover:scale-105 transition-all duration-200"
           />
         </GridItem>
-        
+
         <GridItem>
           <StatsCard
             title="Saved Searches"
@@ -138,17 +138,17 @@ export function BuyerDashboardContent({ stats, isLoading = false }: BuyerDashboa
             icon="solar:bookmark-bold"
             color="info"
             subtitle="Active searches"
-            trend={{
-              value: 1,
-              direction: 'up',
-              period: 'this month'
-            }}
+            // trend={{
+            //   value: 1,
+            //   direction: 'up',
+            //   period: 'this month'
+            // }}
             onClick={() => navigate('/saved-searches')}
             className="hover:shadow-lg hover:scale-105 transition-all duration-200"
           />
         </GridItem>
-        
-        <GridItem>
+
+        {/* <GridItem>
           <StatsCard
             title="Messages"
             value={safeStats.messages}
@@ -158,8 +158,8 @@ export function BuyerDashboardContent({ stats, isLoading = false }: BuyerDashboa
             onClick={() => navigate('/messages')}
             className="hover:shadow-lg hover:scale-105 transition-all duration-200"
           />
-        </GridItem>
-        
+        </GridItem> */}
+
         <GridItem>
           <StatsCard
             title="Messages"

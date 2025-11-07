@@ -194,6 +194,16 @@ export const api = {
           if (key === 'area') backendKey = 'area_sqft';
           if (key === 'sort_by') backendKey = 'sort_by';
           if (key === 'sort_order') backendKey = 'sort_order';
+          
+          // Handle boolean parameters properly
+          if (key === 'is_featured' || key === 'isFeatured') {
+            backendKey = 'is_featured';
+            // Convert boolean to string for URL params
+            if (typeof value === 'boolean') {
+              params.append(backendKey, value.toString());
+              return;
+            }
+          }
 
           // Handle amenities array specially
           if (key === 'amenities' && Array.isArray(value)) {
@@ -220,6 +230,7 @@ export const api = {
 
     const queryString = params.toString();
     const response = await apiRequest(`/properties${queryString ? `?${queryString}` : ''}`) as any;
+    console.log("The response is", response)
     return response;
   },
 
@@ -309,7 +320,9 @@ export const api = {
 
   getRecentProjects: async (limit?: number): Promise<{ success: boolean; data: any[]; total: number }> => {
     const params = limit ? `?limit=${limit}` : '';
+    console.log('The limits is', limit)
     const response = await apiRequest(`/projects/public/recent${params}`) as any;
+    console.log('The response in getRecentProjects', response)
     return response;
   },
 
@@ -322,6 +335,12 @@ export const api = {
   getRecommendedProperties: async (limit?: number): Promise<{ success: boolean; data: any[]; total: number }> => {
     const params = limit ? `?limit=${limit}` : '';
     const response = await apiRequest(`/properties/recommended${params}`) as any;
+    return response;
+  },
+
+  // Get landing page data in a single optimized request
+  getLandingPageData: async (): Promise<{ success: boolean; data: { featured: Property[]; recent: Property[]; recommended: Property[] } }> => {
+    const response = await apiRequest('/properties/landing-data') as any;
     return response;
   },
 

@@ -8,6 +8,7 @@ import { Label } from '@/shared/components/ui/label';
 import { Badge } from '@/shared/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
 import { Separator } from '@/shared/components/ui/separator';
+import { toast } from 'sonner';
 import { 
   Phone, 
   Mail, 
@@ -85,7 +86,8 @@ export const PropertyContact: React.FC<PropertyContactProps> = ({
 
   const handleScheduleVisit = async () => {
     if (!contactForm.visitDate || !contactForm.visitTime) {
-      alert('Please select a date and time for the visit');
+      // Use toast notification instead of alert
+      toast.error('Please select a date and time for the visit');
       return;
     }
 

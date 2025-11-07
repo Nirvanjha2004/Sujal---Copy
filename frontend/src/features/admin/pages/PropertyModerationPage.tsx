@@ -4,6 +4,10 @@ import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
 import { Icon } from '@iconify/react';
 import { propertyModerationService } from '../services/propertyModerationService';
+import { ConfirmationDialog } from '@/shared/components/ui/confirmation-dialog';
+import { useConfirmation } from '@/shared/hooks/useConfirmation';
+import { useErrorHandler } from '@/shared/hooks/useErrorHandler';
+import { useAsyncOperation } from '@/shared/hooks/useAsyncOperation';
 import {
   Dialog,
   DialogContent,
@@ -61,8 +65,6 @@ interface PropertyFilters {
 
 export function PropertyModerationPage() {
   const [properties, setProperties] = useState<PropertyModerationData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [filters, setFilters] = useState<PropertyFilters>({});
@@ -71,17 +73,17 @@ export function PropertyModerationPage() {
   // Property details modal state
   const [selectedProperty, setSelectedProperty] = useState<PropertyModerationData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [loadingDetails, setLoadingDetails] = useState(false);
 
-  useEffect(() => {
-    fetchProperties();
-  }, [currentPage, filters]);
+  const { handleError, showSuccess } = useErrorHandler();
+  const { confirm, isOpen, config, loading: confirmLoading, handleConfirm, handleCancel } = useConfirmation();
 
-  const fetchProperties = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
+  // Fetch properties operation
+  const {
+    loading,
+    error,
+    execute: fetchProperties,
+  } = useAsyncOperation(
+    async () => {
       const response = await propertyModerationService.getProperties({
         page: currentPage,
         limit: 20,
@@ -91,16 +93,83 @@ export function PropertyModerationPage() {
       if (response.success && response.data) {
         setProperties(response.data.data);
         setTotalPages(response.data.totalPages);
+        return response.data;
       } else {
         throw new Error(response.error?.message || 'Failed to fetch properties');
       }
-    } catch (err: any) {
-      console.error('Error fetching properties:', err);
-      setError(err.message || 'Failed to load properties');
-    } finally {
-      setLoading(false);
+    },
+    {
+      showErrorToast: true,
+      errorMessage: 'Failed to load properties',
     }
-  };
+  );
+
+  // Update property status operation
+  const {
+    loading: updateLoading,
+    execute: executeUpdateStatus,
+  } = useAsyncOperation(
+    async ({ propertyId, updates }: { propertyId: number; updates: any }) => {
+      const response = await propertyModerationService.updatePropertyStatus(propertyId, updates);
+      if (response.success) {
+        await fetchProperties();
+        return response;
+      } else {
+        throw new Error(response.error?.message || 'Failed to update property');
+      }
+    },
+    {
+      showSuccessToast: true,
+      successMessage: 'Property status updated successfully',
+      showErrorToast: true,
+    }
+  );
+
+  // Delete property operation
+  const {
+    loading: deleteLoading,
+    execute: executeDelete,
+  } = useAsyncOperation(
+    async (propertyId: number) => {
+      const response = await propertyModerationService.deleteProperty(propertyId);
+      if (response.success) {
+        await fetchProperties();
+        return response;
+      } else {
+        throw new Error(response.error?.message || 'Failed to delete property');
+      }
+    },
+    {
+      showSuccessToast: true,
+      successMessage: 'Property deleted successfully',
+      showErrorToast: true,
+    }
+  );
+
+  // Fetch property details operation
+  const {
+    loading: loadingDetails,
+    execute: fetchPropertyDetails,
+  } = useAsyncOperation(
+    async (propertyId: number) => {
+      const response = await propertyModerationService.getPropertyDetails(propertyId);
+      if (response.success && response.data) {
+        setSelectedProperty(response.data);
+        setIsModalOpen(true);
+        return response.data;
+      } else {
+        throw new Error(response.error?.message || 'Failed to load property details');
+      }
+    },
+    {
+      showErrorToast: true,
+      errorMessage: 'Failed to load property details',
+    }
+  );
+
+  useEffect(() => {
+    fetchProperties();
+  }, [currentPage, filters, fetchProperties]);
 
   const handleSearch = () => {
     setFilters({ ...filters, search: searchTerm });
@@ -114,46 +183,36 @@ export function PropertyModerationPage() {
 
   const updatePropertyStatus = async (propertyId: number, updates: any) => {
     try {
-      const response = await propertyModerationService.updatePropertyStatus(propertyId, updates);
-      if (response.success) {
-        fetchProperties(); // Refresh the list
-      } else {
-        alert(response.error?.message || 'Failed to update property');
-      }
-    } catch (err: any) {
-      alert('Failed to update property');
+      await executeUpdateStatus({ propertyId, updates });
+    } catch (error) {
+      // Error is already handled by useAsyncOperation
     }
   };
 
-  const deleteProperty = async (propertyId: number) => {
-    if (!confirm('Are you sure you want to delete this property?')) return;
-
+  const deleteProperty = async (propertyId: number, propertyTitle: string) => {
     try {
-      const response = await propertyModerationService.deleteProperty(propertyId);
-      if (response.success) {
-        fetchProperties(); // Refresh the list
-      } else {
-        alert(response.error?.message || 'Failed to delete property');
+      const confirmed = await confirm({
+        title: 'Delete Property',
+        description: `Are you sure you want to delete "${propertyTitle}"? This action cannot be undone.`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        variant: 'destructive',
+        icon: 'solar:trash-bin-trash-bold',
+      });
+
+      if (confirmed) {
+        await executeDelete(propertyId);
       }
-    } catch (err: any) {
-      alert('Failed to delete property');
+    } catch (error) {
+      // Error is already handled by useAsyncOperation
     }
   };
 
-  const fetchPropertyDetails = async (propertyId: number) => {
+  const handleFetchPropertyDetails = async (propertyId: number) => {
     try {
-      setLoadingDetails(true);
-      const response = await propertyModerationService.getPropertyDetails(propertyId);
-      if (response.success && response.data) {
-        setSelectedProperty(response.data);
-        setIsModalOpen(true);
-      } else {
-        alert(response.error?.message || 'Failed to load property details');
-      }
-    } catch (err: any) {
-      alert('Failed to load property details');
-    } finally {
-      setLoadingDetails(false);
+      await fetchPropertyDetails(propertyId);
+    } catch (error) {
+      // Error is already handled by useAsyncOperation
     }
   };
 
@@ -339,25 +398,47 @@ export function PropertyModerationPage() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => fetchPropertyDetails(property.id)}
-                        disabled={loadingDetails}
+                        onClick={() => handleFetchPropertyDetails(property.id)}
+                        disabled={loadingDetails || updateLoading || deleteLoading}
                       >
-                        <Icon icon="solar:document-text-bold" className="mr-2 size-4" />
-                        Details
+                        {loadingDetails ? (
+                          <>
+                            <Icon icon="solar:loading-bold" className="mr-2 size-4 animate-spin" />
+                            Loading...
+                          </>
+                        ) : (
+                          <>
+                            <Icon icon="solar:document-text-bold" className="mr-2 size-4" />
+                            Details
+                          </>
+                        )}
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={() => updatePropertyStatus(property.id, { isActive: !property.is_active })}
+                        disabled={updateLoading || deleteLoading || loadingDetails}
                       >
-                        {property.is_active ? 'Deactivate' : 'Activate'}
+                        {updateLoading ? (
+                          <>
+                            <Icon icon="solar:loading-bold" className="mr-1 size-4 animate-spin" />
+                            Updating...
+                          </>
+                        ) : (
+                          property.is_active ? 'Deactivate' : 'Activate'
+                        )}
                       </Button>
                       <Button
                         size="sm"
                         variant="destructive"
-                        onClick={() => deleteProperty(property.id)}
+                        onClick={() => deleteProperty(property.id, property.title)}
+                        disabled={updateLoading || deleteLoading || loadingDetails}
                       >
-                        Delete
+                        {deleteLoading ? (
+                          <Icon icon="solar:loading-bold" className="size-4 animate-spin" />
+                        ) : (
+                          'Delete'
+                        )}
                       </Button>
                     </div>
                   </td>
@@ -397,17 +478,14 @@ export function PropertyModerationPage() {
         )}
       </Card>
 
-      {error && (
-        <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-md">
-          <div className="flex">
-            <Icon icon="solar:danger-triangle-bold" className="size-5 text-red-400" />
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Error</h3>
-              <div className="mt-2 text-sm text-red-700">{error}</div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={isOpen}
+        onClose={handleCancel}
+        onConfirm={handleConfirm}
+        loading={confirmLoading}
+        {...config}
+      />
 
       {/* Property Details Modal */}
       <Dialog open={isModalOpen} onOpenChange={closeModal}>

@@ -1,9 +1,9 @@
 import { api } from '@/shared/lib/api';
 import type { Property as ApiProperty, PropertyFilters as ApiPropertyFilters } from '@/shared/lib/api';
-import type { 
-  Property, 
-  PropertyFilters, 
-  PaginatedResponse, 
+import type {
+  Property,
+  PropertyFilters,
+  PaginatedResponse,
   CreatePropertyRequest,
   UpdatePropertyRequest,
   PaginationOptions,
@@ -36,12 +36,12 @@ class PropertyService {
    * Get all properties with optional filters and pagination
    */
   async getProperties(
-    filters?: PropertyFilters, 
+    filters?: PropertyFilters,
     pagination?: PaginationOptions
   ): Promise<PaginatedResponse<Property>> {
     try {
       const params = new URLSearchParams();
-      
+
       // Add pagination parameters
       if (pagination?.page) {
         params.append('page', pagination.page.toString());
@@ -72,7 +72,7 @@ class PropertyService {
 
       const apiFilters = this.transformFiltersToApi(filters);
       const response = await api.getProperties(apiFilters);
-      
+
       return {
         data: response.data.map(this.transformApiPropertyToProperty),
         total: response.total,
@@ -248,7 +248,7 @@ class PropertyService {
       // For now, we'll implement a basic similar properties logic
       // This can be enhanced with ML-based recommendations later
       const property = await this.getPropertyById(propertyId);
-      
+
       const filters: PropertyFilters = {
         propertyType: property.property_type,
         listingType: property.listing_type,
@@ -258,7 +258,7 @@ class PropertyService {
       };
 
       const response = await this.getProperties(filters, { limit: 6 });
-      
+
       // Filter out the current property and return up to 5 similar ones
       return response.data
         .filter(p => p.id !== propertyId)
@@ -302,11 +302,11 @@ class PropertyService {
     // Required fields - ensure they are always present with meaningful defaults
     transformed.title = data.title || 'Untitled Property';
     transformed.description = data.description || '';
-    transformed.property_type = data.propertyType || 'apartment';
-    transformed.listing_type = data.listingType || 'sale';
+    transformed.property_type = data.property_type || data.propertyType || 'apartment';
+    transformed.listing_type = data.listing_type || data.listingType || 'sale';
     transformed.status = data.status || 'ACTIVE';
     transformed.price = Number(data.price) || 0;
-    transformed.area_sqft = Number(data.areaSqft || data.area) || 0;
+    transformed.area_sqft = Number(data.area_sqft || data.areaSqft || data.area) || 0;
     transformed.address = data.address || 'Address not provided';
     transformed.city = data.city || 'City not provided';
     transformed.state = data.state || 'State not provided';
@@ -318,8 +318,8 @@ class PropertyService {
     if (data.bathrooms !== undefined && data.bathrooms !== '') {
       transformed.bathrooms = Number(data.bathrooms);
     }
-    if (data.postalCode) {
-      transformed.postal_code = data.postalCode;
+    if (data.postal_code || data.postalCode) {
+      transformed.postal_code = data.postal_code || data.postalCode;
     }
     if (data.latitude !== undefined && data.latitude !== '') {
       transformed.latitude = Number(data.latitude);
@@ -440,8 +440,8 @@ class PropertyService {
 
     if (filters.location) apiFilters.location = filters.location;
     if (filters.propertyType) {
-      apiFilters.property_type = Array.isArray(filters.propertyType) 
-        ? filters.propertyType[0] 
+      apiFilters.property_type = Array.isArray(filters.propertyType)
+        ? filters.propertyType[0]
         : filters.propertyType;
     }
     if (filters.listingType) apiFilters.listing_type = filters.listingType;

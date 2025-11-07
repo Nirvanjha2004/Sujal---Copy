@@ -399,11 +399,11 @@ export function AdminDashboardContent({ stats, isLoading = false }: AdminDashboa
             icon="solar:users-group-rounded-bold"
             color="primary"
             subtitle="Registered users"
-            trend={{
-              value: 12,
-              direction: 'up',
-              period: 'this month'
-            }}
+            // trend={{
+            //   value: 12,
+            //   direction: 'up',
+            //   period: 'this month'
+            // }}
             onClick={() => navigate('/admin/users')}
           />
         </GridItem>

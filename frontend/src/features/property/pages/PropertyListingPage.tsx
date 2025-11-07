@@ -71,23 +71,18 @@ export function PropertyListingPage() {
     };
 
     const handleContactOwnerClick = async () => {
-        console.log("Contact Owner button clicked");
-
         if (!authState.isAuthenticated || !authState.user?.email) {
-            console.log("User not authenticated, redirecting to login");
             toast.info("Please log in to contact the owner.");
             navigate('/login');
             return;
         }
 
         if (!property || !property.id) {
-            console.log("Property not available:", property);
             toast.error("Property details not available. Please refresh the page.");
             return;
         }
 
         try {
-            console.log("Creating inquiry for property:", property.id);
             const defaultMessage = `I'm interested in your property: "${property.title}".`;
 
             const inquiryData = {
@@ -98,10 +93,7 @@ export function PropertyListingPage() {
                 inquirer_id: authState.user.id,
             };
 
-            console.log("Inquiry data:", inquiryData);
-
             const inquiryResponse = await api.createInquiry(inquiryData);
-            console.log("Inquiry response:", inquiryResponse);
 
             if (!inquiryResponse || !inquiryResponse.data) {
                 throw new Error("Invalid response from server");
@@ -113,14 +105,12 @@ export function PropertyListingPage() {
             }
 
             const conversationId = inquiry.conversation_id;
-            console.log("Conversation ID:", conversationId);
 
             if (!conversationId) {
                 throw new Error("Could not retrieve conversation ID.");
             }
 
             toast.success("Opening conversation...");
-            console.log("Navigating to:", `/dashboard/messages/${conversationId}`);
             navigate(`/dashboard/messages/${conversationId}`);
 
         } catch (err) {

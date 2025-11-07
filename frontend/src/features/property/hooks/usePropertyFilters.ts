@@ -1,5 +1,8 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { PropertyFilters, PropertySortOption, SearchCriteria } from '../types';
+import { useAsyncOperation } from '@/shared/hooks/useAsyncOperation';
+import { useErrorHandler } from '@/shared/hooks/useErrorHandler';
 
 export interface UsePropertyFiltersReturn {
   filters: PropertyFilters;
@@ -16,6 +19,10 @@ export interface UsePropertyFiltersReturn {
   getSearchCriteria: () => SearchCriteria;
   loadFiltersFromUrl: () => void;
   saveFiltersToUrl: () => void;
+  isLoading: boolean;
+  error: string | null;
+  applyFiltersAsync: () => Promise<void>;
+  clearFiltersAsync: () => Promise<void>;
 }
 
 export interface UsePropertyFiltersOptions {
@@ -27,6 +34,8 @@ export interface UsePropertyFiltersOptions {
   storageKey?: string;
   onFiltersChange?: (filters: PropertyFilters) => void;
   onSortChange?: (sortBy: PropertySortOption, sortOrder: 'asc' | 'desc') => void;
+  onError?: (error: Error) => void;
+  debounceMs?: number;
 }
 
 const getDefaultFilters = (): PropertyFilters => ({
@@ -48,14 +57,19 @@ const getDefaultFilters = (): PropertyFilters => ({
 export const usePropertyFilters = (options: UsePropertyFiltersOptions = {}): UsePropertyFiltersReturn => {
   const {
     initialFilters = {},
-    initialSortBy = 'created_at',
+    initialSortBy = 'relevance',
     initialSortOrder = 'desc',
-    persistToUrl = false,
+    persistToUrl = true,
     persistToStorage = false,
     storageKey = 'propertyFilters',
     onFiltersChange,
-    onSortChange
+    onSortChange,
+    onError,
+    debounceMs = 300
   } = options;
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { handleError } = useErrorHandler();
 
   const [filters, setFiltersState] = useState<PropertyFilters>(() => {
     const defaultFilters = getDefaultFilters();
@@ -78,6 +92,25 @@ export const usePropertyFilters = (options: UsePropertyFiltersOptions = {}): Use
 
   const [sortBy, setSortByState] = useState<PropertySortOption>(initialSortBy);
   const [sortOrder, setSortOrderState] = useState<'asc' | 'desc'>(initialSortOrder);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Async operations for filter application
+  const {
+    execute: executeApplyFilters,
+    loading: applyLoading
+  } = useAsyncOperation(async () => {
+    // Apply filters operation
+    await new Promise(resolve => setTimeout(resolve, 100));
+  });
+
+  const {
+    execute: executeClearFilters,
+    loading: clearLoading
+  } = useAsyncOperation(async () => {
+    // Clear filters operation
+    await new Promise(resolve => setTimeout(resolve, 100));
+  });
 
   // Calculate active filter count
   const activeFilterCount = useMemo(() => {
@@ -154,101 +187,112 @@ export const usePropertyFilters = (options: UsePropertyFiltersOptions = {}): Use
     if (!persistToUrl) return;
     
     try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const newFilters = { ...filters };
+      setIsLoading(true);
+      setError(null);
+      
+      const newFilters = { ...getDefaultFilters() };
       let hasChanges = false;
       
       // Parse URL parameters and update filters
-      if (urlParams.has('location')) {
-        newFilters.location = urlParams.get('location') || undefined;
+      if (searchParams.has('q')) {
+        newFilters.location = searchParams.get('q') || undefined;
         hasChanges = true;
       }
       
-      if (urlParams.has('propertyType')) {
-        const types = urlParams.get('propertyType')?.split(',');
+      if (searchParams.has('location')) {
+        newFilters.location = searchParams.get('location') || undefined;
+        hasChanges = true;
+      }
+      
+      if (searchParams.has('property_type')) {
+        const types = searchParams.get('property_type')?.split(',');
         newFilters.propertyType = types as any;
         hasChanges = true;
       }
       
-      if (urlParams.has('listingType')) {
-        newFilters.listingType = urlParams.get('listingType') as any;
+      if (searchParams.has('listing_type')) {
+        newFilters.listingType = searchParams.get('listing_type') as any;
         hasChanges = true;
       }
       
-      if (urlParams.has('minPrice')) {
-        const minPrice = Number(urlParams.get('minPrice'));
+      if (searchParams.has('min_price')) {
+        const minPrice = Number(searchParams.get('min_price'));
         if (!isNaN(minPrice)) {
           newFilters.minPrice = minPrice;
           hasChanges = true;
         }
       }
       
-      if (urlParams.has('maxPrice')) {
-        const maxPrice = Number(urlParams.get('maxPrice'));
+      if (searchParams.has('max_price')) {
+        const maxPrice = Number(searchParams.get('max_price'));
         if (!isNaN(maxPrice)) {
           newFilters.maxPrice = maxPrice;
           hasChanges = true;
         }
       }
       
-      if (urlParams.has('bedrooms')) {
-        const bedrooms = Number(urlParams.get('bedrooms'));
+      if (searchParams.has('bedrooms')) {
+        const bedrooms = Number(searchParams.get('bedrooms'));
         if (!isNaN(bedrooms)) {
           newFilters.bedrooms = bedrooms;
           hasChanges = true;
         }
       }
       
-      if (urlParams.has('bathrooms')) {
-        const bathrooms = Number(urlParams.get('bathrooms'));
+      if (searchParams.has('bathrooms')) {
+        const bathrooms = Number(searchParams.get('bathrooms'));
         if (!isNaN(bathrooms)) {
           newFilters.bathrooms = bathrooms;
           hasChanges = true;
         }
       }
       
-      if (urlParams.has('minArea')) {
-        const minArea = Number(urlParams.get('minArea'));
+      if (searchParams.has('min_area')) {
+        const minArea = Number(searchParams.get('min_area'));
         if (!isNaN(minArea)) {
           newFilters.minArea = minArea;
           hasChanges = true;
         }
       }
       
-      if (urlParams.has('maxArea')) {
-        const maxArea = Number(urlParams.get('maxArea'));
+      if (searchParams.has('max_area')) {
+        const maxArea = Number(searchParams.get('max_area'));
         if (!isNaN(maxArea)) {
           newFilters.maxArea = maxArea;
           hasChanges = true;
         }
       }
       
-      if (urlParams.has('amenities')) {
-        const amenities = urlParams.get('amenities')?.split(',');
-        newFilters.amenities = amenities;
-        hasChanges = true;
+      if (searchParams.has('amenities')) {
+        const amenities = searchParams.get('amenities')?.split(',').filter(Boolean);
+        if (amenities && amenities.length > 0) {
+          newFilters.amenities = amenities;
+          hasChanges = true;
+        }
       }
       
-      if (urlParams.has('features')) {
-        const features = urlParams.get('features')?.split(',');
-        newFilters.features = features;
-        hasChanges = true;
+      if (searchParams.has('features')) {
+        const features = searchParams.get('features')?.split(',').filter(Boolean);
+        if (features && features.length > 0) {
+          newFilters.features = features;
+          hasChanges = true;
+        }
       }
       
-      if (urlParams.has('isFeatured')) {
-        newFilters.isFeatured = urlParams.get('isFeatured') === 'true';
+      if (searchParams.has('is_featured')) {
+        newFilters.isFeatured = searchParams.get('is_featured') === 'true';
         hasChanges = true;
       }
       
       // Parse sorting parameters
-      if (urlParams.has('sortBy')) {
-        const sortByParam = urlParams.get('sortBy') as PropertySortOption;
+      if (searchParams.has('sort_by')) {
+        const sortByParam = searchParams.get('sort_by') as PropertySortOption;
         setSortByState(sortByParam);
         hasChanges = true;
       }
       
-      if (urlParams.has('sortOrder')) {
-        const sortOrderParam = urlParams.get('sortOrder') as 'asc' | 'desc';
+      if (searchParams.has('sort_order')) {
+        const sortOrderParam = searchParams.get('sort_order') as 'asc' | 'desc';
         setSortOrderState(sortOrderParam);
         hasChanges = true;
       }
@@ -257,43 +301,69 @@ export const usePropertyFilters = (options: UsePropertyFiltersOptions = {}): Use
         setFiltersState(newFilters);
       }
     } catch (err) {
+      const error = err instanceof Error ? err : new Error('Failed to load filters from URL');
+      setError(error.message);
       console.warn('Failed to load filters from URL:', err);
+    } finally {
+      setIsLoading(false);
     }
-  }, [persistToUrl, filters]);
+  }, [persistToUrl, searchParams]);
 
   const saveFiltersToUrl = useCallback(() => {
     if (!persistToUrl) return;
     
     try {
-      const urlParams = new URLSearchParams();
+      const newParams = new URLSearchParams(searchParams);
       
-      // Add filter parameters to URL
+      // Clear existing filter parameters
+      const filterKeys = [
+        'q', 'location', 'property_type', 'listing_type', 
+        'min_price', 'max_price', 'bedrooms', 'bathrooms',
+        'min_area', 'max_area', 'amenities', 'features', 
+        'is_featured', 'sort_by', 'sort_order'
+      ];
+      
+      filterKeys.forEach(key => newParams.delete(key));
+      
+      // Add current filter parameters to URL
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {
+          // Map frontend filter keys to backend URL parameter names
+          let urlKey = key;
+          if (key === 'propertyType') urlKey = 'property_type';
+          if (key === 'listingType') urlKey = 'listing_type';
+          if (key === 'minPrice') urlKey = 'min_price';
+          if (key === 'maxPrice') urlKey = 'max_price';
+          if (key === 'minArea') urlKey = 'min_area';
+          if (key === 'maxArea') urlKey = 'max_area';
+          if (key === 'isFeatured') urlKey = 'is_featured';
+          if (key === 'location') urlKey = 'q'; // Use 'q' for location search
+          
           if (Array.isArray(value) && value.length > 0) {
-            urlParams.set(key, value.join(','));
+            newParams.set(urlKey, value.join(','));
           } else if (!Array.isArray(value)) {
-            urlParams.set(key, String(value));
+            newParams.set(urlKey, String(value));
           }
         }
       });
       
       // Add sorting parameters
-      if (sortBy !== 'created_at') {
-        urlParams.set('sortBy', sortBy);
+      if (sortBy !== 'relevance') {
+        newParams.set('sort_by', sortBy);
       }
       
       if (sortOrder !== 'desc') {
-        urlParams.set('sortOrder', sortOrder);
+        newParams.set('sort_order', sortOrder);
       }
       
       // Update URL without page reload
-      const newUrl = `${window.location.pathname}${urlParams.toString() ? '?' + urlParams.toString() : ''}`;
-      window.history.replaceState({}, '', newUrl);
+      setSearchParams(newParams, { replace: true });
     } catch (err) {
+      const error = err instanceof Error ? err : new Error('Failed to save filters to URL');
+      setError(error.message);
       console.warn('Failed to save filters to URL:', err);
     }
-  }, [persistToUrl, filters, sortBy, sortOrder]);
+  }, [persistToUrl, filters, sortBy, sortOrder, searchParams, setSearchParams]);
 
   // Load filters from URL on mount if persistence is enabled
   useEffect(() => {
@@ -302,12 +372,42 @@ export const usePropertyFilters = (options: UsePropertyFiltersOptions = {}): Use
     }
   }, [persistToUrl, loadFiltersFromUrl]);
 
-  // Save filters to URL when they change
+  // Debounced URL saving
   useEffect(() => {
     if (persistToUrl) {
-      saveFiltersToUrl();
+      const timeoutId = setTimeout(() => {
+        saveFiltersToUrl();
+      }, debounceMs);
+      
+      return () => clearTimeout(timeoutId);
     }
-  }, [persistToUrl, filters, sortBy, sortOrder, saveFiltersToUrl]);
+  }, [persistToUrl, filters, sortBy, sortOrder, saveFiltersToUrl, debounceMs]);
+
+  // Async filter operations
+  const applyFiltersAsync = useCallback(async () => {
+    try {
+      await executeApplyFilters();
+      onFiltersChange?.(filters);
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error('Failed to apply filters');
+      setError(error.message);
+      handleError('Failed to apply filters');
+      onError?.(error);
+    }
+  }, [executeApplyFilters, filters, onFiltersChange, handleError, onError]);
+
+  const clearFiltersAsync = useCallback(async () => {
+    try {
+      await executeClearFilters();
+      const defaultFilters = getDefaultFilters();
+      setFilters(defaultFilters);
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error('Failed to clear filters');
+      setError(error.message);
+      handleError('Failed to clear filters');
+      onError?.(error);
+    }
+  }, [executeClearFilters, setFilters, handleError, onError]);
 
   return {
     filters,
@@ -323,7 +423,11 @@ export const usePropertyFilters = (options: UsePropertyFiltersOptions = {}): Use
     hasActiveFilters,
     getSearchCriteria,
     loadFiltersFromUrl,
-    saveFiltersToUrl
+    saveFiltersToUrl,
+    isLoading: isLoading || applyLoading || clearLoading,
+    error,
+    applyFiltersAsync,
+    clearFiltersAsync
   };
 };
 

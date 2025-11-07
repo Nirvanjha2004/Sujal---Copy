@@ -21,6 +21,45 @@ export interface PropertyFiltersProps {
     className?: string;
 }
 
+// Move FilterSection outside to prevent recreation on every render
+const FilterSection = ({
+    title,
+    icon,
+    sectionKey,
+    children,
+    expandedSections,
+    toggleSection
+}: {
+    title: string;
+    icon: string;
+    sectionKey: string;
+    children: React.ReactNode;
+    expandedSections: Record<string, boolean>;
+    toggleSection: (section: string) => void;
+}) => (
+    <div className="space-y-4">
+        <Button
+            variant="ghost"
+            className="w-full justify-between p-0 h-auto"
+            onClick={() => toggleSection(sectionKey)}
+        >
+            <div className="flex items-center gap-2">
+                <Icon icon={icon} className="size-4" />
+                <span className="font-medium">{title}</span>
+            </div>
+            <Icon
+                icon={expandedSections[sectionKey] ? "solar:alt-arrow-up-bold" : "solar:alt-arrow-down-bold"}
+                className="size-4"
+            />
+        </Button>
+        {expandedSections[sectionKey] && (
+            <div className="mt-4">
+                {children}
+            </div>
+        )}
+    </div>
+);
+
 export function PropertyFilters({
     filters,
     onFiltersChange,
@@ -67,40 +106,6 @@ export function PropertyFilters({
         onFiltersChange(emptyFilters);
         if (onClearFilters) onClearFilters();
     };
-
-    const FilterSection = ({
-        title,
-        icon,
-        sectionKey,
-        children
-    }: {
-        title: string;
-        icon: string;
-        sectionKey: string;
-        children: React.ReactNode;
-    }) => (
-        <div className="space-y-4">
-            <Button
-                variant="ghost"
-                className="w-full justify-between p-0 h-auto"
-                onClick={() => toggleSection(sectionKey)}
-            >
-                <div className="flex items-center gap-2">
-                    <Icon icon={icon} className="size-4" />
-                    <span className="font-medium">{title}</span>
-                </div>
-                <Icon
-                    icon={expandedSections[sectionKey] ? "solar:alt-arrow-up-bold" : "solar:alt-arrow-down-bold"}
-                    className="size-4"
-                />
-            </Button>
-            {expandedSections[sectionKey] && (
-                <div className="mt-4">
-                    {children}
-                </div>
-            )}
-        </div>
-    );
 
     if (variant === 'horizontal') {
         return (
@@ -231,32 +236,33 @@ export function PropertyFilters({
             </CardHeader>
             <CardContent className="space-y-6">
                 {/* Basic Filters */}
-                <FilterSection title="Basic" icon="solar:home-bold" sectionKey="basic">
+                <FilterSection 
+                    title="Basic" 
+                    icon="solar:home-bold" 
+                    sectionKey="basic"
+                    expandedSections={expandedSections}
+                    toggleSection={toggleSection}
+                >
                     <div className="space-y-4">
                         {/* Property Type */}
                         <div>
                             <Label className="text-sm font-medium mb-2 block">Property Type</Label>
-                            <div className="space-y-2">
-                                {PROPERTY_TYPES.map(type => (
-                                    <div key={type.value} className="flex items-center space-x-2">
-                                        <Checkbox
-                                            id={`property-type-${type.value}`}
-                                            checked={Array.isArray(filters.propertyType) ? filters.propertyType.includes(type.value as PropertyType) : false}
-                                            onCheckedChange={(checked) => {
-                                                const currentTypes = Array.isArray(filters.propertyType) ? filters.propertyType : [];
-                                                if (checked) {
-                                                    updateFilter('propertyType', [...currentTypes, type.value as PropertyType]);
-                                                } else {
-                                                    updateFilter('propertyType', currentTypes.filter((t: PropertyType) => t !== type.value));
-                                                }
-                                            }}
-                                        />
-                                        <Label htmlFor={`property-type-${type.value}`} className="text-sm">
+                            <Select
+                                value={Array.isArray(filters.propertyType) ? filters.propertyType[0] || undefined : filters.propertyType || undefined}
+                                onValueChange={(value) => updateFilter('propertyType', value === 'all' ? [] : [value as PropertyType])}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select property type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Any Type</SelectItem>
+                                    {PROPERTY_TYPES.map(type => (
+                                        <SelectItem key={type.value} value={type.value}>
                                             {type.label}
-                                        </Label>
-                                    </div>
-                                ))}
-                            </div>
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
 
                         {/* Listing Type */}
@@ -283,7 +289,13 @@ export function PropertyFilters({
                 </FilterSection>
 
                 {/* Price Range */}
-                <FilterSection title="Price Range" icon="solar:dollar-minimalistic-bold" sectionKey="price">
+                <FilterSection 
+                    title="Price Range" 
+                    icon="solar:dollar-minimalistic-bold" 
+                    sectionKey="price"
+                    expandedSections={expandedSections}
+                    toggleSection={toggleSection}
+                >
                     <div className="space-y-4">
                         <div className="grid grid-cols-2 gap-2">
                             <div>
@@ -309,7 +321,13 @@ export function PropertyFilters({
                 </FilterSection>
 
                 {/* Size & Layout */}
-                <FilterSection title="Size & Layout" icon="solar:ruler-bold" sectionKey="size">
+                <FilterSection 
+                    title="Size & Layout" 
+                    icon="solar:ruler-bold" 
+                    sectionKey="size"
+                    expandedSections={expandedSections}
+                    toggleSection={toggleSection}
+                >
                     <div className="space-y-4">
                         {/* Area Range */}
                         <div className="grid grid-cols-2 gap-2">
@@ -370,7 +388,13 @@ export function PropertyFilters({
                 </FilterSection>
 
                 {/* Amenities */}
-                <FilterSection title="Amenities" icon="solar:star-bold" sectionKey="amenities">
+                <FilterSection 
+                    title="Amenities" 
+                    icon="solar:star-bold" 
+                    sectionKey="amenities"
+                    expandedSections={expandedSections}
+                    toggleSection={toggleSection}
+                >
                     <div className="space-y-2 max-h-48 overflow-y-auto">
                         {Object.entries(AMENITIES_CONFIG).slice(0, 10).map(([amenityKey, amenityConfig]) => (
                             <div key={amenityKey} className="flex items-center space-x-2">
@@ -395,7 +419,13 @@ export function PropertyFilters({
                 </FilterSection>
 
                 {/* Location */}
-                <FilterSection title="Location" icon="solar:map-point-bold" sectionKey="location">
+                <FilterSection 
+                    title="Location" 
+                    icon="solar:map-point-bold" 
+                    sectionKey="location"
+                    expandedSections={expandedSections}
+                    toggleSection={toggleSection}
+                >
                     <div className="space-y-4">
                         <div>
                             <Label className="text-sm font-medium mb-2 block">City/Area</Label>

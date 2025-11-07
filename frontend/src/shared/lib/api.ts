@@ -3,7 +3,7 @@ import { getValidToken } from '@/features/auth/utils';
 import type { Property, PropertyImage, Project, ProjectImage } from '@/shared/types';
 
 // Update the API_BASE_URL to match your backend port
-const API_BASE_URL = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3001/api/v1';
+const API_BASE_URL = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3000/api/v1';
 
 export interface ProjectFilters {
   status?: string;

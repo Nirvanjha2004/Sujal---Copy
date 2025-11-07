@@ -11,7 +11,7 @@ import {
 import { tokenService } from './tokenService';
 
 // API configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
 
 /**
  * Custom error class for API errors

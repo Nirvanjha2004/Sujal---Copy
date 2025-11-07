@@ -168,7 +168,9 @@ export const usePropertyForm = (options: UsePropertyFormOptions): UsePropertyFor
   }, []);
 
   const validateForm = useCallback((): boolean => {
+    console.log('Validating form data:', formData);
     const validationResult = validatePropertyForm(formData);
+    console.log('Validation result:', validationResult);
     setErrors(validationResult.errors);
     return validationResult.isValid;
   }, [formData]);

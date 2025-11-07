@@ -47,12 +47,19 @@ export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    
+    // Force validation and show errors
+    const isFormValid = validateForm();
+    if (!isFormValid) {
+      console.log('Form validation failed. Errors:', errors);
+      return;
+    }
 
     try {
       await submitForm();
     } catch (error) {
       console.error('Submit error:', error);
+      // The error will be handled by the usePropertyForm hook
     }
   };
 
@@ -186,7 +193,7 @@ export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({
                   value={formData.status}
                   onValueChange={(value) => updateField('status', value)}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className={errors.status ? 'border-red-500' : ''}>
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -199,6 +206,9 @@ export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({
                     <SelectItem value="under_construction">Under Construction</SelectItem>
                   </SelectContent>
                 </Select>
+                {errors.status && (
+                  <p className="text-red-500 text-sm mt-1">{errors.status}</p>
+                )}
               </div>
             </div>
 
@@ -427,7 +437,16 @@ export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({
         {Object.keys(errors).length > 0 && (
           <Alert variant="destructive">
             <AlertDescription>
-              Please fix the errors above before submitting the form.
+              <div className="space-y-1">
+                <p className="font-medium">Please fix the following errors:</p>
+                <ul className="list-disc list-inside space-y-1">
+                  {Object.entries(errors).map(([field, error]) => (
+                    <li key={field} className="text-sm">
+                      <span className="font-medium capitalize">{field.replace('_', ' ')}:</span> {error}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </AlertDescription>
           </Alert>
         )}

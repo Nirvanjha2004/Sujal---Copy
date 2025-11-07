@@ -93,7 +93,7 @@ export const validatePropertyStatus = (status: string): FieldValidationResult =>
     return { isValid: false, error: 'Property status is required' };
   }
   
-  const validStatuses = ['new', 'resale', 'under_construction'];
+  const validStatuses = ['active', 'pending', 'sold', 'rented', 'new', 'resale', 'under_construction'];
   if (!validStatuses.includes(status.toLowerCase())) {
     return { isValid: false, error: 'Please select a valid property status' };
   }

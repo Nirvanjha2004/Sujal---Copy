@@ -21,4 +21,4 @@ CREATE TABLE IF NOT EXISTS seo_settings (
     INDEX idx_entity_type_id (entity_type, entity_id),
     INDEX idx_page_type (page_type),
     INDEX idx_is_active (is_active)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

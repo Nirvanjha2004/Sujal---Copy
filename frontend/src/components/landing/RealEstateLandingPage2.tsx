@@ -165,7 +165,7 @@ export function RealEstateLandingPage() {
       <div className="min-h-screen bg-background">
         <Header variant="landing" />
         <section 
-          className="relative py-20 overflow-hidden bg-cover bg-center bg-no-repeat"
+          className="relative py-20 overflow-hidden bg-cover bg-center bg-no-repeat full-width-element"
           style={{
             backgroundImage: 'url(/landingpage/images/topbanner.png)',
             backgroundSize: 'cover',
@@ -583,7 +583,7 @@ export function RealEstateLandingPage() {
             </div>
           </div>
         </section>
-        <section className="py-16 bg-gradient-to-br from-primary to-accent">
+        <section className="py-16 bg-gradient-to-br from-primary to-accent full-width-element">
           <div className="container mx-auto px-4">
             <Card className="overflow-hidden border-0 shadow-2xl">
               <CardContent className="p-0">
@@ -607,7 +607,7 @@ export function RealEstateLandingPage() {
                       Talk to Our Expert
                     </Button>
                   </div>
-                  <div className="relative h-full min-h-[400px]">
+                  <div className="relative h-full min-h-[25rem]">
                     <img
                       alt="Happy Family"
                       src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/portrait/3.webp"
@@ -661,7 +661,7 @@ export function RealEstateLandingPage() {
                       <p>PROP PUZZLES</p>
                     </div>
                   </div>
-                  <div className="relative h-full min-h-[300px]">
+                  <div className="relative h-full min-h-[18.75rem]">
                     <img
                       alt="Raaga Project"
                       src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/landscape/6.webp"
@@ -673,7 +673,7 @@ export function RealEstateLandingPage() {
             </Card>
           </div>
         </section>
-        <section className="py-16 bg-gradient-to-br from-red-50 to-red-100">
+        <section className="py-16 bg-gradient-to-br from-red-50 to-red-100 full-width-element">
           <div className="container mx-auto px-4">
             <div className="mb-8 flex items-center justify-between">
               <div>
@@ -1220,7 +1220,7 @@ export function RealEstateLandingPage() {
           </div>
         </div>
       </section> */}
-      <section className="py-16 bg-gradient-to-br from-pink-50 to-pink-100">
+      <section className="py-16 bg-gradient-to-br from-pink-50 to-pink-100 full-width-element">
         <div className="container mx-auto px-4">
           <Card className="overflow-hidden border-0 shadow-2xl">
             <CardContent className="p-0">
@@ -1277,7 +1277,7 @@ export function RealEstateLandingPage() {
                     send a 'hi' to +91 7428887036
                   </p>
                 </div>
-                <div className="relative h-full min-h-[400px]">
+                <div className="relative h-full min-h-[25rem]">
                   <img
                     alt="Happy Couple"
                     src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/portrait/2.webp"
@@ -1290,7 +1290,7 @@ export function RealEstateLandingPage() {
         </div>
       </section>
       <section
-        className="py-16 bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300"
+        className="py-16 bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 full-width-element"
       >
         <div className="container mx-auto px-4">
           <div className="mb-8">
@@ -1512,7 +1512,7 @@ export function RealEstateLandingPage() {
           </div>
         </div>
       </section> */}
-      <footer className="bg-slate-900 text-white py-16">
+      <footer className="bg-slate-900 text-white py-16 full-width-element">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-6 gap-8">
             <div>

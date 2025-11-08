@@ -245,12 +245,6 @@ export function AgentDashboardContent({ stats, isLoading = false }: AgentDashboa
             icon: 'solar:home-add-bold',
             onClick: () => navigate('/add-property')
           },
-          {
-            label: 'View Analytics',
-            icon: 'solar:chart-2-bold',
-            onClick: () => navigate('/agent/analytics'),
-            variant: 'outline'
-          }
         ]}
         stats={[{
           label: 'Active Listings',

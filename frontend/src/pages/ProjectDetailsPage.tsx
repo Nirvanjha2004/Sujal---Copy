@@ -195,7 +195,7 @@ export function ProjectDetailsPage() {
           <div className="mb-8 overflow-hidden">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Main large image - takes full height on left */}
-              <div className="relative w-full h-[400px] overflow-hidden rounded-lg">
+              <div className="relative w-full h-[25rem] overflow-hidden rounded-lg">
                 <img
                   src={project.images[0]}
                   alt={project.name}
@@ -206,7 +206,7 @@ export function ProjectDetailsPage() {
               {/* Smaller images grid - 2x2 on right */}
               <div className="grid grid-cols-2 gap-4">
                 {project.images.slice(1, 5).map((image, index) => (
-                  <div key={index} className="relative w-full h-[192px] overflow-hidden rounded-lg">
+                  <div key={index} className="relative w-full h-[12rem] overflow-hidden rounded-lg">
                     <img
                       src={image}
                       alt={`${project.name} ${index + 2}`}
@@ -216,7 +216,7 @@ export function ProjectDetailsPage() {
                 ))}
                 {/* Fill empty slots if less than 4 additional images */}
                 {project.images.length < 5 && Array.from({ length: 5 - project.images.length }).map((_, index) => (
-                  <div key={`empty-${index}`} className="relative w-full h-[192px] bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
+                  <div key={`empty-${index}`} className="relative w-full h-[12rem] bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
                     <Icon icon="solar:gallery-bold" className="h-8 w-8 text-gray-400" />
                   </div>
                 ))}

@@ -78,10 +78,22 @@ export function OwnerDashboardContent({ stats, isLoading = false }: OwnerDashboa
           api.getInquiries().catch(() => ({ data: [] })) // Fallback to empty array if inquiries fail
         ]);
 
-        const properties = propertiesResponse.data || [];
-        const inquiries = inquiriesResponse.data || [];
 
-        // Create a map of property ID to inquiry count
+        const properties = propertiesResponse.data || [];
+
+        // Handle different possible response structures for inquiries
+        let inquiries: any[] = [];
+        const responseData = inquiriesResponse.data as any;
+        if (responseData) {
+          if (Array.isArray(responseData)) {
+            // If data is directly an array
+            inquiries = responseData;
+          } else if (responseData.inquiries && Array.isArray(responseData.inquiries)) {
+            // If data has an inquiries property that's an array
+            inquiries = responseData.inquiries;
+          }
+        }
+
         const inquiryCountMap = inquiries.reduce((acc: Record<number, number>, inquiry: any) => {
           const propertyId = inquiry.property_id;
           acc[propertyId] = (acc[propertyId] || 0) + 1;
@@ -97,6 +109,7 @@ export function OwnerDashboardContent({ stats, isLoading = false }: OwnerDashboa
             inquiries: inquiryCountMap[property.id] || 0
           }));
 
+        console.log("The sorted Properties are", sortedProperties)
         setRecentProperties(sortedProperties);
 
         // Calculate real performance metrics based on actual data
@@ -298,12 +311,7 @@ export function OwnerDashboardContent({ stats, isLoading = false }: OwnerDashboa
             icon: 'solar:home-add-bold',
             onClick: () => navigate('/add-property')
           },
-          {
-            label: 'View Analytics',
-            icon: 'solar:chart-2-bold',
-            onClick: () => navigate('/owner/analytics'),
-            variant: 'outline'
-          }
+
         ]}
         stats={[{
           label: 'Active Properties',
@@ -361,7 +369,7 @@ export function OwnerDashboardContent({ stats, isLoading = false }: OwnerDashboa
       </DashboardGrid>
 
       {/* Performance Metrics Section */}
-      <Card className="border-0 shadow-sm">
+      {/* <Card className="border-0 shadow-sm">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-3 text-lg font-semibold">
             <div className="p-2 rounded-lg bg-primary/10">
@@ -372,17 +380,17 @@ export function OwnerDashboardContent({ stats, isLoading = false }: OwnerDashboa
               This Month
             </Badge>
           </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <DashboardGrid columns={4} gap="md">
-            {performanceMetrics.map((metric) => (
-              <GridItem key={metric.id}>
-                <Card className="border-0 bg-gradient-to-br from-card to-card/50 hover:shadow-md transition-all duration-300 h-full">
-                  <CardContent className="p-6 h-full flex flex-col justify-between">
-                    <div className="space-y-4">
-                      {/* Header with label and target */}
-                      <div className="flex items-start justify-between min-h-[2.5rem]">
-                        <p className="text-sm font-medium text-muted-foreground leading-tight">
+        </CardHeader> */}
+      {/* <CardContent> */}
+      {/* <DashboardGrid columns={4} gap="md"> */}
+      {/* {performanceMetrics.map((metric) => ( */}
+      {/* <GridItem key={metric.id}> */}
+      {/* <Card className="border-0 bg-gradient-to-br from-card to-card/50 hover:shadow-md transition-all duration-300 h-full"> */}
+      {/* <CardContent className="p-6 h-full flex flex-col justify-between"> */}
+      {/* <div className="space-y-4"> */}
+      {/* Header with label and target */}
+      {/* <div className="flex items-start justify-between min-h-[2.5rem]"> */}
+      {/* <p className="text-sm font-medium text-muted-foreground leading-tight">
                           {metric.label}
                         </p>
                         {metric.target && (
@@ -392,26 +400,26 @@ export function OwnerDashboardContent({ stats, isLoading = false }: OwnerDashboa
                           >
                             Target: {metric.target}{metric.id === 'occupancy-rate' || metric.id === 'success-rate' ? '%' : ''}
                           </Badge>
-                        )}
-                      </div>
+                        )} */}
+      {/* </div> */}
 
-                      {/* Value and trend */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-baseline gap-2">
-                          <p className="text-3xl font-bold text-foreground">
-                            {metric.value}
-                            {metric.id === 'occupancy-rate' || metric.id === 'success-rate' ? '%' : ''}
-                          </p>
+      {/* Value and trend */}
+      {/* <div className="flex items-center justify-between"> */}
+      {/* <div className="flex items-baseline gap-2"> */}
+      {/* <p className="text-3xl font-bold text-foreground"> */}
+      {/* {metric.value} */}
+      {/* {metric.id === 'occupancy-rate' || metric.id === 'success-rate' ? '%' : ''} */}
+      {/* </p>
                         </div>
-                      </div>
-                    </div>
+                      </div> */}
+      {/* </div>
                   </CardContent>
-                </Card>
-              </GridItem>
+                </Card> */}
+      {/* </GridItem>
             ))}
           </DashboardGrid>
-        </CardContent>
-      </Card>
+        </CardContent> */}
+      {/* </Card> */}
 
       {/* Recent Properties Section */}
       <Card className="border-0 shadow-sm">

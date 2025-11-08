@@ -90,7 +90,7 @@ export function MyPropertiesPage() {
         return (
             <Layout>
                 <div className="container mx-auto px-4 py-8">
-                    <div className="flex items-center justify-center min-h-[400px]">
+                    <div className="flex items-center justify-center min-h-[25rem]">
                         <div className="text-center">
                             <Icon icon="solar:loading-bold" className="size-8 animate-spin mx-auto mb-4 text-primary" />
                             <p className="text-muted-foreground">Loading your properties...</p>

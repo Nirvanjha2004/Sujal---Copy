@@ -207,7 +207,7 @@ export function DashboardPage() {
     return (
       <Layout>
         <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-center min-h-[400px]">
+          <div className="flex items-center justify-center min-h-[25rem]">
             <Icon icon="solar:loading-bold" className="size-8 animate-spin text-muted-foreground" />
           </div>
         </div>

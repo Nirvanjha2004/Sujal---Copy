@@ -16,7 +16,7 @@ export function AddPropertyPage() {
     return (
         <div className="min-h-screen bg-background">
             {/* Header */}
-            <header className="bg-primary text-primary-foreground py-4 px-4">
+            <header className="bg-primary text-primary-foreground py-4 full-width-element">
                 <div className="max-w-4xl mx-auto flex items-center gap-4">
                     <Button
                         variant="ghost"
@@ -28,14 +28,14 @@ export function AddPropertyPage() {
                     </Button>
                     <h1 className="text-2xl font-bold">Add New Property</h1>
                 </div>
-            </header>
+        </header>
 
             <div className="max-w-4xl mx-auto p-6">
                 {!canCreateProperty && (
                     <Alert className="mb-6 border-red-200 bg-red-50">
                         <Icon icon="solar:danger-bold" className="size-5 text-red-500" />
                         <AlertDescription className="text-red-700">
-                            You need to be a Property Owner, Agent, or Builder to create property listings. 
+                            You need to be a Property Owner, Agent, or Builder to create property listings.
                             Please contact support to update your account type.
                         </AlertDescription>
                     </Alert>

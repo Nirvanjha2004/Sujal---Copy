@@ -356,11 +356,6 @@ export function AdminDashboardContent({ stats, isLoading = false }: AdminDashboa
         roleSpecificMessage="Oversee platform operations and ensure optimal performance for all users"
         quickActions={[
           {
-            label: 'View Analytics',
-            icon: 'solar:chart-2-bold',
-            onClick: () => navigate('/admin/analytics')
-          },
-          {
             label: 'User Management',
             icon: 'solar:users-group-rounded-bold',
             onClick: () => navigate('/admin/users'),

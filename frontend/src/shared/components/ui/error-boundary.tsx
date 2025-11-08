@@ -113,7 +113,7 @@ function DefaultErrorFallback({
   };
 
   return (
-    <div className="min-h-[400px] flex items-center justify-center p-4">
+    <div className="min-h-[25rem] flex items-center justify-center p-4">
       <Card className="w-full max-w-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-destructive">

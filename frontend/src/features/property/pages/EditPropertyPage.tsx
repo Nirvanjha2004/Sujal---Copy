@@ -30,7 +30,7 @@ export function EditPropertyPage() {
     if (loading) {
         return (
             <div className="min-h-screen bg-background">
-                <header className="bg-primary text-primary-foreground py-4 px-4">
+                <header className="bg-primary text-primary-foreground py-4 full-width-element">
                     <div className="max-w-4xl mx-auto flex items-center gap-4">
                         <Button
                             variant="ghost"
@@ -53,7 +53,7 @@ export function EditPropertyPage() {
     if (propertyError || !property) {
         return (
             <div className="min-h-screen bg-background">
-                <header className="bg-primary text-primary-foreground py-4 px-4">
+                <header className="bg-primary text-primary-foreground py-4 full-width-element">
                     <div className="max-w-4xl mx-auto flex items-center gap-4">
                         <Button
                             variant="ghost"
@@ -88,7 +88,7 @@ export function EditPropertyPage() {
     return (
         <div className="min-h-screen bg-background">
             {/* Header */}
-            <header className="bg-primary text-primary-foreground py-4 px-4">
+            <header className="bg-primary text-primary-foreground py-4 full-width-element">
                 <div className="max-w-4xl mx-auto flex items-center gap-4">
                     <Button
                         variant="ghost"

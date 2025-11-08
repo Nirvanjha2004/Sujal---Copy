@@ -5,8 +5,79 @@
 /* Import accessibility styles */
 @import './shared/styles/accessibility.css';
 
+/* Global body styles for centered content */
+@layer base {
+  body {
+    padding-left: 2rem;
+    padding-right: 2rem;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  
+  @media (min-width: 1024px) {
+    body {
+      padding-left: 4rem;
+      padding-right: 4rem;
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    body {
+      padding-left: 6rem;
+      padding-right: 6rem;
+    }
+  }
+  
+  @media (min-width: 1536px) {
+    body {
+      padding-left: 8rem;
+      padding-right: 8rem;
+    }
+  }
+}
+
+/* Full-width elements (navbar, header, footer) that should ignore body padding */
+@layer components {
+  .full-width-element {
+    margin-left: -2rem;
+    margin-right: -2rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+  
+  @media (min-width: 1024px) {
+    .full-width-element {
+      margin-left: -4rem;
+      margin-right: -4rem;
+      padding-left: 4rem;
+      padding-right: 4rem;
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    .full-width-element {
+      margin-left: -6rem;
+      margin-right: -6rem;
+      padding-left: 6rem;
+      padding-right: 6rem;
+    }
+  }
+  
+  @media (min-width: 1536px) {
+    .full-width-element {
+      margin-left: -8rem;
+      margin-right: -8rem;
+      padding-left: 8rem;
+      padding-right: 8rem;
+    }
+  }
+}
+
 /* Enhanced Design System Foundation - RED THEME */
 :root {
+  /* Global Scale - Makes website appear at 80% zoom by default */
+  font-size: 12.8px; /* 16px * 0.8 = 12.8px - scales everything proportionally */
+  
   /* Primary Colors - RED THEME */
   --primary: 355 78% 60%;                    /* Red #E63946 */
   --primary-foreground: 0 0% 100%;           /* White text on primary */
@@ -118,6 +189,26 @@
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1280px;
   --breakpoint-2xl: 1536px;
+}
+
+/* Responsive font-size adjustments for mobile */
+@media (max-width: 640px) {
+  :root {
+    font-size: 14px; /* Slightly larger on mobile for better readability */
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  :root {
+    font-size: 13px; /* Medium size for tablets */
+  }
+}
+
+/* Maintain 80% scale for desktop and larger screens */
+@media (min-width: 1025px) {
+  :root {
+    font-size: 12.8px; /* 80% of 16px */
+  }
 }
 
 /* Enhanced Utility Classes */
@@ -315,7 +406,7 @@
 
   @media (min-width: 640px) {
     .container {
-      max-width: 640px;
+      max-width: 600px;
       padding-left: var(--space-6);
       padding-right: var(--space-6);
     }
@@ -323,25 +414,25 @@
 
   @media (min-width: 768px) {
     .container {
-      max-width: 768px;
+      max-width: 720px;
     }
   }
 
   @media (min-width: 1024px) {
     .container {
-      max-width: 1024px;
+      max-width: 960px;
     }
   }
 
   @media (min-width: 1280px) {
     .container {
-      max-width: 1280px;
+      max-width: 1140px;
     }
   }
 
   @media (min-width: 1536px) {
     .container {
-      max-width: 1536px;
+      max-width: 1320px;
     }
   }
 

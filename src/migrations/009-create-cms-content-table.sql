@@ -23,4 +23,4 @@ CREATE TABLE IF NOT EXISTS cms_content (
     INDEX idx_date_range (start_date, end_date),
     
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -73,7 +73,7 @@ export class MigrationRunner {
 
   getMigrationFiles(): MigrationFile[] {
     const migrationsDir = path.join(__dirname, '../migrations');
-    
+
     if (!fs.existsSync(migrationsDir)) {
       throw new Error(`Migrations directory not found: ${migrationsDir}`);
     }
@@ -83,7 +83,7 @@ export class MigrationRunner {
       .map(filename => {
         const orderMatch = filename.match(/^(\d+)/);
         const order = orderMatch ? parseInt(orderMatch[1], 10) : 999;
-        
+
         return {
           filename,
           filepath: path.join(migrationsDir, filename),
@@ -103,20 +103,9 @@ export class MigrationRunner {
     console.log(`Executing migration: ${migrationFile.filename}`);
 
     const sql = fs.readFileSync(migrationFile.filepath, 'utf8');
-    
-    try {
-      // Split SQL by semicolons and execute each statement separately
-      const statements = sql
-        .split(';')
-        .map(stmt => stmt.trim())
-        .filter(stmt => stmt.length > 0 && !stmt.startsWith('--'));
 
-      for (const statement of statements) {
-        if (statement) {
-          await this.connection.execute(statement);
-        }
-      }
-      
+    try {
+      await this.connection.query(sql); // ✅ Executes full SQL file at once
       await this.markMigrationAsExecuted(migrationFile.filename);
       console.log(`✓ Migration completed: ${migrationFile.filename}`);
     } catch (error) {
@@ -124,6 +113,7 @@ export class MigrationRunner {
       throw error;
     }
   }
+
 
   async runMigrations(): Promise<void> {
     try {
@@ -163,7 +153,7 @@ export class MigrationRunner {
   async rollbackLastMigration(): Promise<void> {
     try {
       await this.connect();
-      
+
       const [rows] = await this.connection!.execute(
         'SELECT filename FROM migrations ORDER BY executed_at DESC LIMIT 1'
       ) as [any[], any];

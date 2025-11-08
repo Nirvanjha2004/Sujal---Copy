@@ -23,4 +23,4 @@ CREATE TABLE IF NOT EXISTS messages (
     FOREIGN KEY (recipient_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (property_id) REFERENCES properties(id) ON DELETE SET NULL,
     FOREIGN KEY (inquiry_id) REFERENCES inquiries(id) ON DELETE SET NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

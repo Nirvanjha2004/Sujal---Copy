@@ -1,5 +1,6 @@
 import { connectDatabase } from '../config/database';
-import { seedProperties } from '../utils/seedProperties';
+import { seedDatabase } from '../utils/seed';
+
 
 async function runSeed() {
   try {
@@ -8,7 +9,7 @@ async function runSeed() {
     console.log('Database connected successfully');
 
     console.log('\nSeeding properties...');
-    await seedProperties();
+    await seedDatabase();
 
     console.log('\n✅ Seeding completed successfully!');
     process.exit(0);

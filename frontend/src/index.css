@@ -5,45 +5,51 @@
 /* Import accessibility styles */
 @import './shared/styles/accessibility.css';
 
-/* Enhanced Design System Foundation */
+/* Enhanced Design System Foundation - RED THEME */
 :root {
-  /* Primary Colors */
-  --primary: 221.2 83.2% 53.3%;        /* Blue primary from landing */
-  --primary-foreground: 210 40% 98%;    /* White text on primary */
-  --primary-muted: 221.2 83.2% 53.3% / 0.1; /* Light primary background */
+  /* Primary Colors - RED THEME */
+  --primary: 355 78% 60%;                    /* Red #E63946 */
+  --primary-foreground: 0 0% 100%;           /* White text on primary */
+  --primary-muted: 355 78% 60% / 0.1;        /* Light red background */
+
+  /* Gradient Colors for Hero/Header sections */
+  --gradient-start: 355 78% 60%;             /* Red #E63946 */
+  --gradient-mid: 0 100% 71%;                /* Coral #FF6B6B */
+  --gradient-end: 15 100% 75%;               /* Light coral #FF8787 */
 
   /* Secondary Colors */
-  --secondary: 210 40% 96%;             /* Light gray backgrounds */
-  --secondary-foreground: 222.2 84% 4.9%; /* Dark text on secondary */
+  --secondary: 210 40% 96%;                  /* Light gray backgrounds */
+  --secondary-foreground: 222.2 84% 4.9%;    /* Dark text on secondary */
 
-  /* Accent Colors */
-  --accent: 210 40% 96%;                /* Subtle accent */
-  --accent-foreground: 222.2 84% 4.9%; /* Text on accent */
+  /* Accent Colors - RED TINTED */
+  --accent: 355 78% 97%;                     /* Very light red */
+  --accent-foreground: 355 78% 30%;          /* Dark red text */
 
   /* Neutral Colors */
-  --background: 0 0% 100%;              /* Pure white background */
-  --foreground: 222.2 84% 4.9%;        /* Primary text color */
-  --muted: 210 40% 96%;                 /* Muted backgrounds */
-  --muted-foreground: 215.4 16.3% 46.9%; /* Muted text */
+  --background: 0 0% 100%;                   /* Pure white background */
+  --foreground: 222.2 84% 4.9%;             /* Primary text color */
+  --muted: 210 40% 96%;                      /* Muted backgrounds */
+  --muted-foreground: 215.4 16.3% 46.9%;    /* Muted text */
 
   /* Border and Dividers */
-  --border: 214.3 31.8% 91.4%;         /* Subtle borders */
-  --input: 214.3 31.8% 91.4%;          /* Input borders */
-  --ring: 221.2 83.2% 53.3%;           /* Focus rings */
+  --border: 214.3 31.8% 91.4%;              /* Subtle borders */
+  --input: 214.3 31.8% 91.4%;               /* Input borders */
+  --ring: 355 78% 60%;                       /* Red focus rings */
 
   /* Card Colors */
-  --card: 0 0% 100%;                    /* Card background */
-  --card-foreground: 222.2 84% 4.9%;   /* Card text */
+  --card: 0 0% 100%;                         /* Card background */
+  --card-foreground: 222.2 84% 4.9%;        /* Card text */
 
   /* Popover Colors */
-  --popover: 0 0% 100%;                 /* Popover background */
-  --popover-foreground: 222.2 84% 4.9%; /* Popover text */
+  --popover: 0 0% 100%;                      /* Popover background */
+  --popover-foreground: 222.2 84% 4.9%;     /* Popover text */
 
   /* Status Colors */
-  --success: 142.1 76.2% 36.3%;        /* Green for success */
-  --warning: 47.9 95.8% 53.1%;         /* Yellow for warnings */
-  --destructive: 0 84.2% 60.2%;        /* Red for errors */
-  --info: 204 94% 94%;                  /* Light blue for info */
+  --success: 142.1 76.2% 36.3%;             /* Green for success */
+  --warning: 47.9 95.8% 53.1%;              /* Yellow for warnings */
+  --destructive: 0 84.2% 50%;               /* Deep red for errors (darker than primary) */
+  --destructive-foreground: 0 0% 100%;      /* White text on destructive */
+  --info: 204 94% 94%;                       /* Light blue for info */
 
   /* Typography */
   --font-heading: 'Inter', system-ui, sans-serif;
@@ -173,6 +179,61 @@
   .font-heading { font-family: var(--font-heading); }
   .font-body { font-family: var(--font-body); }
   .font-mono { font-family: var(--font-mono); }
+
+  /* RED THEME Gradient Utilities */
+  .hero-gradient {
+    background: linear-gradient(135deg, 
+      hsl(var(--gradient-start)) 0%, 
+      hsl(var(--gradient-mid)) 50%,
+      hsl(var(--gradient-end)) 100%
+    );
+  }
+
+  .header-gradient {
+    background: linear-gradient(90deg, 
+      hsl(var(--gradient-start)) 0%, 
+      hsl(var(--gradient-mid)) 100%
+    );
+  }
+
+  .accent-overlay {
+    background: linear-gradient(135deg, 
+      hsl(var(--gradient-start) / 0.9) 0%, 
+      hsl(var(--gradient-mid) / 0.9) 100%
+    );
+  }
+
+  .gradient-button {
+    background: linear-gradient(135deg, 
+      hsl(var(--gradient-start)) 0%, 
+      hsl(var(--gradient-mid)) 100%
+    );
+    color: white;
+    border: none;
+    transition: all 0.3s ease;
+  }
+
+  .gradient-button:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .gradient-button:active {
+    transform: translateY(0);
+    filter: brightness(1.05);
+  }
+
+  /* Gradient text effect */
+  .gradient-text {
+    background: linear-gradient(135deg, 
+      hsl(var(--gradient-start)) 0%, 
+      hsl(var(--gradient-mid)) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 
   /* Enhanced Card Component */
   .card {

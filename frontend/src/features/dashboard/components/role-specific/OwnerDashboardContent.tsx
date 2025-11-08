@@ -35,11 +35,6 @@ interface PerformanceMetric {
   label: string;
   value: number;
   target?: number;
-  trend?: {
-    value: number;
-    direction: 'up' | 'down' | 'stable';
-    period: string;
-  };
   color: 'success' | 'warning' | 'error' | 'info';
 }
 
@@ -154,7 +149,6 @@ export function OwnerDashboardContent({ stats, isLoading = false }: OwnerDashboa
         label: 'Occupancy Rate',
         value: Math.round(occupancyRate * 10) / 10,
         target: 90,
-        trend: { value: 3.2, direction: 'up', period: 'vs last month' },
         color: occupancyRate >= 80 ? 'success' : occupancyRate >= 60 ? 'warning' : 'error'
       },
       {
@@ -162,7 +156,6 @@ export function OwnerDashboardContent({ stats, isLoading = false }: OwnerDashboa
         label: 'Avg Views per Property',
         value: Math.round(avgViews),
         target: 100,
-        trend: { value: 0.5, direction: 'up', period: 'vs last month' },
         color: avgViews >= 80 ? 'success' : avgViews >= 50 ? 'info' : 'warning'
       },
       {
@@ -170,7 +163,6 @@ export function OwnerDashboardContent({ stats, isLoading = false }: OwnerDashboa
         label: 'Listing Success Rate',
         value: Math.round(successRate * 10) / 10,
         target: 75,
-        trend: { value: 2.1, direction: 'up', period: 'vs last quarter' },
         color: successRate >= 70 ? 'success' : successRate >= 50 ? 'info' : 'warning'
       },
       {
@@ -178,7 +170,6 @@ export function OwnerDashboardContent({ stats, isLoading = false }: OwnerDashboa
         label: 'Avg Days on Market',
         value: Math.round(avgDaysOnMarket),
         target: 30,
-        trend: { value: 0.8, direction: 'down', period: 'vs last month' },
         color: avgDaysOnMarket <= 30 ? 'success' : avgDaysOnMarket <= 60 ? 'info' : 'warning'
       }
     ];
@@ -331,11 +322,6 @@ export function OwnerDashboardContent({ stats, isLoading = false }: OwnerDashboa
             icon="solar:buildings-2-bold"
             color="primary"
             subtitle="Properties owned"
-            trend={{
-              value: 8.2,
-              direction: 'up',
-              period: 'vs last month'
-            }}
             onClick={() => navigate('/my-properties')}
           />
         </GridItem>
@@ -347,11 +333,6 @@ export function OwnerDashboardContent({ stats, isLoading = false }: OwnerDashboa
             icon="solar:eye-bold"
             color="info"
             subtitle="Currently listed"
-            trend={{
-              value: 3.1,
-              direction: 'up',
-              period: 'vs last week'
-            }}
             onClick={() => navigate('/my-properties?status=active')}
           />
         </GridItem>
@@ -363,11 +344,6 @@ export function OwnerDashboardContent({ stats, isLoading = false }: OwnerDashboa
             icon="solar:check-circle-bold"
             color="success"
             subtitle="Successfully sold"
-            trend={{
-              value: 12.5,
-              direction: 'up',
-              period: 'vs last month'
-            }}
             onClick={() => navigate('/my-properties?status=SOLD')}
           />
         </GridItem>
@@ -379,11 +355,6 @@ export function OwnerDashboardContent({ stats, isLoading = false }: OwnerDashboa
             icon="solar:key-bold"
             color="warning"
             subtitle="Currently rented"
-            trend={{
-              value: 5.7,
-              direction: 'up',
-              period: 'vs last month'
-            }}
             onClick={() => navigate('/my-properties?status=RENTED')}
           />
         </GridItem>
@@ -432,34 +403,7 @@ export function OwnerDashboardContent({ stats, isLoading = false }: OwnerDashboa
                             {metric.id === 'occupancy-rate' || metric.id === 'success-rate' ? '%' : ''}
                           </p>
                         </div>
-                        {metric.trend && (
-                          <div className={cn(
-                            "flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full shrink-0",
-                            metric.trend.direction === 'up' ? 'text-success bg-success/10' :
-                              metric.trend.direction === 'down' ? 'text-destructive bg-destructive/10' :
-                                'text-muted-foreground bg-muted/50'
-                          )}>
-                            <Icon
-                              icon={
-                                metric.trend.direction === 'up' ? 'solar:arrow-up-bold' :
-                                  metric.trend.direction === 'down' ? 'solar:arrow-down-bold' :
-                                    'solar:minus-bold'
-                              }
-                              className="size-3"
-                            />
-                            {Math.abs(metric.trend.value)}%
-                          </div>
-                        )}
                       </div>
-                    </div>
-
-                    {/* Footer with period */}
-                    <div className="mt-4">
-                      {metric.trend && (
-                        <p className="text-xs text-muted-foreground">
-                          {metric.trend.period}
-                        </p>
-                      )}
                     </div>
                   </CardContent>
                 </Card>

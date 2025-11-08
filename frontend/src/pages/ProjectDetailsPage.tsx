@@ -192,23 +192,33 @@ export function ProjectDetailsPage() {
 
         {/* Image Gallery */}
         {project.images && project.images.length > 0 && (
-          <div className="mb-8">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-96">
-              <div className="md:col-span-2">
+          <div className="mb-8 overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Main large image - takes full height on left */}
+              <div className="relative w-full h-[400px] overflow-hidden rounded-lg">
                 <img
                   src={project.images[0]}
                   alt={project.name}
-                  className="w-full h-full object-cover rounded-lg"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
               </div>
-              <div className="md:col-span-2 grid grid-cols-2 gap-4">
+              
+              {/* Smaller images grid - 2x2 on right */}
+              <div className="grid grid-cols-2 gap-4">
                 {project.images.slice(1, 5).map((image, index) => (
-                  <img
-                    key={index}
-                    src={image}
-                    alt={`${project.name} ${index + 2}`}
-                    className="w-full h-full object-cover rounded-lg"
-                  />
+                  <div key={index} className="relative w-full h-[192px] overflow-hidden rounded-lg">
+                    <img
+                      src={image}
+                      alt={`${project.name} ${index + 2}`}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+                {/* Fill empty slots if less than 4 additional images */}
+                {project.images.length < 5 && Array.from({ length: 5 - project.images.length }).map((_, index) => (
+                  <div key={`empty-${index}`} className="relative w-full h-[192px] bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
+                    <Icon icon="solar:gallery-bold" className="h-8 w-8 text-gray-400" />
+                  </div>
                 ))}
               </div>
             </div>

@@ -39,7 +39,7 @@ export function Header({ variant = 'default' }: HeaderProps) {
 
   if (variant === 'landing') {
     return (
-      <header className="bg-gradient-to-r from-primary to-primary/90 text-primary-foreground">
+      <header className="header-gradient text-white">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between py-3">
             <div className="flex items-center gap-8">

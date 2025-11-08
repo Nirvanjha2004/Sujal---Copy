@@ -1,7 +1,7 @@
 import { Icon } from "@iconify/react";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/components/ui/tabs";
+
 import {
   Select,
   SelectTrigger,
@@ -17,11 +17,11 @@ import { useAuth } from "@/shared/contexts/AuthContext";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { PROPERTY_TYPES } from "@/features/property/constants";
+import { Header } from "@/shared/components/layout/Header";
 
 
 export function RealEstateLandingPage() {
   const navigate = useNavigate();
-  const { state: { isAuthenticated } } = useAuth();
 
   // OPTIMIZED: Single hook with only 2 API calls instead of 4+
   const { data, loading } = useLandingPageData();
@@ -163,143 +163,177 @@ export function RealEstateLandingPage() {
   return (
     <>
       <div className="min-h-screen bg-background">
-        <header className="bg-gradient-to-r from-primary to-primary/90 text-primary-foreground">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between py-3">
-              <div className="flex items-center gap-8">
-                <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
-                  <Icon icon="solar:home-smile-bold" className="size-8" />
-                  <span className="text-xl font-bold">PropPuzzle</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                {isAuthenticated ? (
-                  <>
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      className="shadow-lg"
-                      onClick={() => navigate('/dashboard')}
-                    >
-                      Post Property FREE
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="rounded-full"
-                      onClick={() => navigate('/profile')}
-                    >
-                      <Icon icon="solar:user-circle-bold" className="size-6" />
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      className="shadow-lg"
-                      onClick={() => navigate('/register')}
-                    >
-                      Post Property FREE
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="rounded-full"
-                      onClick={() => navigate('/login')}
-                    >
-                      <Icon icon="solar:user-circle-bold" className="size-6" />
-                    </Button>
-                  </>
-                )}
-                <Button size="icon" variant="ghost">
-                  <Icon icon="solar:hamburger-menu-bold" className="size-6" />
+        <Header variant="landing" />
+        <section 
+          className="relative py-20 overflow-hidden bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: 'url(/landingpage/images/topbanner.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+        >
+          {/* Overlay for better text readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent"></div>
+          
+          <div className="container mx-auto px-4 md:px-6 lg:px-8 relative z-10">
+            <div className="max-w-4xl">
+              <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4 text-white drop-shadow-lg">
+                Buy in Kolkata South
+              </h1>
+              <p className="text-lg md:text-xl text-white/95 mb-10 drop-shadow-md">
+                Discover the perfect property from thousands of listings across India
+              </p>
+              <Card className="shadow-2xl bg-white/95 backdrop-blur-sm">
+                <CardContent className="p-0">
+                  {/* Tabs for Buy/Rent/New Launch etc */}
+                  <div className="border-b border-gray-200">
+                    <div className="flex items-center gap-1 p-2">
+                      <Button
+                        variant={listingType === 'buy' ? 'default' : 'ghost'}
+                        size="sm"
+                        onClick={() => setListingType('buy')}
+                        className="rounded-md"
+                      >
+                        Buy
+                      </Button>
+                      <Button
+                        variant={listingType === 'rent' ? 'default' : 'ghost'}
+                        size="sm"
+                        onClick={() => setListingType('rent')}
+                        className="rounded-md"
+                      >
+                        Rent
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => navigate('/projects')}
+                        className="rounded-md"
+                      >
+                        New Launch
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => navigate('/properties?listing_type=pg')}
+                        className="rounded-md"
+                      >
+                        PG/Co-living
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => navigate('/properties?property_type=commercial')}
+                        className="rounded-md"
+                      >
+                        Commercial
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => navigate('/properties?property_type=plot')}
+                        className="rounded-md"
+                      >
+                        Plot/land
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => navigate('/projects')}
+                        className="rounded-md"
+                      >
+                        Projects
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="p-4 md:p-6">
+                    <div className="flex flex-col md:flex-row gap-3">
+                      <Select value={listingType} onValueChange={setListingType}>
+                        <SelectTrigger className="md:w-32">
+                          <SelectValue placeholder="Buy" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="buy">Buy</SelectItem>
+                          <SelectItem value="rent">Rent</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Select value={propertyType} onValueChange={setPropertyType}>
+                        <SelectTrigger className="md:w-48">
+                          <SelectValue placeholder="All Residential" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Residential</SelectItem>
+                          <SelectItem value="apartment">Apartment</SelectItem>
+                          <SelectItem value="villa">Villa</SelectItem>
+                          <SelectItem value="plot">Plot</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <div className="flex-1 relative">
+                        <Icon
+                          icon="solar:magnifer-bold"
+                          className="size-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                        />
+                        <Input
+                          className="pl-10 pr-12 h-11"
+                          placeholder="Search 'Form Houses in 1 cr'"
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              handleSearch();
+                            }
+                          }}
+                        />
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+                        >
+                          <Icon icon="solar:map-point-bold" className="size-5 text-primary" />
+                        </Button>
+                      </div>
+                      <Button
+                        className="gradient-button h-11 px-8 font-semibold"
+                        onClick={handleSearch}
+                      >
+                        Search
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              {/* City Selection Buttons */}
+              <div className="flex items-center gap-4 mt-6">
+                <Button
+                  variant="secondary"
+                  className="bg-white/95 hover:bg-white shadow-md"
+                  onClick={() => navigate('/properties?city=kolkata')}
+                >
+                  <Icon icon="solar:home-bold" className="size-4 mr-2 text-primary" />
+                  Buy in Kolkata
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="text-white hover:bg-white/10"
+                  onClick={() => navigate('/cities')}
+                >
+                  <Icon icon="solar:map-bold" className="size-4 mr-2" />
+                  Explore new city
                 </Button>
               </div>
             </div>
           </div>
-        </header>
-        <section className="relative bg-gradient-to-br from-primary/10 to-accent/10 py-16 overflow-hidden">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl">
-              <h1 className="font-heading text-4xl md:text-5xl font-bold tracking-tight mb-4">
-                Find Your Dream Home
-              </h1>
-              <p className="text-lg text-muted-foreground mb-8">
-                Discover the perfect property from thousands of listings across India
-              </p>
-              <Card className="shadow-2xl">
-                <CardContent className="p-0">
-                  <Tabs className="w-full" defaultValue="buy">
-
-                    <TabsContent value="buy" className="p-6">
-                      <div className="flex flex-col md:flex-row gap-3">
-                        <Select value={listingType} onValueChange={setListingType}>
-                          <SelectTrigger className="md:w-32">
-                            <SelectValue placeholder="Buy" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="buy">Buy</SelectItem>
-                            <SelectItem value="rent">Rent</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <Select value={propertyType} onValueChange={setPropertyType}>
-                          <SelectTrigger className="md:w-48">
-                            <SelectValue placeholder="All Residential" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All Residential</SelectItem>
-                            <SelectItem value="apartment">Apartment</SelectItem>
-                            <SelectItem value="villa">Villa</SelectItem>
-                            <SelectItem value="plot">Plot</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <div className="flex-1 relative">
-                          <Icon
-                            icon="solar:magnifer-bold"
-                            className="size-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                          />
-                          <Input
-                            className="pl-10 pr-12"
-                            placeholder="Search 'Localities, Projects, Landmarks'"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            onKeyPress={(e) => {
-                              if (e.key === 'Enter') {
-                                handleSearch();
-                              }
-                            }}
-                          />
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="absolute right-2 top-1/2 -translate-y-1/2"
-                          >
-                            <Icon icon="solar:map-point-bold" className="size-5 text-accent" />
-                          </Button>
-                        </div>
-                        <Button
-                          className="shadow-lg shadow-primary/20 bg-gradient-to-br from-primary to-primary/90 md:w-32"
-                          onClick={handleSearch}
-                        >
-                          Search
-                        </Button>
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
         </section>
-        <section className="py-16 bg-secondary/30">
-          <div className="container mx-auto px-4">
+        <section className="py-12 md:py-16 bg-background">
+          <div className="container mx-auto px-4 md:px-6 lg:px-8">
             <div className="mb-8 flex items-center justify-between">
               <div>
-                <h2 className="font-heading text-3xl font-semibold tracking-tight mb-2">
-                  Recommended Properties
+                <h2 className="font-heading text-2xl md:text-3xl font-bold tracking-tight mb-1">
+                  Recommended Projects
                 </h2>
-                <p className="text-muted-foreground">The most searched properties</p>
+                <p className="text-sm md:text-base text-muted-foreground">The most searched projects in Kolkata South</p>
               </div>
               <div className="flex items-center gap-2">
                 <Button
@@ -465,14 +499,14 @@ export function RealEstateLandingPage() {
             )}
           </div>
         </section>
-        <section className="py-16">
-          <div className="container mx-auto px-4">
+        <section className="py-12 md:py-16 bg-gray-50">
+          <div className="container mx-auto px-4 md:px-6 lg:px-8">
             <div className="mb-8 flex items-center justify-between">
               <div>
-                <h2 className="font-heading text-3xl font-semibold tracking-tight mb-2">
+                <h2 className="font-heading text-2xl md:text-3xl font-bold tracking-tight mb-1">
                   Apartments, Villas and more
                 </h2>
-                <p className="text-muted-foreground">in South Kolkata</p>
+                <p className="text-sm md:text-base text-muted-foreground">in South Kolkata</p>
               </div>
               <div className="flex items-center gap-2">
                 <Button
@@ -1363,62 +1397,6 @@ export function RealEstateLandingPage() {
           </div>
         </div>
       </section>
-      <section className="py-16 bg-gradient-to-br from-orange-50 to-orange-100">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div>
-              <h2 className="font-heading text-4xl font-bold tracking-tight mb-4">
-                Download PropPuzzle Mobile App
-              </h2>
-              <p className="text-muted-foreground mb-6">
-                and never miss out any update
-              </p>
-              <div className="space-y-4 mb-8">
-                <div className="flex items-center gap-3">
-                  <Icon
-                    icon="solar:check-circle-bold"
-                    className="size-6 text-green-600"
-                  />
-                  <p className="text-muted-foreground">
-                    Get to know about newly posted properties as soon as they are posted
-                  </p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Icon
-                    icon="solar:check-circle-bold"
-                    className="size-6 text-green-600"
-                  />
-                  <p className="text-muted-foreground">
-                    Manage your properties with ease and get instant alerts about responses
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <img
-                  alt="Google Play"
-                  src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/placeholder/landscape.png"
-                  className="h-12 w-auto"
-                />
-                <img
-                  alt="App Store"
-                  src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/placeholder/landscape.png"
-                  className="h-12 w-auto"
-                />
-              </div>
-            </div>
-            <div className="relative">
-              <img
-                alt="Mobile App"
-                src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/placeholder/portrait.png"
-                className="w-full max-w-sm mx-auto"
-              />
-              <div
-                className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
       {/* <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="mb-8">
@@ -1657,40 +1635,6 @@ export function RealEstateLandingPage() {
                 <p className="text-sm text-gray-300">Toll Free - 1800 41 99099</p>
                 <p className="text-sm text-gray-300">9:30 AM to 6:30 PM (Mon-Sun)</p>
                 <p className="text-sm text-gray-300">Email - feedback@PropPuzzle.com</p>
-                <p className="text-sm text-gray-300">Connect with us</p>
-                <div className="flex gap-3 mt-4">
-                  <Icon
-                    icon="solar:facebook-bold"
-                    className="size-6 text-gray-300 hover:text-white cursor-pointer"
-                  />
-                  <Icon
-                    icon="solar:twitter-bold"
-                    className="size-6 text-gray-300 hover:text-white cursor-pointer"
-                  />
-                  <Icon
-                    icon="solar:instagram-bold"
-                    className="size-6 text-gray-300 hover:text-white cursor-pointer"
-                  />
-                </div>
-              </div>
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg mb-4 text-white">Download the App</h3>
-              <div className="space-y-4">
-                <img
-                  alt="Google Play"
-                  src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/placeholder/landscape.png"
-                  className="h-10 w-auto"
-                />
-                <img
-                  alt="App Store"
-                  src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/placeholder/landscape.png"
-                  className="h-10 w-auto"
-                />
-                <p className="text-xs text-gray-400 mt-4">
-                  All trademarks are the property of their respective owners. All rights reserved -
-                  Info Edge (India) Ltd. A naukri.com group venture
-                </p>
               </div>
             </div>
           </div>

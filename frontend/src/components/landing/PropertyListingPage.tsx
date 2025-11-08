@@ -692,40 +692,6 @@ export function PropertyListingPage() {
                                 <p className="text-sm text-gray-300">Toll Free - 1800 41 99099</p>
                                 <p className="text-sm text-gray-300">9:30 AM to 6:30 PM (Mon-Sun)</p>
                                 <p className="text-sm text-gray-300">Email - feedback@PropPuzzle.com</p>
-                                <p className="text-sm text-gray-300">Connect with us</p>
-                                <div className="flex gap-3 mt-4">
-                                    <Icon
-                                        icon="solar:facebook-bold"
-                                        className="size-6 text-gray-300 hover:text-white cursor-pointer"
-                                    />
-                                    <Icon
-                                        icon="solar:twitter-bold"
-                                        className="size-6 text-gray-300 hover:text-white cursor-pointer"
-                                    />
-                                    <Icon
-                                        icon="solar:instagram-bold"
-                                        className="size-6 text-gray-300 hover:text-white cursor-pointer"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                        <div>
-                            <h3 className="font-semibold text-lg mb-4 text-white">Download the App</h3>
-                            <div className="space-y-4">
-                                <img
-                                    alt="Google Play"
-                                    src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/placeholder/landscape.png"
-                                    className="h-10 w-auto"
-                                />
-                                <img
-                                    alt="App Store"
-                                    src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/placeholder/landscape.png"
-                                    className="h-10 w-auto"
-                                />
-                                <p className="text-xs text-gray-400 mt-4">
-                                    All trademarks are the property of their respective owners. All rights reserved -
-                                    Info Edge (India) Ltd. A naukri.com group venture
-                                </p>
                             </div>
                         </div>
                     </div>

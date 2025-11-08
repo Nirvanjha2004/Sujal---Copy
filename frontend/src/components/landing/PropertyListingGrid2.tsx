@@ -705,56 +705,6 @@ export function PropertyListingGrid() {
                 <p className="text-sm text-gray-300">Toll Free - 1800 41 99099</p>
                 <p className="text-sm text-gray-300">9:30 AM to 6:30 PM (Mon-Sun)</p>
                 <p className="text-sm text-gray-300">Email - feedback@PropPuzzle.com</p>
-                <p className="text-sm text-white font-medium">Connect with us</p>
-                <div className="flex gap-3 mt-3">
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="size-8 rounded bg-gray-700 hover:bg-gray-600 text-white"
-                  >
-                    <Icon icon="solar:facebook-bold" className="size-4" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="size-8 rounded bg-gray-700 hover:bg-gray-600 text-white"
-                  >
-                    <Icon icon="solar:youtube-bold" className="size-4" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="size-8 rounded bg-gray-700 hover:bg-gray-600 text-white"
-                  >
-                    <Icon icon="solar:twitter-bold" className="size-4" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="size-8 rounded bg-gray-700 hover:bg-gray-600 text-white"
-                  >
-                    <Icon icon="solar:instagram-bold" className="size-4" />
-                  </Button>
-                </div>
-                <p className="text-sm text-white font-medium mt-4">Download the App</p>
-                <div className="flex gap-2 mt-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-10 px-3 border-gray-600 text-white hover:bg-gray-700"
-                  >
-                    <Icon icon="solar:google-play-bold" className="size-4 mr-2" />
-                    Google Play
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-10 px-3 border-gray-600 text-white hover:bg-gray-700"
-                  >
-                    <Icon icon="solar:apple-bold" className="size-4 mr-2" />
-                    App Store
-                  </Button>
-                </div>
               </div>
             </div>
           </div>

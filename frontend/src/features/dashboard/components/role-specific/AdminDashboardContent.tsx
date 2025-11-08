@@ -166,21 +166,18 @@ function PlatformAnalyticsOverview({
     {
       label: 'Property Conversion Rate',
       value: '12.5%',
-      trend: { value: 3, direction: 'up' as const },
       icon: 'solar:chart-2-bold',
       color: 'text-success'
     },
     {
       label: 'User Engagement',
       value: '78%',
-      trend: { value: 5, direction: 'up' as const },
       icon: 'solar:users-group-rounded-bold',
       color: 'text-primary'
     },
     {
       label: 'Platform Growth',
       value: '+24%',
-      trend: { value: 8, direction: 'up' as const },
       icon: 'solar:graph-up-bold',
       color: 'text-warning'
     }
@@ -212,10 +209,6 @@ function PlatformAnalyticsOverview({
                   <div className="font-medium text-foreground">{metric.label}</div>
                   <div className="text-2xl font-bold text-foreground">{metric.value}</div>
                 </div>
-              </div>
-              <div className="flex items-center gap-1 text-success text-sm font-medium">
-                <Icon icon="solar:arrow-up-bold" className="size-4" />
-                +{metric.trend.value}%
               </div>
             </div>
           ))}
@@ -431,11 +424,6 @@ export function AdminDashboardContent({ stats, isLoading = false }: AdminDashboa
             icon="solar:eye-bold"
             color="info"
             subtitle="Currently active"
-            trend={{
-              value: 5,
-              direction: 'up',
-              period: 'today'
-            }}
             onClick={() => navigate('/admin/properties?status=active')}
           />
         </GridItem>
@@ -461,11 +449,6 @@ export function AdminDashboardContent({ stats, isLoading = false }: AdminDashboa
             icon="solar:chat-round-dots-bold"
             color="warning"
             subtitle="Total inquiries"
-            trend={{
-              value: 18,
-              direction: 'up',
-              period: 'this month'
-            }}
           />
         </GridItem>
 
@@ -476,11 +459,6 @@ export function AdminDashboardContent({ stats, isLoading = false }: AdminDashboa
             icon="solar:dollar-minimalistic-bold"
             color="success"
             subtitle="This month"
-            trend={{
-              value: 22,
-              direction: 'up',
-              period: 'vs last month'
-            }}
           />
         </GridItem>
 
@@ -491,11 +469,6 @@ export function AdminDashboardContent({ stats, isLoading = false }: AdminDashboa
             icon="solar:graph-up-bold"
             color="info"
             subtitle="Active users"
-            trend={{
-              value: 4,
-              direction: 'up',
-              period: 'this week'
-            }}
           />
         </GridItem>
       </DashboardGrid>

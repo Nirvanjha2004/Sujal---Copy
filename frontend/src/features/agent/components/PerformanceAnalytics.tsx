@@ -122,11 +122,6 @@ const PerformanceAnalytics = () => {
           icon="solar:home-bold"
           color="primary"
           subtitle={`${userAnalytics.summary.activeProperties} active`}
-          trend={{
-            value: 8.2,
-            direction: 'up',
-            period: 'vs last month'
-          }}
           onClick={() => {/* Navigate to properties */}}
         />
 
@@ -136,11 +131,6 @@ const PerformanceAnalytics = () => {
           icon="solar:star-bold"
           color="warning"
           subtitle="Premium listings"
-          trend={{
-            value: 12.5,
-            direction: 'up',
-            period: 'vs last month'
-          }}
         />
 
         <AgentStatsCard
@@ -149,11 +139,6 @@ const PerformanceAnalytics = () => {
           icon="solar:eye-bold"
           color="info"
           subtitle="All-time views"
-          trend={{
-            value: 15.3,
-            direction: 'up',
-            period: 'vs last month'
-          }}
         />
 
         <AgentStatsCard
@@ -162,11 +147,6 @@ const PerformanceAnalytics = () => {
           icon="solar:chart-bold"
           color="success"
           subtitle="Performance metric"
-          trend={{
-            value: 5.7,
-            direction: 'up',
-            period: 'vs last month'
-          }}
         />
       </div>
 
@@ -320,11 +300,6 @@ const PerformanceAnalytics = () => {
                 icon="solar:eye-bold"
                 color="info"
                 subtitle="Daily engagement"
-                trend={{
-                  value: 8.3,
-                  direction: 'up',
-                  period: 'vs last week'
-                }}
               />
 
               <AgentStatsCard

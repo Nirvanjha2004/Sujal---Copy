@@ -6,18 +6,23 @@
  */
 
 export const colors = {
-  // Primary Colors
-  primary: 'hsl(221.2 83.2% 53.3%)',
-  primaryForeground: 'hsl(210 40% 98%)',
-  primaryMuted: 'hsl(221.2 83.2% 53.3% / 0.1)',
+  // Primary Colors - RED THEME
+  primary: 'hsl(355 78% 60%)',
+  primaryForeground: 'hsl(0 0% 100%)',
+  primaryMuted: 'hsl(355 78% 60% / 0.1)',
+
+  // Gradient Colors
+  gradientStart: 'hsl(355 78% 60%)',
+  gradientMid: 'hsl(0 100% 71%)',
+  gradientEnd: 'hsl(15 100% 75%)',
 
   // Secondary Colors
   secondary: 'hsl(210 40% 96%)',
   secondaryForeground: 'hsl(222.2 84% 4.9%)',
 
-  // Accent Colors
-  accent: 'hsl(210 40% 96%)',
-  accentForeground: 'hsl(222.2 84% 4.9%)',
+  // Accent Colors - RED TINTED
+  accent: 'hsl(355 78% 97%)',
+  accentForeground: 'hsl(355 78% 30%)',
 
   // Neutral Colors
   background: 'hsl(0 0% 100%)',
@@ -28,7 +33,7 @@ export const colors = {
   // Border and Dividers
   border: 'hsl(214.3 31.8% 91.4%)',
   input: 'hsl(214.3 31.8% 91.4%)',
-  ring: 'hsl(221.2 83.2% 53.3%)',
+  ring: 'hsl(355 78% 60%)',
 
   // Card Colors
   card: 'hsl(0 0% 100%)',
@@ -41,7 +46,8 @@ export const colors = {
   // Status Colors
   success: 'hsl(142.1 76.2% 36.3%)',
   warning: 'hsl(47.9 95.8% 53.1%)',
-  destructive: 'hsl(0 84.2% 60.2%)',
+  destructive: 'hsl(0 84.2% 50%)',
+  destructiveForeground: 'hsl(0 0% 100%)',
   info: 'hsl(204 94% 94%)',
 } as const;
 
@@ -142,6 +148,9 @@ export const cssVars = {
     primary: 'var(--primary)',
     primaryForeground: 'var(--primary-foreground)',
     primaryMuted: 'var(--primary-muted)',
+    gradientStart: 'var(--gradient-start)',
+    gradientMid: 'var(--gradient-mid)',
+    gradientEnd: 'var(--gradient-end)',
     secondary: 'var(--secondary)',
     secondaryForeground: 'var(--secondary-foreground)',
     accent: 'var(--accent)',
@@ -160,6 +169,7 @@ export const cssVars = {
     success: 'var(--success)',
     warning: 'var(--warning)',
     destructive: 'var(--destructive)',
+    destructiveForeground: 'var(--destructive-foreground)',
     info: 'var(--info)',
   },
   spacing: {

@@ -28,7 +28,7 @@ interface PageLoadingProps {
 
 export function PageLoading({ message = "Loading..." }: PageLoadingProps) {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+    <div className="flex flex-col items-center justify-center min-h-[25rem] space-y-4">
       <LoadingSpinner size="lg" className="text-primary" />
       <p className="text-gray-600">{message}</p>
     </div>

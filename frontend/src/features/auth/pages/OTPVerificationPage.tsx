@@ -41,8 +41,8 @@ export function OTPVerificationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen w-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
+      <div className="w-full max-w-md mx-auto px-4">
         {/* Header */}
         <AuthHeader 
           title="Verify Your Email"

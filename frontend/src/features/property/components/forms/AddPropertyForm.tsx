@@ -47,7 +47,7 @@ export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Force validation and show errors
     const isFormValid = validateForm();
     if (!isFormValid) {

@@ -32,7 +32,7 @@ export function Header({ variant = 'default' }: HeaderProps) {
                 <Icon icon="solar:home-smile-bold" className="size-8" />
                 <span className="text-xl font-bold">PropPuzzle</span>
               </div>
-              <nav className="hidden md:flex items-center gap-6 text-sm">
+              {/* <nav className="hidden md:flex items-center gap-6 text-sm">
                 <button 
                   onClick={() => navigate('/properties?listing_type=sale')}
                   className="hover:underline"
@@ -63,7 +63,7 @@ export function Header({ variant = 'default' }: HeaderProps) {
                 >
                   For Dealers/Builders
                 </button>
-              </nav>
+              </nav> */}
             </div>
             <div className="flex items-center gap-3">
               {authState.isAuthenticated ? (

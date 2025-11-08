@@ -11,10 +11,10 @@ export function RegisterPage() {
 
   const handleRegisterSuccess = (email: string) => {
     // Redirect to OTP verification
-    navigate('/verify-email', { 
-      state: { 
-        email 
-      } 
+    navigate('/verify-email', {
+      state: {
+        email
+      }
     });
   };
 
@@ -23,28 +23,28 @@ export function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen w-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
+      <div className="w-full max-w-md mx-auto px-4">
         {/* Header */}
-        <AuthHeader 
+        <AuthHeader
           title="Create Account"
           subtitle="Join thousands of property seekers and owners"
         />
 
         {/* Registration Form */}
         <AuthCard title="Sign Up">
-          <RegisterForm 
+          <RegisterForm
             onSuccess={handleRegisterSuccess}
             onError={handleRegisterError}
             className="space-y-4"
           />
 
-          <SocialLoginButtons className="mt-6" />
+          {/* <SocialLoginButtons className="mt-6" /> */}
 
           <div className="mt-6 text-center text-sm">
             <span className="text-muted-foreground">Already have an account? </span>
-            <Link 
-              to="/login" 
+            <Link
+              to="/login"
               className="text-primary hover:underline font-medium"
             >
               Sign in
@@ -54,8 +54,8 @@ export function RegisterPage() {
 
         {/* Back to Home */}
         <div className="mt-6 text-center">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             onClick={() => navigate('/')}
             className="text-muted-foreground hover:text-foreground"
           >

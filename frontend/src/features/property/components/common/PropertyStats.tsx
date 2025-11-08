@@ -191,12 +191,6 @@ export function PropertyStats({
               </div>
               <p className="text-2xl font-bold">{formatValue(item.value, item.format)}</p>
               <p className="text-sm text-muted-foreground">{item.label}</p>
-              {showTrends && item.trend && (
-                <div className={`flex items-center justify-center gap-1 text-xs mt-1 ${getTrendColor(item.trend)}`}>
-                  <Icon icon={getTrendIcon(item.trend)!} className="size-3" />
-                  <span>{Math.abs(item.trend)}% vs last month</span>
-                </div>
-              )}
             </div>
           ))}
         </div>

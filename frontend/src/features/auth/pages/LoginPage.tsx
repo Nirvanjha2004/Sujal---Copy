@@ -39,8 +39,8 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen w-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
+      <div className="w-full max-w-md mx-auto px-4">
         {/* Header */}
         <AuthHeader 
           title="Welcome Back"
@@ -62,7 +62,7 @@ export function LoginPage() {
             className="space-y-4"
           />
 
-          <SocialLoginButtons className="mt-6" />
+          {/* <SocialLoginButtons className="mt-6" /> */}
 
           <div className="mt-6 text-center text-sm">
             <span className="text-muted-foreground">Don't have an account? </span>

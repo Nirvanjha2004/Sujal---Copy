@@ -25,6 +25,11 @@ module.exports = {
           foreground: "hsl(var(--primary-foreground))",
           muted: "hsl(var(--primary-muted))",
         },
+        gradient: {
+          start: "hsl(var(--gradient-start))",
+          mid: "hsl(var(--gradient-mid))",
+          end: "hsl(var(--gradient-end))",
+        },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",

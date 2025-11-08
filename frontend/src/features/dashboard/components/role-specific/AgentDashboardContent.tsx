@@ -73,7 +73,6 @@ export function AgentDashboardContent({ stats, isLoading = false }: AgentDashboa
       label: 'Conversion Rate',
       value: 12.5,
       target: 15,
-      trend: { value: 2.3, direction: 'up', period: 'vs last month' },
       color: 'success'
     },
     {
@@ -81,7 +80,6 @@ export function AgentDashboardContent({ stats, isLoading = false }: AgentDashboa
       label: 'Avg Days on Market',
       value: 28,
       target: 30,
-      trend: { value: 5, direction: 'down', period: 'vs last month' },
       color: 'success'
     },
     {
@@ -89,7 +87,6 @@ export function AgentDashboardContent({ stats, isLoading = false }: AgentDashboa
       label: 'Client Satisfaction',
       value: 4.8,
       target: 4.5,
-      trend: { value: 0.2, direction: 'up', period: 'vs last quarter' },
       color: 'success'
     },
     {
@@ -97,7 +94,6 @@ export function AgentDashboardContent({ stats, isLoading = false }: AgentDashboa
       label: 'Avg Response Time',
       value: 2.5,
       target: 4,
-      trend: { value: 1.2, direction: 'down', period: 'vs last month' },
       color: 'success'
     }
   ];
@@ -249,12 +245,6 @@ export function AgentDashboardContent({ stats, isLoading = false }: AgentDashboa
             icon: 'solar:home-add-bold',
             onClick: () => navigate('/add-property')
           },
-          {
-            label: 'View Analytics',
-            icon: 'solar:chart-2-bold',
-            onClick: () => navigate('/agent/analytics'),
-            variant: 'outline'
-          }
         ]}
         stats={[{
           label: 'Active Listings',
@@ -273,11 +263,6 @@ export function AgentDashboardContent({ stats, isLoading = false }: AgentDashboa
             icon="solar:home-bold"
             color="primary"
             subtitle="Properties listed"
-            trend={{
-              value: 8.2,
-              direction: 'up',
-              period: 'vs last month'
-            }}
             onClick={() => navigate('/my-properties')}
           />
         </GridItem>
@@ -289,11 +274,6 @@ export function AgentDashboardContent({ stats, isLoading = false }: AgentDashboa
             icon="solar:eye-bold"
             color="info"
             subtitle="Currently active"
-            trend={{
-              value: 3.1,
-              direction: 'up',
-              period: 'vs last week'
-            }}
             onClick={() => navigate('/my-properties?status=active')}
           />
         </GridItem>
@@ -305,11 +285,6 @@ export function AgentDashboardContent({ stats, isLoading = false }: AgentDashboa
             icon="solar:check-circle-bold"
             color="success"
             subtitle="Successfully sold"
-            trend={{
-              value: 12.5,
-              direction: 'up',
-              period: 'vs last month'
-            }}
             onClick={() => navigate('/my-properties?status=SOLD')}
           />
         </GridItem>
@@ -321,11 +296,6 @@ export function AgentDashboardContent({ stats, isLoading = false }: AgentDashboa
             icon="solar:key-bold"
             color="warning"
             subtitle="Successfully rented"
-            trend={{
-              value: 5.7,
-              direction: 'up',
-              period: 'vs last month'
-            }}
             onClick={() => navigate('/my-properties?status=RENTED')}
           />
         </GridItem>

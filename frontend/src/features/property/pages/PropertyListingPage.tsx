@@ -216,7 +216,7 @@ export function PropertyListingPage() {
                                 <Icon icon="solar:home-smile-bold" className="size-8" />
                                 <span className="text-xl font-bold">PropPuzzles</span>
                             </div>
-                            <nav className="hidden md:flex items-center gap-6 text-sm">
+                            {/* <nav className="hidden md:flex items-center gap-6 text-sm">
                                 <button
                                     onClick={() => navigate('/properties?listing_type=sale')}
                                     className="hover:underline"
@@ -247,7 +247,7 @@ export function PropertyListingPage() {
                                 >
                                     Insights
                                 </button>
-                            </nav>
+                            </nav> */}
                         </div>
                         <div className="flex items-center gap-3">
                             {authState.isAuthenticated ? (

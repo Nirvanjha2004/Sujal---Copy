@@ -34,7 +34,7 @@ export function useLandingPageData(): UseLandingPageDataReturn {
       // OPTIMIZED: Only 2 API calls instead of 4
       const [propertiesResponse, projectsResponse] = await Promise.allSettled([
         // Single call to get all properties (limit 20 to cover all needs)
-        api.getProperties({ status: 'ACTIVE' }, 1, 20),
+        api.getProperties({ status: 'active' }, 1, 20),
         
         // Single call to get recent projects
         api.getRecentProjects(6)

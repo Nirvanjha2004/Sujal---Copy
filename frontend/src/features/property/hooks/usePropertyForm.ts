@@ -219,7 +219,7 @@ export const usePropertyForm = (options: UsePropertyFormOptions): UsePropertyFor
     
     try {
       let property: Property;
-      
+      console.log("The property Data is", formData)
       if (mode === 'create') {
         const createData: CreatePropertyRequest = {
           title: formData.title || 'Property Title',
@@ -233,6 +233,7 @@ export const usePropertyForm = (options: UsePropertyFormOptions): UsePropertyFor
           address: formData.address || 'Address not provided',
           city: formData.city || 'City not provided',
           state: formData.state || 'State not provided',
+          status: (formData.status || 'ACTIVE').toLowerCase(),
           postal_code: formData.postal_code || '',
           amenities: formData.amenities.reduce((acc, amenity) => {
             acc[amenity] = true;
@@ -256,6 +257,7 @@ export const usePropertyForm = (options: UsePropertyFormOptions): UsePropertyFor
           area_sqft: Number(formData.area) || 0,
           bedrooms: Number(formData.bedrooms) || 0,
           bathrooms: Number(formData.bathrooms) || 0,
+          status: (formData.status || 'ACTIVE').toLowerCase(),
           address: formData.address || 'Address not provided',
           city: formData.city || 'City not provided',
           state: formData.state || 'State not provided',

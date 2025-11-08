@@ -88,6 +88,7 @@ export interface CreatePropertyRequest {
   area_sqft?: number;
   bedrooms?: number;
   bathrooms?: number;
+  status: string;
   address: string;
   city: string;
   state: string;

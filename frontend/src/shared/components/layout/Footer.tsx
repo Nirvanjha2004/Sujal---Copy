@@ -3,7 +3,7 @@ import { Button } from "@/shared/components/ui/button";
 
 export function Footer() {
   return (
-    <footer className="bg-slate-800 text-white mt-16">
+    <footer className="bg-slate-800 text-white mt-16 full-width-element">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
@@ -62,7 +62,6 @@ export function Footer() {
               <li>Toll Free - 1800 41 99099</li>
               <li>9:30 AM to 6:30 PM (Mon-Sun)</li>
               <li>Email - feedback@PropPuzzle.com</li>
-              <li>Connect with us</li>
             </ul>
             <div className="flex items-center gap-3 mt-4">
               <Button
@@ -86,27 +85,6 @@ export function Footer() {
               >
                 <Icon icon="solar:instagram-bold" className="size-4" />
               </Button>
-            </div>
-            <div className="mt-6">
-              <h4 className="font-semibold mb-2">Download the App</h4>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-10 px-3 border-gray-600 text-white hover:bg-gray-700"
-                >
-                  <Icon icon="solar:google-play-bold" className="size-4 mr-2" />
-                  Google Play
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-10 px-3 border-gray-600 text-white hover:bg-gray-700"
-                >
-                  <Icon icon="solar:apple-bold" className="size-4 mr-2" />
-                  App Store
-                </Button>
-              </div>
             </div>
           </div>
         </div>

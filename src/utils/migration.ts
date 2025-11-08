@@ -105,7 +105,18 @@ export class MigrationRunner {
     const sql = fs.readFileSync(migrationFile.filepath, 'utf8');
     
     try {
-      await this.connection.execute(sql);
+      // Split SQL by semicolons and execute each statement separately
+      const statements = sql
+        .split(';')
+        .map(stmt => stmt.trim())
+        .filter(stmt => stmt.length > 0 && !stmt.startsWith('--'));
+
+      for (const statement of statements) {
+        if (statement) {
+          await this.connection.execute(statement);
+        }
+      }
+      
       await this.markMigrationAsExecuted(migrationFile.filename);
       console.log(`✓ Migration completed: ${migrationFile.filename}`);
     } catch (error) {

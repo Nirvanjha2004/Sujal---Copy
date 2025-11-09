@@ -255,8 +255,8 @@ export function PropertySearchPage() {
     return (
         <div className="min-h-screen bg-background">
             {/* Header */}
-            <header className="bg-primary py-4 px-3">
-                <div className="max-w-[1400px] mx-auto flex items-center gap-6">
+            <header className="bg-primary py-4 w-screen relative left-1/2 right-1/2 -mx-[50vw]">
+                <div className="max-w-[1400px] mx-auto px-3 flex items-center gap-6">
                     <h1
                         className="text-2xl font-bold text-primary-foreground cursor-pointer"
                         onClick={() => navigate('/')}

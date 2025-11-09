@@ -288,7 +288,7 @@ export function ProjectDetailsPage() {
                             className="aspect-video rounded-lg overflow-hidden bg-muted"
                           >
                             <img
-                              src={image.image_url}
+                              src={image.large_url}
                               alt={image.alt_text || project.name}
                               className="w-full h-full object-cover"
                             />

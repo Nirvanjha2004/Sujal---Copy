@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { Button } from "@/shared/components/ui/button";
 import { PropertyImage } from "../../types";
+import { getContextualImage, getImageSrcSet, getImageSizes } from "@/shared/utils/imageUtils";
 
 export interface PropertyGalleryProps {
   images: PropertyImage[];
@@ -57,8 +58,12 @@ export function PropertyGallery({
     if (e.key === 'ArrowLeft') prevImage();
   };
 
-  const getImageUrl = (image: PropertyImage) => {
-    return image.image_url || '';
+  const getMainImageUrl = (image: PropertyImage) => {
+    return getContextualImage(image, 'detail');
+  };
+
+  const getThumbnailImageUrl = (image: PropertyImage) => {
+    return getContextualImage(image, 'thumbnail');
   };
 
   const getImageAlt = (image: PropertyImage, index: number) => {
@@ -98,9 +103,9 @@ export function PropertyGallery({
       updated_at: new Date().toISOString()
     }
   ];
-
+  console.log("images", images);
   const displayImages = images && images.length > 0 ? images : defaultImages;
-
+  console.log("displayImages", displayImages);
   return (
     <>
       <div className={`space-y-4 ${className}`}>
@@ -109,9 +114,12 @@ export function PropertyGallery({
           {/* Main Image */}
           <div className="relative aspect-[4/3] rounded-lg overflow-hidden cursor-pointer group">
             <img
-              src={getImageUrl(displayImages[selectedImageIndex])}
+              src={getMainImageUrl(displayImages[selectedImageIndex])}
+              srcSet={getImageSrcSet(displayImages[selectedImageIndex])}
+              sizes={getImageSizes('detail')}
               alt={getImageAlt(displayImages[selectedImageIndex], selectedImageIndex)}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              loading="lazy"
               onClick={() => openLightbox(selectedImageIndex)}
             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
@@ -172,9 +180,12 @@ export function PropertyGallery({
                 }}
               >
                 <img
-                  src={getImageUrl(image)}
+                  src={getThumbnailImageUrl(image)}
+                  srcSet={getImageSrcSet(image)}
+                  sizes={getImageSizes('thumbnail')}
                   alt={getImageAlt(image, index + 1)}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
                 
@@ -203,9 +214,12 @@ export function PropertyGallery({
                 onClick={() => setSelectedImageIndex(index)}
               >
                 <img
-                  src={getImageUrl(image)}
+                  src={getThumbnailImageUrl(image)}
+                  srcSet={getImageSrcSet(image)}
+                  sizes={getImageSizes('thumbnail')}
                   alt={getImageAlt(image, index)}
                   className="w-full h-full object-cover"
+                  loading="lazy"
                 />
               </button>
             ))}
@@ -223,7 +237,9 @@ export function PropertyGallery({
         >
           <div className="relative max-w-4xl max-h-[90vh] w-full h-full flex items-center justify-center p-4">
             <img
-              src={getImageUrl(displayImages[selectedImageIndex])}
+              src={getMainImageUrl(displayImages[selectedImageIndex])}
+              srcSet={getImageSrcSet(displayImages[selectedImageIndex])}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1200px"
               alt={getImageAlt(displayImages[selectedImageIndex], selectedImageIndex)}
               className="max-w-full max-h-full object-contain"
               onClick={(e) => e.stopPropagation()}
@@ -286,9 +302,12 @@ export function PropertyGallery({
                   }}
                 >
                   <img
-                    src={getImageUrl(image)}
+                    src={getThumbnailImageUrl(image)}
+                    srcSet={getImageSrcSet(image)}
+                    sizes={getImageSizes('thumbnail')}
                     alt={getImageAlt(image, index)}
                     className="w-full h-full object-cover"
+                    loading="lazy"
                   />
                 </button>
               ))}

@@ -17,7 +17,6 @@ import { AdminPanelPage } from '@/features/admin'
 import { AddPropertyPage, MyPropertiesPage } from '@/features/property/pages'
 import { AgentPropertyDashboard } from '@/features/agent/components'
 import { PropertySearchPage } from '@/features/property/pages/PropertySearchPage'
-import { PropertySearchDashboard } from './components/landing/SearchViewedDashboard'
 import { ProjectDetailsPage as PublicProjectDetailsPage } from './pages/ProjectDetailsPage'
 
 import { BulkUploadPage } from '@/pages/agent/BulkUploadPage'
@@ -45,10 +44,6 @@ function App() {
                     <Route path="/property/:id" element={<PropertyDetailsPage />} />
                     <Route path="/project/:id" element={<PublicProjectDetailsPage />} />
                     {/* <Route path="/calculators" element={<CalculatorsPage />} /> */}
-
-                    {/* Search & Activity Dashboard - Can be accessed by both authenticated and unauthenticated users */}
-                    <Route path="/search-dashboard" element={<PropertySearchDashboard />} />
-
                     {/* Authentication routes */}
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />

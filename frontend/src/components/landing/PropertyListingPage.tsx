@@ -28,6 +28,7 @@ import {
     PopoverTrigger,
 } from "@/shared/components/ui/popover";
 import { cn } from "@/shared/lib/utils";
+import { PropertyGallery } from "@/features/property/components/common/PropertyGallery";
 
 export function PropertyListingPage() {
     const { id } = useParams<{ id: string }>();
@@ -204,9 +205,9 @@ export function PropertyListingPage() {
 
     return (
         <div className="property-listing-page min-h-screen bg-background">
-            <header className="bg-gradient-to-r from-primary to-primary/90 text-primary-foreground">
-                <div className="container mx-auto px-4">
-                    <div className="flex items-center justify-between py-3">
+            <header className="bg-gradient-to-r from-primary to-primary/90 text-primary-foreground w-full">
+                <div className="w-full px-4">
+                    <div className="flex items-center justify-between py-3 max-w-7xl mx-auto">
                         <div className="flex items-center gap-8">
                             <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
                                 <Icon icon="solar:home-smile-bold" className="size-8" />
@@ -296,7 +297,7 @@ export function PropertyListingPage() {
                 <div className="text-sm text-muted-foreground mb-4">
                     Home {">"} {property.city}, {property.state} {">"} {property.title}
                 </div>
-                <ImageGallery images={property.images || []} title={property.title} />
+                <PropertyGallery images={property.images || []} title={property.title} />
                 <div className="flex items-start justify-between mb-6">
                     <div>
                         <div className="flex items-center gap-3 mb-3">

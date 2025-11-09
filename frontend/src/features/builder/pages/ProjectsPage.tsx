@@ -201,7 +201,7 @@ export function ProjectsPage() {
                   <div className="h-48 bg-muted relative">
                     {project.images && project.images.length > 0 ? (
                       <img
-                        src={project.images[0].image_url}
+                        src={project.images[0].large_url}
                         alt={project.name}
                         className="w-full h-full object-cover"
                       />

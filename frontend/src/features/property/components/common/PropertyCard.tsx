@@ -8,6 +8,7 @@ import { Property, PropertyCardVariant } from "../../types";
 import { useFavorites } from "../../contexts/FavoritesContext";
 import { formatPrice, formatArea } from "../../utils/propertyHelpers";
 import { cn } from "@/shared/lib/utils";
+import { getContextualImage, getImageSrcSet, getImageSizes } from "@/shared/utils/imageUtils";
 
 export interface PropertyCardProps {
   property: Property;
@@ -60,9 +61,24 @@ export function PropertyCard({
   const getImageUrl = () => {
     const primaryImage = property.images?.find(img => img.is_primary);
     const firstImage = property.images?.[0];
-    return primaryImage?.image_url || 
-           firstImage?.image_url ||
-           "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80";
+    const imageData = primaryImage || firstImage;
+    
+    if (!imageData) {
+      return "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80";
+    }
+    
+    // Use appropriate size based on variant
+    return getContextualImage(imageData, variant === 'grid' ? 'grid' : 'list');
+  };
+
+  const getImageSrcSetValue = () => {
+    const primaryImage = property.images?.find(img => img.is_primary);
+    const firstImage = property.images?.[0];
+    const imageData = primaryImage || firstImage;
+    
+    if (!imageData) return '';
+    
+    return getImageSrcSet(imageData);
   };
 
   const getPropertyType = () => property.property_type || 'apartment';
@@ -80,6 +96,8 @@ export function PropertyCard({
           <div className="aspect-[4/3] overflow-hidden bg-muted">
             <img
               src={getImageUrl()}
+              srcSet={getImageSrcSetValue()}
+              sizes={getImageSizes('grid')}
               alt={property.title}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               loading="lazy"

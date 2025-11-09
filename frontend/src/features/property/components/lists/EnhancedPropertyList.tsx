@@ -45,8 +45,8 @@ export function EnhancedPropertyList({
   const getImageUrl = (property: Property) => {
     const primaryImage = property.images?.find(img => img.is_primary);
     const firstImage = property.images?.[0];
-    return primaryImage?.image_url || 
-           firstImage?.image_url ||
+    return primaryImage?.large_url || 
+           firstImage?.large_url ||
            "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80";
   };
 

@@ -39,6 +39,9 @@ export interface PropertyImage {
   id: number;
   property_id: number;
   image_url: string;
+  thumbnail_url?: string;
+  large_url?: string;
+  medium_url?: string;
   alt_text?: string;
   display_order: number;
   is_primary: boolean;

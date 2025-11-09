@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/shared/components/ui/card";
 import { useFavorites } from "@/features/buyer/hooks/useFavorites";
 import { useNavigate } from "react-router-dom";
 import { Property } from "@/features/property/types";
+import { getContextualImage, getImageSrcSet, getImageSizes } from "@/shared/utils/imageUtils";
 
 interface PropertyCardProps {
   property: Property;
@@ -27,7 +28,7 @@ export function PropertyCard({ property, variant = 'list' }: PropertyCardProps) 
 
   const handleFavoriteToggle = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    
+
     try {
       if (isFavorite(property.id)) {
         await removeFromFavorites(property.id);
@@ -43,14 +44,19 @@ export function PropertyCard({ property, variant = 'list' }: PropertyCardProps) 
     navigate(`/property/${property.id}`);
   };
 
+  const primaryImage = property.images?.find(img => img.is_primary) || property.images?.[0];
+
   if (variant === 'grid') {
     return (
       <Card className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow" onClick={handlePropertyClick}>
         <div className="relative">
           <img
-            src={property.images?.[0]?.image_url || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"}
+            src={primaryImage ? getContextualImage(primaryImage, 'grid') : "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"}
+            srcSet={primaryImage ? getImageSrcSet(primaryImage) : ''}
+            sizes={getImageSizes('grid')}
             alt={property.title}
             className="w-full h-48 object-cover"
+            loading="lazy"
           />
           <Button
             variant="ghost"
@@ -58,9 +64,9 @@ export function PropertyCard({ property, variant = 'list' }: PropertyCardProps) 
             className="absolute top-2 right-2 bg-white/80 hover:bg-white"
             onClick={handleFavoriteToggle}
           >
-            <Icon 
-              icon={isFavorite(property.id) ? "solar:heart-bold" : "solar:heart-linear"} 
-              className={`size-5 ${isFavorite(property.id) ? 'text-red-500' : 'text-gray-600'}`} 
+            <Icon
+              icon={isFavorite(property.id) ? "solar:heart-bold" : "solar:heart-linear"}
+              className={`size-5 ${isFavorite(property.id) ? 'text-red-500' : 'text-gray-600'}`}
             />
           </Button>
         </div>
@@ -97,9 +103,12 @@ export function PropertyCard({ property, variant = 'list' }: PropertyCardProps) 
       <div className="flex flex-col md:flex-row">
         <div className="relative md:w-64 h-48 md:h-auto">
           <img
-            src={property.images?.[0]?.image_url || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"}
+            src={primaryImage ? getContextualImage(primaryImage, 'list') : "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"}
+            srcSet={primaryImage ? getImageSrcSet(primaryImage) : ''}
+            sizes={getImageSizes('list')}
             alt={property.title}
             className="w-full h-full object-cover"
+            loading="lazy"
           />
           <Button
             variant="ghost"
@@ -107,9 +116,9 @@ export function PropertyCard({ property, variant = 'list' }: PropertyCardProps) 
             className="absolute top-2 right-2 bg-white/80 hover:bg-white"
             onClick={handleFavoriteToggle}
           >
-            <Icon 
-              icon={isFavorite(property.id) ? "solar:heart-bold" : "solar:heart-linear"} 
-              className={`size-5 ${isFavorite(property.id) ? 'text-red-500' : 'text-gray-600'}`} 
+            <Icon
+              icon={isFavorite(property.id) ? "solar:heart-bold" : "solar:heart-linear"}
+              className={`size-5 ${isFavorite(property.id) ? 'text-red-500' : 'text-gray-600'}`}
             />
           </Button>
         </div>

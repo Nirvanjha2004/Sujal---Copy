@@ -288,7 +288,7 @@ class ProjectController {
         start_date: startDate ? new Date(startDate) : undefined,
         expected_completion: expectedCompletion ? new Date(expectedCompletion) : undefined,
         rera_number: reraNumber,
-        approval_status: 'pending',
+        approval_status: 'approved',
         amenities: amenities || [],
         specifications: specifications || {},
         pricing: pricing || {},
@@ -859,125 +859,136 @@ class ProjectController {
 
   // Upload images for a project
   async uploadProjectImages(req: ProjectRequest, res: Response): Promise<void> {
-    const t = await Project.sequelize!.transaction();
     try {
       const projectId = parseInt(req.params.projectId);
+      const userId = req.user?.userId;
       const files = req.files as Express.Multer.File[];
 
-      if (!req.user || req.user.role !== 'builder') {
-        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Access denied. Builder role required.' } });
+      if (!userId || req.user?.role !== 'builder') {
+        res.status(403).json({
+          success: false,
+          error: {
+            code: 'FORBIDDEN',
+            message: 'Access denied. Builder role required.'
+          }
+        });
         return;
       }
 
       if (!files || files.length === 0) {
-        res.status(400).json({ success: false, error: { message: 'No image files provided' } });
+        res.status(400).json({
+          success: false,
+          error: {
+            code: 'NO_FILES',
+            message: 'No image files provided'
+          }
+        });
         return;
       }
 
+      // Verify project exists and user owns it
       const project = await Project.findOne({
-        where: { id: projectId, builder_id: req.user.userId },
-        transaction: t,
+        where: { id: projectId, builder_id: userId },
       });
 
       if (!project) {
-        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Project not found or access denied' } });
+        res.status(404).json({
+          success: false,
+          error: {
+            code: 'NOT_FOUND',
+            message: 'Project not found or access denied'
+          }
+        });
         return;
       }
 
-      const existingImageCount = await ProjectImage.count({ where: { project_id: projectId }, transaction: t });
-
-      const imagePromises = files.map((file, index) => {
-        const imageUrl = `/uploads/projects/${file.filename}`;
-        return ProjectImage.create({
-          project_id: projectId,
-          image_url: imageUrl,
-          is_primary: existingImageCount === 0 && index === 0, // First image of the first upload is primary
-          display_order: existingImageCount + index + 1,
-          image_type: 'location'
-        }, { transaction: t });
-      });
-
-      const savedImages = await Promise.all(imagePromises);
-
-      await t.commit();
+      // Use S3 service to process and upload images
+      const { ImageServiceS3 } = await import('../services/imageServiceS3');
+      const result = await ImageServiceS3.processBulkProjectImages(
+        projectId,
+        files,
+        {
+          generateThumbnail: true,
+          optimize: true,
+          quality: 85
+        }
+      );
 
       res.status(201).json({
         success: true,
-        data: { images: savedImages },
-        message: `${savedImages.length} image(s) uploaded successfully.`,
+        data: {
+          successful: result.successful,
+          failed: result.failed,
+          totalProcessed: result.totalProcessed,
+          successCount: result.successful.length,
+          failureCount: result.failed.length
+        },
+        message: `${result.successful.length} image(s) uploaded successfully.`,
       });
 
     } catch (error) {
-      await t.rollback();
       console.error('Upload project images error:', error);
-      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to upload images' } });
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'Failed to upload images'
+        }
+      });
     }
   }
 
   // Delete an image from a project
   async deleteProjectImage(req: ProjectRequest, res: Response): Promise<void> {
-    const t = await Project.sequelize!.transaction();
     try {
-      const { projectId, imageId } = req.params;
+      const { imageId } = req.params;
+      const userId = req.user?.userId;
 
-      if (!req.user || req.user.role !== 'builder') {
-        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Access denied. Builder role required.' } });
-        return;
-      }
-
-      const project = await Project.findOne({
-        where: { id: parseInt(projectId), builder_id: req.user.userId },
-        transaction: t,
-      });
-
-      if (!project) {
-        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Project not found or access denied' } });
-        return;
-      }
-
-      const image = await ProjectImage.findOne({
-        where: { id: parseInt(imageId), project_id: parseInt(projectId) },
-        transaction: t,
-      });
-
-      if (!image) {
-        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Image not found' } });
-        return;
-      }
-
-      // Delete the physical file
-      const filePath = path.join(__dirname, '..', '..', 'public', image.image_url);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
-
-      const wasPrimary = image.is_primary;
-      await image.destroy({ transaction: t });
-
-      // If the deleted image was primary, assign a new primary image
-      if (wasPrimary) {
-        const newPrimary = await ProjectImage.findOne({
-          where: { project_id: parseInt(projectId) },
-          order: [['display_order', 'ASC']],
-          transaction: t,
+      if (!userId || req.user?.role !== 'builder') {
+        res.status(403).json({
+          success: false,
+          error: {
+            code: 'FORBIDDEN',
+            message: 'Access denied. Builder role required.'
+          }
         });
-
-        if (newPrimary) {
-          await newPrimary.update({ is_primary: true }, { transaction: t });
-        }
+        return;
       }
 
-      await t.commit();
+      // Use S3 service to delete image
+      const { ImageServiceS3 } = await import('../services/imageServiceS3');
+      const result = await ImageServiceS3.deleteProjectImage(
+        parseInt(imageId),
+        userId
+      );
 
-      res.json({
-        success: true,
-        message: 'Image deleted successfully',
-      });
+      if (result.success) {
+        res.status(200).json({
+          success: true,
+          message: 'Image deleted successfully'
+        });
+      } else {
+        const statusCode = result.error === 'Access denied' ? 403 :
+          result.error === 'Image not found' ? 404 : 400;
+        res.status(statusCode).json({
+          success: false,
+          error: {
+            code: result.error === 'Access denied' ? 'FORBIDDEN' :
+              result.error === 'Image not found' ? 'NOT_FOUND' : 'DELETE_FAILED',
+            message: result.error
+          }
+        });
+      }
 
     } catch (error) {
-      await t.rollback();
       console.error('Delete project image error:', error);
-      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to delete image' } });
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'Failed to delete image'
+        }
+      });
     }
   }
 

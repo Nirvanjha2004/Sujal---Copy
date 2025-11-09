@@ -19,7 +19,7 @@ CREATE TABLE projects (
   expected_completion TIMESTAMP NULL,
   actual_completion TIMESTAMP NULL,
   rera_number VARCHAR(100),
-  approval_status VARCHAR(50) NOT NULL DEFAULT 'pending',
+  approval_status VARCHAR(50) NOT NULL DEFAULT 'approved',
   amenities JSON,
   specifications JSON,
   pricing JSON,

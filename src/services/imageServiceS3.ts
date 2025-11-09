@@ -464,6 +464,293 @@ export class ImageServiceS3 {
   }
 
   /**
+   * Process and save single project image to S3
+   */
+  static async processAndSaveProjectImage(
+    projectId: number,
+    file: Express.Multer.File,
+    options: ImageProcessingOptions = {}
+  ): Promise<ImageUploadResult> {
+    try {
+      // Import ProjectImage dynamically to avoid circular dependency
+      const { ProjectImage } = await import('../models/ProjectImage');
+      const { Project } = await import('../models/Project');
+
+      // Validate project exists
+      const project = await Project.findByPk(projectId);
+      if (!project) {
+        // Clean up uploaded file
+        await this.cleanupLocalFile(file.path);
+        return { success: false, error: 'Project not found' };
+      }
+
+      // Read file buffer
+      const buffer = await readFile(file.path);
+
+      // Validate image
+      const validation = await imageProcessingService.validateImage(buffer);
+      if (!validation.isValid) {
+        await this.cleanupLocalFile(file.path);
+        return { success: false, error: validation.error || 'Invalid image' };
+      }
+
+      const {
+        generateThumbnail: shouldGenerateSizes = true,
+        quality = 85
+      } = options;
+
+      // Process image and generate all sizes
+      const processedImages = await imageProcessingService.processImage(buffer, {
+        quality,
+        format: 'jpeg',
+        generateSizes: shouldGenerateSizes,
+      });
+
+      // Upload all sizes to S3
+      const uploadResults = await Promise.all([
+        s3Service.uploadImage({
+          folder: 'projects',
+          entityId: projectId,
+          filename: file.originalname,
+          buffer: processedImages.original,
+          mimetype: file.mimetype,
+          size: 'original',
+        }),
+        s3Service.uploadImage({
+          folder: 'projects',
+          entityId: projectId,
+          filename: file.originalname,
+          buffer: processedImages.large,
+          mimetype: file.mimetype,
+          size: 'large',
+        }),
+        s3Service.uploadImage({
+          folder: 'projects',
+          entityId: projectId,
+          filename: file.originalname,
+          buffer: processedImages.medium,
+          mimetype: file.mimetype,
+          size: 'medium',
+        }),
+        s3Service.uploadImage({
+          folder: 'projects',
+          entityId: projectId,
+          filename: file.originalname,
+          buffer: processedImages.thumbnail,
+          mimetype: file.mimetype,
+          size: 'thumbnail',
+        }),
+      ]);
+
+      const [originalUpload, largeUpload, mediumUpload, thumbnailUpload] = uploadResults;
+
+      // Get image metadata
+      const metadata = await imageProcessingService.getMetadata(buffer);
+
+      // Save to database with S3 URLs
+      const projectImage = await ProjectImage.create({
+        project_id: projectId,
+        image_url: originalUpload.url,
+        s3_key: originalUpload.key,
+        s3_bucket: originalUpload.bucket,
+        thumbnail_url: thumbnailUpload.url,
+        medium_url: mediumUpload.url,
+        large_url: largeUpload.url,
+        file_size: originalUpload.size,
+        mime_type: file.mimetype,
+        width: metadata.width || 0,
+        height: metadata.height || 0,
+        alt_text: `Project image for ${project.name}`,
+        display_order: await this.getNextProjectDisplayOrder(projectId),
+        is_primary: false,
+      });
+
+      // Clean up local file
+      await this.cleanupLocalFile(file.path);
+
+      return {
+        success: true,
+        imageId: projectImage.id,
+        filename: file.originalname,
+        url: originalUpload.url,
+        thumbnailUrl: thumbnailUpload.url,
+        mediumUrl: mediumUpload.url,
+        largeUrl: largeUpload.url,
+      };
+
+    } catch (error) {
+      // Clean up local file on error
+      await this.cleanupLocalFile(file.path);
+
+      console.error('Error processing project image:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to process image'
+      };
+    }
+  }
+
+  /**
+   * Process bulk project images
+   */
+  static async processBulkProjectImages(
+    projectId: number,
+    files: Express.Multer.File[],
+    options: ImageProcessingOptions = {}
+  ): Promise<BulkImageUploadResult> {
+    const successful: ImageUploadResult[] = [];
+    const failed: Array<{ filename: string; error: string }> = [];
+
+    // Import ProjectImage dynamically
+    const { Project } = await import('../models/Project');
+
+    // Validate project exists
+    const project = await Project.findByPk(projectId);
+    if (!project) {
+      // Clean up all files
+      await Promise.all(files.map(file => this.cleanupLocalFile(file.path)));
+      
+      return {
+        successful: [],
+        failed: files.map(file => ({
+          filename: file.originalname,
+          error: 'Project not found'
+        })),
+        totalProcessed: files.length
+      };
+    }
+
+    // Process each file concurrently (with limit)
+    const CONCURRENT_LIMIT = 3;
+    for (let i = 0; i < files.length; i += CONCURRENT_LIMIT) {
+      const batch = files.slice(i, i + CONCURRENT_LIMIT);
+      const results = await Promise.all(
+        batch.map(file => this.processAndSaveProjectImage(projectId, file, options))
+      );
+
+      results.forEach((result, index) => {
+        if (result.success) {
+          successful.push(result);
+        } else {
+          failed.push({
+            filename: batch[index].originalname,
+            error: result.error || 'Unknown error'
+          });
+        }
+      });
+    }
+
+    return {
+      successful,
+      failed,
+      totalProcessed: files.length
+    };
+  }
+
+  /**
+   * Delete project image from S3 and database
+   */
+  static async deleteProjectImage(imageId: number, userId: number): Promise<{ success: boolean; error?: string }> {
+    try {
+      // Import ProjectImage dynamically
+      const { ProjectImage } = await import('../models/ProjectImage');
+      const { Project } = await import('../models/Project');
+
+      // Find image
+      const image = await ProjectImage.findByPk(imageId, {
+        include: [{ model: Project, as: 'project' }]
+      });
+
+      if (!image) {
+        return { success: false, error: 'Image not found' };
+      }
+
+      // Verify user owns the project
+      const project = image.project as any;
+      if (project && project.builder_id !== userId) {
+        return { success: false, error: 'Access denied' };
+      }
+
+      // Delete all size variants from S3
+      const keysToDelete: string[] = [];
+      
+      if (image.s3_key) {
+        const variants = s3Service.getSizeVariants(image.s3_key);
+        keysToDelete.push(
+          variants.original,
+          variants.large,
+          variants.medium,
+          variants.thumbnail
+        );
+      }
+
+      if (keysToDelete.length > 0) {
+        await s3Service.deleteMultipleImages(keysToDelete);
+      }
+
+      // Delete from database
+      await image.destroy();
+
+      return { success: true };
+
+    } catch (error) {
+      console.error('Error deleting project image:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to delete image'
+      };
+    }
+  }
+
+  /**
+   * Get project images
+   */
+  static async getProjectImages(projectId: number): Promise<any[]> {
+    try {
+      // Import ProjectImage dynamically
+      const { ProjectImage } = await import('../models/ProjectImage');
+
+      const images = await ProjectImage.findAll({
+        where: { project_id: projectId },
+        order: [['display_order', 'ASC'], ['created_at', 'ASC']]
+      });
+
+      return images.map(img => ({
+        id: img.id,
+        url: img.image_url,
+        thumbnailUrl: img.thumbnail_url,
+        mediumUrl: img.medium_url,
+        largeUrl: img.large_url,
+        altText: img.alt_text,
+        caption: img.caption,
+        imageType: img.image_type,
+        displayOrder: img.display_order,
+        isPrimary: img.is_primary,
+        width: img.width,
+        height: img.height,
+        fileSize: img.file_size,
+        mimeType: img.mime_type,
+        createdAt: img.created_at
+      }));
+
+    } catch (error) {
+      console.error('Error getting project images:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get next display order for project images
+   */
+  private static async getNextProjectDisplayOrder(projectId: number): Promise<number> {
+    const { ProjectImage } = await import('../models/ProjectImage');
+    const maxOrder = await ProjectImage.max('display_order', {
+      where: { project_id: projectId }
+    }) as number | null;
+    return (maxOrder || 0) + 1;
+  }
+
+  /**
    * Clean up local file
    */
   private static async cleanupLocalFile(filePath: string): Promise<void> {

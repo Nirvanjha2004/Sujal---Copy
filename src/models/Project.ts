@@ -181,7 +181,7 @@ Project.init(
     approval_status: {
       type: DataTypes.STRING(50),
       allowNull: false,
-      defaultValue: 'pending',
+      defaultValue: 'approved',
     },
     amenities: {
       type: DataTypes.JSON,

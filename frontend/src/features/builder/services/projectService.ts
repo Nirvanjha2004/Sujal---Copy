@@ -78,7 +78,7 @@ class ProjectService {
     try {
       console.log('ProjectService: Creating project:', projectData);
       
-      // Transform the data to match API expectations
+      // Backend validation expects camelCase, so keep it as-is
       const apiData = {
         name: projectData.name,
         description: projectData.description,
@@ -87,11 +87,11 @@ class ProjectService {
         city: projectData.city,
         state: projectData.state,
         pincode: projectData.pincode,
-        projectType: projectData.project_type,
-        totalUnits: projectData.total_units,
-        startDate: projectData.start_date,
-        expectedCompletion: projectData.expected_completion,
-        reraNumber: projectData.rera_number,
+        projectType: projectData.projectType, // Keep camelCase for backend validation
+        totalUnits: projectData.totalUnits || 0,
+        startDate: projectData.startDate,
+        expectedCompletion: projectData.expectedCompletion,
+        reraNumber: projectData.reraNumber,
         amenities: projectData.amenities,
         specifications: projectData.specifications,
         pricing: projectData.pricing

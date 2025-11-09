@@ -7,10 +7,6 @@ import { AuthenticatedRequest } from '../middleware/auth';
 import { sendErrorResponse, sendSuccessResponse, isEmailDeliveryError, handleEmailDeliveryError, ValidationError } from '../utils/errorResponse';
 
 class AuthController {
-
-
-
-
   /**
    * Register a new user
    */

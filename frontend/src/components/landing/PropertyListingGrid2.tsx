@@ -493,7 +493,7 @@ export function PropertyListingGrid() {
                 <div className="flex flex-col md:flex-row" onClick={() => navigate(`/property/${property.id}`)}>
                   <div className="md:w-1/3">
                     <img
-                      src={property.images?.[0]?.image_url || "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/landscape/4.webp"}
+                      src={property.images?.[0]?.medium_url || "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/landscape/4.webp"}
                       alt={property.title}
                       className="w-full h-64 md:h-full object-cover"
                     />

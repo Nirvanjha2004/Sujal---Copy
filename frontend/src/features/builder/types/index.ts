@@ -38,6 +38,9 @@ export interface ProjectImage {
   id: number;
   project_id: number;
   image_url: string;
+  thumbnail_url?: string;
+  medium_url?: string;
+  large_url?: string;
   caption?: string;
   alt_text?: string;
   is_primary?: boolean;

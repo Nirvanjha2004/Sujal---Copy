@@ -45,7 +45,10 @@ export function NewProjectPage() {
     watch,
     formState: { errors }
   } = useForm<ProjectFormData>({
-    resolver: zodResolver(projectSchema)
+    resolver: zodResolver(projectSchema),
+    defaultValues: {
+      projectType: 'residential' // Set default project type
+    }
   });
 
   const commonAmenities = [
@@ -86,12 +89,10 @@ export function NewProjectPage() {
         pricing: {}
       };
 
-      const response = await projectService.createProject(projectData);
+      const project = await projectService.createProject(projectData);
 
-      if (response.success) {
-        toast.success('Project created successfully!');
-        navigate(`/builder/projects/${response.data.project.id}`);
-      }
+      toast.success('Project created successfully!');
+      navigate(`/builder/projects/${project.id}`);
     } catch (error) {
       console.error('Error creating project:', error);
       toast.error('Failed to create project');
@@ -149,7 +150,10 @@ export function NewProjectPage() {
 
                 <div>
                   <Label htmlFor="projectType">Project Type *</Label>
-                  <Select onValueChange={(value) => setValue('projectType', value as any)}>
+                  <Select 
+                    defaultValue="residential" 
+                    onValueChange={(value) => setValue('projectType', value as any)}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select project type" />
                     </SelectTrigger>

@@ -9,12 +9,18 @@ export function transformPropertyImages(images: any[]): any[] {
   }
 
   const baseUrl = process.env.BASE_URL || `http://localhost:${config.server.port}`;
-  
+
   return images.map(image => ({
     ...image,
-    url: image.image_url ? `${baseUrl}/uploads/properties/${image.image_url}` : null,
-    image_url: image.image_url ? `${baseUrl}/uploads/properties/${image.image_url}` : null,
-    thumbnailUrl: image.image_url ? `${baseUrl}/uploads/properties/${image.image_url.replace(/(\.[^.]+)$/, '_thumb$1')}` : null
+    // Keep original image_url (could be S3 URL or local path)
+    image_url: image.image_url || null,
+    // Include optimized versions if they exist
+    thumbnail_url: image.thumbnail_url || null,
+    medium_url: image.medium_url || null,
+    large_url: image.large_url || null,
+    // Legacy support
+    url: image.image_url || null,
+    thumbnailUrl: image.thumbnail_url || null
   }));
 }
 
@@ -27,7 +33,7 @@ export function transformPropertyWithImages(property: any): any {
   }
 
   const propertyData = typeof property.toJSON === 'function' ? property.toJSON() : property;
-  
+
   return {
     ...propertyData,
     images: transformPropertyImages(propertyData.images || [])

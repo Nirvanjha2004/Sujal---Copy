@@ -28,6 +28,9 @@ interface Message {
 interface PropertyImage {
   id: number;
   image_url: string;
+  thumbnail_url?: string;
+  medium_url?: string;
+  large_url?: string;
   alt_text?: string;
   is_primary: boolean;
 }
@@ -163,10 +166,10 @@ export function MessagesPage() {
     
     // Try to get primary image first
     const primaryImage = property.images.find(img => img.is_primary);
-    if (primaryImage) return primaryImage.image_url;
+    if (primaryImage) return primaryImage.large_url;
     
     // Fallback to first image
-    return property.images[0].image_url;
+    return property.images[0].large_url;
   };
 
   if (loading) {

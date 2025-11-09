@@ -43,6 +43,37 @@ export class PropertyImage extends Model {
   @Column(DataType.STRING(500))
   image_url!: string;
 
+  @Column(DataType.STRING(500))
+  s3_key?: string;
+
+  @Column(DataType.STRING(100))
+  s3_bucket?: string;
+
+  @Column(DataType.STRING(500))
+  thumbnail_url?: string;
+
+  @Column(DataType.STRING(500))
+  medium_url?: string;
+
+  @Column(DataType.STRING(500))
+  large_url?: string;
+
+  @Column(DataType.INTEGER)
+  file_size?: number;
+
+  @Column(DataType.STRING(50))
+  mime_type?: string;
+
+  @Column(DataType.INTEGER)
+  width?: number;
+
+  @Column(DataType.INTEGER)
+  height?: number;
+
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  is_primary!: boolean;
+
   @Column(DataType.STRING(255))
   alt_text?: string;
 

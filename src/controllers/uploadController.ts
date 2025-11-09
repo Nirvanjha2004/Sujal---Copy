@@ -2,7 +2,12 @@ import { Response } from 'express';
 import { AuthenticatedRequest } from '../types';
 import { BulkUploadService } from '../services/bulkUploadService';
 import { ImageService } from '../services/imageService';
+import { ImageServiceS3 } from '../services/imageServiceS3';
 import fs from 'fs';
+
+// Use S3 service if AWS is configured, otherwise fall back to local storage
+const USE_S3 = process.env.AWS_S3_BUCKET && process.env.AWS_ACCESS_KEY_ID;
+const ActiveImageService = USE_S3 ? ImageServiceS3 : ImageService;
 
 export class UploadController {
   // Upload single property image
@@ -35,7 +40,7 @@ export class UploadController {
         return;
       }
 
-      const result = await ImageService.processAndSavePropertyImage(
+      const result = await ActiveImageService.processAndSavePropertyImage(
         parseInt(propertyId),
         req.file,
         {
@@ -115,7 +120,7 @@ export class UploadController {
 
       console.log("The files are", files);
 
-      const result = await ImageService.processBulkPropertyImages(
+      const result = await ActiveImageService.processBulkPropertyImages(
         parseInt(propertyId),
         files,
         {
@@ -171,7 +176,7 @@ export class UploadController {
         return;
       }
 
-      const result = await ImageService.deletePropertyImage(parseInt(imageId), userId);
+      const result = await ActiveImageService.deletePropertyImage(parseInt(imageId), userId);
 
       if (result.success) {
         res.status(200).json({
@@ -234,7 +239,7 @@ export class UploadController {
         return;
       }
 
-      const result = await ImageService.updateImageOrder(parseInt(imageId), displayOrder, userId);
+      const result = await ActiveImageService.updateImageOrder(parseInt(imageId), displayOrder, userId);
 
       if (result.success) {
         res.status(200).json({
@@ -271,7 +276,7 @@ export class UploadController {
     try {
       const { propertyId } = req.params;
 
-      const images = await ImageService.getPropertyImages(parseInt(propertyId));
+      const images = await ActiveImageService.getPropertyImages(parseInt(propertyId));
 
       res.status(200).json({
         success: true,
@@ -603,7 +608,7 @@ export class UploadController {
         return;
       }
 
-      const stats = await ImageService.getStorageStats();
+      const stats = await ActiveImageService.getStorageStats();
 
       res.status(200).json({
         success: true,
@@ -649,7 +654,7 @@ export class UploadController {
         return;
       }
 
-      const result = await ImageService.cleanupOrphanedImages();
+      const result = await ActiveImageService.cleanupOrphanedImages();
 
       res.status(200).json({
         success: true,

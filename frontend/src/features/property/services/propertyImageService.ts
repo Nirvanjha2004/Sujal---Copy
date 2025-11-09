@@ -40,7 +40,7 @@ class PropertyImageService {
       return {
         id: response.id,
         property_id: propertyId,
-        image_url: response.image_url || response.url,
+        image_url: response.large_url || response.medium_url || response.thumbnail_url,
         alt_text: caption || `Property ${propertyId} image`,
         display_order: response.display_order || 0,
         is_primary: response.is_primary || false,
@@ -89,7 +89,7 @@ class PropertyImageService {
           uploadedImages.push({
             id: imageData.imageId || imageData.id,
             property_id: propertyId,
-            image_url: imageData.url || imageData.image_url,
+            image_url: imageData.url || imageData.large_url || imageData.medium_url,
             alt_text: `Property ${propertyId} image ${index + 1}`,
             display_order: existingImages.length + index,
             is_primary: index === 0 && existingImages.length === 0,
@@ -305,7 +305,7 @@ class PropertyImageService {
     return {
       id: apiImage.id,
       property_id: apiImage.property_id || apiImage.propertyId,
-      image_url: apiImage.image_url || apiImage.url,
+      image_url: apiImage.medium_url || apiImage.large_url || apiImage.image_url || apiImage.url,
       alt_text: apiImage.alt_text || apiImage.alt || 'Property image',
       display_order: apiImage.display_order || apiImage.order || 0,
       is_primary: apiImage.is_primary || apiImage.isPrimary || false,

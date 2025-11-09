@@ -16,6 +16,9 @@ export interface Message {
 export interface PropertyImage {
   id: number;
   image_url: string;
+  large_url? : string;
+  thumbnail_url?: string;
+  medium_url? : string; 
   alt_text?: string;
   is_primary: boolean;
 }

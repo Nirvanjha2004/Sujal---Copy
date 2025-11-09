@@ -455,7 +455,7 @@ export function PropertySearchDashboard() {
                       >
                         <div className="relative">
                           <img
-                            src={property.images?.[0]?.image_url || "/api/placeholder/400/300"}
+                            src={property.images?.[0]?.medium_url || "/api/placeholder/400/300"}
                             alt={property.title}
                             className="w-full h-40 object-cover"
                           />
@@ -531,7 +531,7 @@ export function PropertySearchDashboard() {
                       >
                         <div className="relative">
                           <img
-                            src={favorite.property.images?.[0]?.image_url || "/api/placeholder/400/300"}
+                            src={favorite.property.images?.[0]?.medium_url || "/api/placeholder/400/300"}
                             alt={favorite.property.title}
                             className="w-full h-40 object-cover"
                           />
@@ -607,7 +607,7 @@ export function PropertySearchDashboard() {
                       >
                         <div className="relative">
                           <img
-                            src={contacted.property.images?.[0]?.image_url || "/api/placeholder/400/300"}
+                            src={contacted.property.images?.[0]?.medium_url || "/api/placeholder/400/300"}
                             alt={contacted.property.title}
                             className="w-full h-40 object-cover"
                           />

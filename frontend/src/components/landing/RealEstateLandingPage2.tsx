@@ -331,7 +331,7 @@ export function RealEstateLandingPage() {
             <div className="mb-8 flex items-center justify-between">
               <div>
                 <h2 className="font-heading text-2xl md:text-3xl font-bold tracking-tight mb-1">
-                  Recommended Projects
+                  Recommended Properties
                 </h2>
                 <p className="text-sm md:text-base text-muted-foreground">The most searched projects in Kolkata South</p>
               </div>
@@ -382,7 +382,7 @@ export function RealEstateLandingPage() {
                         <CardContent className="p-0">
                           <img
                             alt="Project"
-                            src={property.images?.[0]?.image_url || "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/landscape/4.webp"}
+                            src={property.images?.[0]?.medium_url || "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/landscape/4.webp"}
                             className="w-full h-48 object-cover rounded-t-xl"
                           />
                           <div className="p-4">

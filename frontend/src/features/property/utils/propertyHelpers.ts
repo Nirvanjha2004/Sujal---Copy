@@ -137,7 +137,7 @@ export const getPropertyImageUrl = (
   fallbackUrl: string = '/images/property-placeholder.jpg'
 ): string => {
   const primaryImage = getPrimaryImage(images);
-  return primaryImage?.image_url || fallbackUrl;
+  return  primaryImage?.large_url || primaryImage?.medium_url||primaryImage?.image_url || fallbackUrl;
 };
 
 /**
@@ -148,7 +148,7 @@ export const getPropertyThumbnailUrl = (
   fallbackUrl: string = '/images/property-placeholder-thumb.jpg'
 ): string => {
   const primaryImage = getPrimaryImage(images);
-  return primaryImage?.image_url || fallbackUrl;
+  return primaryImage?.thumbnail_url|| primaryImage?.image_url || fallbackUrl;
 };
 
 /**

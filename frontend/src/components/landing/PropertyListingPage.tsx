@@ -78,52 +78,65 @@ export function PropertyListingPage() {
         }
     };
 
-    const handleContactOwnerClick = async () => {
-        // 1. Check for authentication and user details first
-        if (!authState.isAuthenticated || !authState.user?.email) {
-            toast.info("Please log in to contact the owner.");
+    // Show contact card modal instead of redirecting to conversations
+    const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+
+    const handleContactOwnerClick = () => {
+        if (!authState.isAuthenticated) {
+            toast.info("Please log in to view contact details.");
             navigate('/login');
             return;
         }
-
-        // 2. Ensure property data is loaded
-        if (!property || !property.id) {
-            toast.error("Property details not available. Please refresh the page.");
-            return;
-        }
-
-        try {
-            const defaultMessage = `I'm interested in your property: "${property.title}".`;
-
-            console.log('inquiryResponse:', property.id, authState.user.email, authState.user.first_name, authState.user.id);
-
-            // 3. Use guaranteed values from the checks above
-            const inquiryResponse = await api.createInquiry({
-                property_id: property.id,
-                message: defaultMessage,
-                name: authState.user.first_name || "Interested Buyer", // Fallback for name
-                email: authState.user.email,
-                inquirer_id: authState.user.id,
-            });
-
-
-            const inquiry = inquiryResponse.data.inquiry;
-            const conversationId = inquiry.conversation_id;
-
-            if (!conversationId) {
-                throw new Error("Could not retrieve conversation ID.");
-            }
-
-            toast.success("Opening conversation...");
-
-            // Navigate to the specific conversation page
-            navigate(`/dashboard/messages/${conversationId}`);
-
-        } catch (err) {
-            console.error("Failed to create inquiry:", err);
-            toast.error("Could not start conversation. Please try again.");
-        }
+        setIsContactModalOpen(true);
     };
+
+    // COMMENTED OUT: Old implementation that redirects to conversations
+    // const handleContactOwnerClick = async () => {
+    //     // 1. Check for authentication and user details first
+    //     if (!authState.isAuthenticated || !authState.user?.email) {
+    //         toast.info("Please log in to contact the owner.");
+    //         navigate('/login');
+    //         return;
+    //     }
+
+    //     // 2. Ensure property data is loaded
+    //     if (!property || !property.id) {
+    //         toast.error("Property details not available. Please refresh the page.");
+    //         return;
+    //     }
+
+    //     try {
+    //         const defaultMessage = `I'm interested in your property: "${property.title}".`;
+
+    //         console.log('inquiryResponse:', property.id, authState.user.email, authState.user.first_name, authState.user.id);
+
+    //         // 3. Use guaranteed values from the checks above
+    //         const inquiryResponse = await api.createInquiry({
+    //             property_id: property.id,
+    //             message: defaultMessage,
+    //             name: authState.user.first_name || "Interested Buyer", // Fallback for name
+    //             email: authState.user.email,
+    //             inquirer_id: authState.user.id,
+    //         });
+
+
+    //         const inquiry = inquiryResponse.data.inquiry;
+    //         const conversationId = inquiry.conversation_id;
+
+    //         if (!conversationId) {
+    //             throw new Error("Could not retrieve conversation ID.");
+    //         }
+
+    //         toast.success("Opening conversation...");
+
+    //         // Navigate to the specific conversation page
+    //         navigate(`/dashboard/messages/${conversationId}`);
+
+    //     } catch (err) {
+    //         console.error("Failed to create inquiry:", err);
+    //         toast.error("Could not start conversation. Please try again.");
+    //     }
+    // };
 
     // Add these handler functions in your component
     const handleScheduleVisitClick = () => {
@@ -704,6 +717,62 @@ export function PropertyListingPage() {
                     </div>
                 </div>
             </footer>
+
+            {/* Contact Owner Modal */}
+            <Dialog open={isContactModalOpen} onOpenChange={setIsContactModalOpen}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Contact Owner</DialogTitle>
+                        <DialogDescription>
+                            Property owner contact information
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="flex items-center gap-4">
+                            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                                <Icon icon="solar:user-bold" className="size-8 text-primary" />
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-lg">Property Owner</h3>
+                                <p className="text-sm text-muted-foreground">Listed by owner</p>
+                            </div>
+                        </div>
+                        <Separator />
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-3">
+                                <Icon icon="solar:phone-bold" className="size-5 text-primary" />
+                                <div>
+                                    <p className="text-sm text-muted-foreground">Phone</p>
+                                    <p className="font-medium">+91 98765 43210</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <Icon icon="solar:letter-bold" className="size-5 text-primary" />
+                                <div>
+                                    <p className="text-sm text-muted-foreground">Email</p>
+                                    <p className="font-medium">owner@example.com</p>
+                                </div>
+                            </div>
+                        </div>
+                        <Separator />
+                        <div className="bg-muted p-3 rounded-lg">
+                            <p className="text-sm text-muted-foreground">
+                                <Icon icon="solar:info-circle-bold" className="size-4 inline mr-1" />
+                                Contact the owner directly for property inquiries and site visits.
+                            </p>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsContactModalOpen(false)}>
+                            Close
+                        </Button>
+                        <Button className="bg-primary">
+                            <Icon icon="solar:phone-bold" className="mr-2 h-4 w-4" />
+                            Call Now
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             {/* Site Visit Modal */}
             <Dialog open={isSiteVisitModalOpen} onOpenChange={setSiteVisitModalOpen}>

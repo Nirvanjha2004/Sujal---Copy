@@ -17,7 +17,6 @@ import { Layout } from "@/shared/components/layout/Layout";
 import { Icon } from "@iconify/react";
 import { toast } from 'sonner';
 import { useAuth } from '@/shared/contexts/AuthContext';
-import { api } from '@/shared/lib/api';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/shared/components/ui/dialog";
 import { Separator } from "@/shared/components/ui/separator";
 
@@ -266,14 +265,37 @@ export function PropertyDetailsPage() {
 
                     {/* Action Buttons */}
                     <div className="flex flex-col gap-3 lg:w-64">
-                        <Button
-                            onClick={handleContactOwnerClick}
-                            size="lg"
-                            className="w-full shadow-lg shadow-primary/20"
-                        >
-                            <Icon icon="solar:phone-calling-bold" className="size-5 mr-2" />
-                            Contact Owner
-                        </Button>
+                        {/* Show Edit button only for property owner or agents */}
+                        {authState.isAuthenticated && 
+                         authState.user && 
+                         (authState.user.id === property.user_id || 
+                          authState.user.role === 'agent' || 
+                          authState.user.role === 'admin') && (
+                            <Button
+                                onClick={() => navigate(`/property/${property.id}/edit`)}
+                                size="lg"
+                                variant="outline"
+                                className="w-full"
+                            >
+                                <Icon icon="solar:pen-bold" className="size-5 mr-2" />
+                                Edit Property
+                            </Button>
+                        )}
+                        
+                        {/* Show Contact button only if user is not the owner */}
+                        {(!authState.isAuthenticated || 
+                          !authState.user || 
+                          authState.user.id !== property.user_id) && (
+                            <Button
+                                onClick={handleContactOwnerClick}
+                                size="lg"
+                                className="w-full shadow-lg shadow-primary/20"
+                            >
+                                <Icon icon="solar:phone-calling-bold" className="size-5 mr-2" />
+                                Contact Owner
+                            </Button>
+                        )}
+                        
                         <div className="grid grid-cols-2 gap-2">
                             <Button
                                 variant="outline"

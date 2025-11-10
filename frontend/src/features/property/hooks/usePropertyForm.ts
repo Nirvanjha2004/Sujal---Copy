@@ -305,7 +305,8 @@ export const usePropertyForm = (options: UsePropertyFormOptions): UsePropertyFor
           setIsLoading(false);
         });
     }
-  }, [mode, propertyId, loadProperty, onError]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, propertyId]);
 
   return {
     formData,

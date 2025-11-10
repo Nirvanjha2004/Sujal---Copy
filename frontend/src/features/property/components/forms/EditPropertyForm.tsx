@@ -62,7 +62,8 @@ export const EditPropertyForm: React.FC<EditPropertyFormProps> = ({
     if (initialProperty) {
       loadProperty(initialProperty);
     }
-  }, [initialProperty, loadProperty]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialProperty]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

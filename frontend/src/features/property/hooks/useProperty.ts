@@ -111,7 +111,8 @@ export const useProperty = (options: UsePropertyOptions = {}): UsePropertyReturn
     if (autoFetch && propertyId) {
       fetchProperty();
     }
-  }, [autoFetch, propertyId, fetchProperty]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoFetch, propertyId]);
 
   return {
     property,
@@ -196,7 +197,8 @@ export const useUserProperties = (userId?: number): UseUserPropertiesReturn => {
     if (userId) {
       fetchUserProperties();
     }
-  }, [userId, fetchUserProperties]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
 
   return {
     properties,

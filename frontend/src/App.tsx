@@ -14,7 +14,7 @@ import { FavoritesPage } from '@/features/buyer/pages/FavoritesPage'
 import { SavedSearchesPage } from '@/features/buyer/pages/SavedSearchesPage'
 // import { CalculatorsPage } from '@/features/calculators'
 import { AdminPanelPage } from '@/features/admin'
-import { AddPropertyPage, MyPropertiesPage } from '@/features/property/pages'
+import { AddPropertyPage, MyPropertiesPage, EditPropertyPage } from '@/features/property/pages'
 import { AgentPropertyDashboard } from '@/features/agent/components'
 import { PropertySearchPage } from '@/features/property/pages/PropertySearchPage'
 import { ProjectDetailsPage as PublicProjectDetailsPage } from './pages/ProjectDetailsPage'
@@ -128,6 +128,14 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <MyPropertiesPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/property/:id/edit"
+                        element={
+                            <ProtectedRoute>
+                                <EditPropertyPage />
                             </ProtectedRoute>
                         }
                     />

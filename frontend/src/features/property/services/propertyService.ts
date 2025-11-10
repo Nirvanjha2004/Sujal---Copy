@@ -143,12 +143,19 @@ class PropertyService {
   /**
    * Update property
    */
-  async updateProperty(id: number, propertyData: UpdatePropertyRequest): Promise<Property> {
+  async updateProperty(id: number, updateData: UpdatePropertyRequest): Promise<Property> {
     try {
       // Transform frontend data to backend format
-      const backendData = this.transformToBackendFormat(propertyData);
+      const backendData = this.transformToBackendFormat(updateData);
       const response = await api.updateProperty(id, backendData);
-      return this.transformApiPropertyToProperty(response);
+      // Handle both response formats: direct property or { data: property }
+      const responseData = (response as any).data || response;
+      const transformedProperty = this.transformApiPropertyToProperty(responseData);
+      // Ensure the property has the correct ID
+      if (!transformedProperty.id) {
+        transformedProperty.id = id;
+      }
+      return transformedProperty;
     } catch (error: any) {
       if (error.status === 404) {
         throw this.createError(
@@ -295,7 +302,7 @@ class PropertyService {
   }
 
   /**
-   * Transform frontend property data to backend format
+   * Transform frontend property data to backend format (camelCase for backend)
    */
   private transformToBackendFormat(data: any): any {
     const transformed: any = {};
@@ -303,11 +310,11 @@ class PropertyService {
     // Required fields - ensure they are always present with meaningful defaults
     transformed.title = data.title || 'Untitled Property';
     transformed.description = data.description || '';
-    transformed.property_type = data.property_type || data.propertyType || 'apartment';
-    transformed.listing_type = data.listing_type || data.listingType || 'sale';
+    transformed.propertyType = data.property_type || data.propertyType || 'apartment';
+    transformed.listingType = data.listing_type || data.listingType || 'sale';
     transformed.status = data.status || 'ACTIVE';
     transformed.price = Number(data.price) || 0;
-    transformed.area_sqft = Number(data.area_sqft || data.areaSqft || data.area) || 0;
+    transformed.areaSqft = Number(data.area_sqft || data.areaSqft || data.area) || 0;
     transformed.address = data.address || 'Address not provided';
     transformed.city = data.city || 'City not provided';
     transformed.state = data.state || 'State not provided';
@@ -320,7 +327,7 @@ class PropertyService {
       transformed.bathrooms = Number(data.bathrooms);
     }
     if (data.postal_code || data.postalCode) {
-      transformed.postal_code = data.postal_code || data.postalCode;
+      transformed.postalCode = data.postal_code || data.postalCode;
     }
     if (data.latitude !== undefined && data.latitude !== '') {
       transformed.latitude = Number(data.latitude);
@@ -349,8 +356,8 @@ class PropertyService {
     }
 
     // Handle boolean fields with defaults
-    transformed.is_active = data.isActive !== undefined ? data.isActive : true;
-    transformed.is_featured = data.isFeatured !== undefined ? data.isFeatured : false;
+    transformed.isActive = data.isActive !== undefined ? data.isActive : true;
+    transformed.isFeatured = data.isFeatured !== undefined ? data.isFeatured : false;
 
     return transformed;
   }

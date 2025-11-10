@@ -1,7 +1,7 @@
 import { Icon } from "@iconify/react";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
-
+import topbanner from './topbanner.png';
 import {
   Select,
   SelectTrigger,
@@ -164,164 +164,135 @@ export function RealEstateLandingPage() {
     <>
       <div className="min-h-screen bg-background">
         <Header variant="landing" />
-        <section 
+        <section
           className="relative py-20 overflow-hidden bg-cover bg-center bg-no-repeat full-width-element"
           style={{
-            backgroundImage: 'url(/landingpage/images/topbanner.png)',
+            backgroundImage: `url(${topbanner})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }}
         >
           {/* Overlay for better text readability */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent"></div>
-          
+
           <div className="container mx-auto px-4 md:px-6 lg:px-8 relative z-10">
-            <div className="max-w-4xl">
-              <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4 text-white drop-shadow-lg">
-                Buy in Kolkata South
-              </h1>
-              <p className="text-lg md:text-xl text-white/95 mb-10 drop-shadow-md">
-                Discover the perfect property from thousands of listings across India
-              </p>
-              <Card className="shadow-2xl bg-white/95 backdrop-blur-sm">
-                <CardContent className="p-0">
-                  {/* Tabs for Buy/Rent/New Launch etc */}
-                  <div className="border-b border-gray-200">
-                    <div className="flex items-center gap-1 p-2">
-                      <Button
-                        variant={listingType === 'buy' ? 'default' : 'ghost'}
-                        size="sm"
-                        onClick={() => setListingType('buy')}
-                        className="rounded-md"
-                      >
-                        Buy
-                      </Button>
-                      <Button
-                        variant={listingType === 'rent' ? 'default' : 'ghost'}
-                        size="sm"
-                        onClick={() => setListingType('rent')}
-                        className="rounded-md"
-                      >
-                        Rent
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => navigate('/projects')}
-                        className="rounded-md"
-                      >
-                        New Launch
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => navigate('/properties?listing_type=pg')}
-                        className="rounded-md"
-                      >
-                        PG/Co-living
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => navigate('/properties?property_type=commercial')}
-                        className="rounded-md"
-                      >
-                        Commercial
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => navigate('/properties?property_type=plot')}
-                        className="rounded-md"
-                      >
-                        Plot/land
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => navigate('/projects')}
-                        className="rounded-md"
-                      >
-                        Projects
-                      </Button>
+            <div className="grid lg:grid-cols-2 gap-12 xl:gap-56 items-center">
+              <div className="max-w-4xl">
+                <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4 text-white drop-shadow-lg">
+                  Buy in Kolkata South
+                </h1>
+                <p className="text-lg md:text-xl text-white/95 mb-10 drop-shadow-md">
+                  Discover the perfect property from thousands of listings across India
+                </p>
+                <Card className="shadow-2xl bg-white/95 backdrop-blur-sm">
+                  <CardContent className="p-0">
+
+                    <div className="p-4 md:p-6">
+                      <div className="flex flex-col md:flex-row gap-3">
+                        <Select value={listingType} onValueChange={setListingType}>
+                          <SelectTrigger className="md:w-32">
+                            <SelectValue placeholder="Buy" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="buy">Buy</SelectItem>
+                            <SelectItem value="rent">Rent</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Select value={propertyType} onValueChange={setPropertyType}>
+                          <SelectTrigger className="md:w-48">
+                            <SelectValue placeholder="All Residential" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Residential</SelectItem>
+                            <SelectItem value="apartment">Apartment</SelectItem>
+                            <SelectItem value="villa">Villa</SelectItem>
+                            <SelectItem value="plot">Plot</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <div className="flex-1 relative">
+                          <Icon
+                            icon="solar:magnifer-bold"
+                            className="size-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                          />
+                          <Input
+                            className="pl-10 pr-12 h-11"
+                            placeholder="Search 'Form Houses in 1 cr'"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyPress={(e) => {
+                              if (e.key === 'Enter') {
+                                handleSearch();
+                              }
+                            }}
+                          />
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+                          >
+                            <Icon icon="solar:map-point-bold" className="size-5 text-primary" />
+                          </Button>
+                        </div>
+                        <Button
+                          className="gradient-button h-11 px-8 font-semibold"
+                          onClick={handleSearch}
+                        >
+                          Search
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Engaging Text Section */}
+              <div className="hidden lg:block lg:pl-8 xl:pl-12">
+                <div className="text-white space-y-6">
+                  <div className="space-y-3">
+                    <h2 className="font-heading text-3xl xl:text-4xl font-bold tracking-tight drop-shadow-lg">
+                      Solve Your Property Puzzle
+                    </h2>
+                    <p className="text-lg xl:text-xl text-white/90 drop-shadow-md font-medium">
+                      Where Every Piece Fits Perfectly
+                    </p>
+                  </div>
+
+                  <div className="space-y-4 text-white/85 drop-shadow-md">
+                    <div className="flex items-start gap-3">
+                      <div className="mt-1 flex-shrink-0">
+                        <Icon icon="solar:check-circle-bold" className="size-6 text-green-400" />
+                      </div>
+                      <p className="text-base xl:text-lg">
+                        <span className="font-semibold text-white">10,000+</span> verified properties across India
+                      </p>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <div className="mt-1 flex-shrink-0">
+                        <Icon icon="solar:check-circle-bold" className="size-6 text-green-400" />
+                      </div>
+                      <p className="text-base xl:text-lg">
+                        <span className="font-semibold text-white">Smart Search</span> to find your dream home instantly
+                      </p>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <div className="mt-1 flex-shrink-0">
+                        <Icon icon="solar:check-circle-bold" className="size-6 text-green-400" />
+                      </div>
+                      <p className="text-base xl:text-lg">
+                        <span className="font-semibold text-white">Trusted by thousands</span> of happy homeowners
+                      </p>
                     </div>
                   </div>
 
-                  <div className="p-4 md:p-6">
-                    <div className="flex flex-col md:flex-row gap-3">
-                      <Select value={listingType} onValueChange={setListingType}>
-                        <SelectTrigger className="md:w-32">
-                          <SelectValue placeholder="Buy" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="buy">Buy</SelectItem>
-                          <SelectItem value="rent">Rent</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Select value={propertyType} onValueChange={setPropertyType}>
-                        <SelectTrigger className="md:w-48">
-                          <SelectValue placeholder="All Residential" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Residential</SelectItem>
-                          <SelectItem value="apartment">Apartment</SelectItem>
-                          <SelectItem value="villa">Villa</SelectItem>
-                          <SelectItem value="plot">Plot</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <div className="flex-1 relative">
-                        <Icon
-                          icon="solar:magnifer-bold"
-                          className="size-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                        />
-                        <Input
-                          className="pl-10 pr-12 h-11"
-                          placeholder="Search 'Form Houses in 1 cr'"
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          onKeyPress={(e) => {
-                            if (e.key === 'Enter') {
-                              handleSearch();
-                            }
-                          }}
-                        />
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
-                        >
-                          <Icon icon="solar:map-point-bold" className="size-5 text-primary" />
-                        </Button>
-                      </div>
-                      <Button
-                        className="gradient-button h-11 px-8 font-semibold"
-                        onClick={handleSearch}
-                      >
-                        Search
-                      </Button>
-                    </div>
+                  <div className="pt-4">
+                    <p className="text-sm xl:text-base text-white/70 italic drop-shadow-md">
+                      "PropPuzzles makes finding your perfect property as easy as solving a puzzle -
+                      every piece falls into place effortlessly."
+                    </p>
                   </div>
-                </CardContent>
-              </Card>
-              
-              {/* City Selection Buttons */}
-              <div className="flex items-center gap-4 mt-6">
-                <Button
-                  variant="secondary"
-                  className="bg-white/95 hover:bg-white shadow-md"
-                  onClick={() => navigate('/properties?city=kolkata')}
-                >
-                  <Icon icon="solar:home-bold" className="size-4 mr-2 text-primary" />
-                  Buy in Kolkata
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="text-white hover:bg-white/10"
-                  onClick={() => navigate('/cities')}
-                >
-                  <Icon icon="solar:map-bold" className="size-4 mr-2" />
-                  Explore new city
-                </Button>
+                </div>
               </div>
             </div>
           </div>

@@ -3,16 +3,16 @@ import { Property } from '../../types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 
 import { Separator } from '@/shared/components/ui/separator';
-import { 
-  Wifi, 
-  Car, 
-  Shield, 
-  Waves, 
-  Dumbbell, 
-  Trees, 
-  Zap, 
-  Droplets, 
-  Wind, 
+import {
+  Wifi,
+  Car,
+  Shield,
+  Waves,
+  Dumbbell,
+  Trees,
+  Zap,
+  Droplets,
+  Wind,
   Camera,
   Home,
   Building,
@@ -34,11 +34,15 @@ export const PropertyFeatures: React.FC<PropertyFeaturesProps> = ({
 }) => {
   // Get amenities in array format
   const amenitiesList = formatAmenities(property.amenities);
-  
+
+  // Debug logging
+  console.log('Property amenities (raw):', property.amenities);
+  console.log('Formatted amenities list:', amenitiesList);
+
   // Get amenity icon based on name
   const getAmenityIcon = (amenity: string) => {
     const lowerAmenity = amenity.toLowerCase();
-    
+
     if (lowerAmenity.includes('wifi') || lowerAmenity.includes('internet')) return Wifi;
     if (lowerAmenity.includes('parking') || lowerAmenity.includes('garage')) return Car;
     if (lowerAmenity.includes('security') || lowerAmenity.includes('guard')) return Shield;
@@ -49,7 +53,7 @@ export const PropertyFeatures: React.FC<PropertyFeaturesProps> = ({
     if (lowerAmenity.includes('water') || lowerAmenity.includes('supply')) return Droplets;
     if (lowerAmenity.includes('ac') || lowerAmenity.includes('air')) return Wind;
     if (lowerAmenity.includes('cctv') || lowerAmenity.includes('camera')) return Camera;
-    
+
     return Home; // Default icon
   };
 
@@ -65,22 +69,22 @@ export const PropertyFeatures: React.FC<PropertyFeaturesProps> = ({
 
     amenities.forEach(amenity => {
       const lowerAmenity = amenity.toLowerCase();
-      
-      if (lowerAmenity.includes('security') || lowerAmenity.includes('guard') || 
-          lowerAmenity.includes('cctv') || lowerAmenity.includes('camera') ||
-          lowerAmenity.includes('fire') || lowerAmenity.includes('safety')) {
+
+      if (lowerAmenity.includes('security') || lowerAmenity.includes('guard') ||
+        lowerAmenity.includes('cctv') || lowerAmenity.includes('camera') ||
+        lowerAmenity.includes('fire') || lowerAmenity.includes('safety')) {
         categories['Security & Safety'].push(amenity);
-      } else if (lowerAmenity.includes('pool') || lowerAmenity.includes('gym') || 
-                 lowerAmenity.includes('garden') || lowerAmenity.includes('park') ||
-                 lowerAmenity.includes('club') || lowerAmenity.includes('sports')) {
+      } else if (lowerAmenity.includes('pool') || lowerAmenity.includes('gym') ||
+        lowerAmenity.includes('garden') || lowerAmenity.includes('park') ||
+        lowerAmenity.includes('club') || lowerAmenity.includes('sports')) {
         categories['Recreational'].push(amenity);
-      } else if (lowerAmenity.includes('power') || lowerAmenity.includes('water') || 
-                 lowerAmenity.includes('wifi') || lowerAmenity.includes('internet') ||
-                 lowerAmenity.includes('gas') || lowerAmenity.includes('electricity')) {
+      } else if (lowerAmenity.includes('power') || lowerAmenity.includes('water') ||
+        lowerAmenity.includes('wifi') || lowerAmenity.includes('internet') ||
+        lowerAmenity.includes('gas') || lowerAmenity.includes('electricity')) {
         categories['Utilities'].push(amenity);
-      } else if (lowerAmenity.includes('parking') || lowerAmenity.includes('elevator') || 
-                 lowerAmenity.includes('lift') || lowerAmenity.includes('ac') ||
-                 lowerAmenity.includes('furnished') || lowerAmenity.includes('balcony')) {
+      } else if (lowerAmenity.includes('parking') || lowerAmenity.includes('elevator') ||
+        lowerAmenity.includes('lift') || lowerAmenity.includes('ac') ||
+        lowerAmenity.includes('furnished') || lowerAmenity.includes('balcony')) {
         categories['Basic Amenities'].push(amenity);
       } else {
         categories['Other'].push(amenity);
@@ -95,7 +99,7 @@ export const PropertyFeatures: React.FC<PropertyFeaturesProps> = ({
 
   // Property specifications from the property amenities
   const specifications: Record<string, boolean> = {}; // TODO: Derive from amenities or other property fields
-  
+
   // Common property features to check
   const commonFeatures = [
     { key: 'furnished', label: 'Furnished', icon: Home },
@@ -123,11 +127,11 @@ export const PropertyFeatures: React.FC<PropertyFeaturesProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {commonFeatures.map((feature) => {
               const IconComponent = feature.icon;
-              const isAvailable = specifications[feature.key] || 
-                                amenitiesList.some(amenity => 
-                                  amenity.toLowerCase().includes(feature.label.toLowerCase().split(' ')[0])
-                                );
-              
+              const isAvailable = specifications[feature.key] ||
+                amenitiesList.some(amenity =>
+                  amenity.toLowerCase().includes(feature.label.toLowerCase().split(' ')[0])
+                );
+
               return (
                 <div key={feature.key} className="flex items-center gap-3 p-3 rounded-lg border">
                   <IconComponent className="h-5 w-5 text-gray-600 flex-shrink-0" />

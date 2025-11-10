@@ -1,12 +1,11 @@
 import { api } from '@/shared/lib/api';
+import { handlePropertyError, validateImageFile } from '../utils/errorHandler';
 import type { PropertyImage, PropertyImageType } from '../types';
 
 /**
  * Property image service for image upload, management, and optimization
  */
 class PropertyImageService {
-  private readonly MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-  private readonly ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
   private readonly MAX_IMAGES_PER_PROPERTY = 20;
 
   /**
@@ -18,10 +17,21 @@ class PropertyImageService {
     imageType: PropertyImageType = 'gallery',
     caption?: string
   ): Promise<PropertyImage> {
-    try {
-      // Validate file before upload
-      this.validateImageFile(imageFile);
+    // Input validation
+    if (!propertyId || propertyId <= 0) {
+      throw {
+        code: 'INVALID_PROPERTY_ID',
+        message: 'Please provide a valid property ID'
+      };
+    }
 
+    // Validate file before upload
+    const fileError = validateImageFile(imageFile);
+    if (fileError) {
+      throw fileError;
+    }
+
+    try {
       // Optimize image before upload
       const optimizedFile = await this.optimizeImage(imageFile);
 
@@ -48,7 +58,8 @@ class PropertyImageService {
         updated_at: response.updated_at || new Date().toISOString()
       };
     } catch (error: any) {
-      throw new Error(`Failed to upload property image: ${error.message}`);
+      console.error('Error uploading property image:', error);
+      throw handlePropertyError(error);
     }
   }
 
@@ -125,10 +136,26 @@ class PropertyImageService {
    * Delete a property image
    */
   async deletePropertyImage(propertyId: number, imageId: number): Promise<void> {
+    // Input validation
+    if (!propertyId || propertyId <= 0) {
+      throw {
+        code: 'INVALID_PROPERTY_ID',
+        message: 'Please provide a valid property ID'
+      };
+    }
+
+    if (!imageId || imageId <= 0) {
+      throw {
+        code: 'VALIDATION_ERROR',
+        message: 'Please provide a valid image ID'
+      };
+    }
+
     try {
       await api.deletePropertyImage(propertyId, imageId);
     } catch (error: any) {
-      throw new Error(`Failed to delete property image: ${error.message}`);
+      console.error('Error deleting property image:', error);
+      throw handlePropertyError(error);
     }
   }
 
@@ -226,25 +253,7 @@ class PropertyImageService {
     }
   }
 
-  /**
-   * Validate image file
-   */
-  private validateImageFile(file: File): void {
-    // Check file size
-    if (file.size > this.MAX_FILE_SIZE) {
-      throw new Error(`File size must be less than ${this.MAX_FILE_SIZE / (1024 * 1024)}MB`);
-    }
 
-    // Check file type
-    if (!this.ALLOWED_TYPES.includes(file.type)) {
-      throw new Error(`File type ${file.type} is not allowed. Allowed types: ${this.ALLOWED_TYPES.join(', ')}`);
-    }
-
-    // Check if file is actually an image
-    if (!file.type.startsWith('image/')) {
-      throw new Error('File must be an image');
-    }
-  }
 
   /**
    * Upload image file using fetch

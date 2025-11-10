@@ -52,7 +52,7 @@ export function usePopularProperties(limit: number = 10) {
 export function useProperties(filters?: PropertyFilters) {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<any | null>(null);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
 
@@ -60,12 +60,17 @@ export function useProperties(filters?: PropertyFilters) {
     const fetchProperties = async () => {
       try {
         setLoading(true);
+        setError(null);
         const response = await api.getProperties(filters);
         setProperties(response.data);
         setTotal(response.total);
         setPage(response.page);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch properties');
+      } catch (err: any) {
+        const errorData = err.response?.data?.error || err;
+        setError({
+          code: errorData.code || 'UNKNOWN_ERROR',
+          message: errorData.message || err.message || 'Failed to fetch properties'
+        });
         setProperties([]);
       } finally {
         setLoading(false);
@@ -81,16 +86,31 @@ export function useProperties(filters?: PropertyFilters) {
 export function useProperty(id: number) {
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<any | null>(null);
 
   useEffect(() => {
     const fetchProperty = async () => {
+      // Input validation
+      if (!id || id <= 0) {
+        setError({
+          code: 'INVALID_PROPERTY_ID',
+          message: 'Invalid property ID'
+        });
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
+        setError(null);
         const response = await api.getProperty(id);
         setProperty(response);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch property');
+      } catch (err: any) {
+        const errorData = err.response?.data?.error || err;
+        setError({
+          code: errorData.code || 'UNKNOWN_ERROR',
+          message: errorData.message || err.message || 'Failed to fetch property'
+        });
         setProperty(null);
       } finally {
         setLoading(false);
@@ -108,7 +128,7 @@ export function useProperty(id: number) {
 export function useSearchProperties(query: string, filters?: PropertyFilters) {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<any | null>(null);
   const [total, setTotal] = useState(0);
 
   useEffect(() => {
@@ -133,9 +153,13 @@ export function useSearchProperties(query: string, filters?: PropertyFilters) {
           setProperties(response.data || []);
           setTotal(response.total || 0);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Search error:', err);
-        setError(err instanceof Error ? err.message : 'Failed to search properties');
+        const errorData = err.response?.data?.error || err;
+        setError({
+          code: errorData.code || 'UNKNOWN_ERROR',
+          message: errorData.message || err.message || 'Failed to search properties'
+        });
         setProperties([]);
         setTotal(0);
       } finally {

@@ -154,18 +154,21 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
   try {
     const response = await fetch(url, config);
 
-    // Handle 401 responses by clearing invalid tokens
-    if (response.status === 401) {
-      const errorData = await response.json().catch(() => ({}));
-      if (errorData.error?.code === 'INVALID_TOKEN' || errorData.error?.code === 'MISSING_TOKEN') {
-        console.warn('Received 401 with invalid token, clearing from localStorage');
-        localStorage.removeItem('token');
-      }
-      throw new ApiError(response.status, `HTTP error! status: ${response.status}`);
-    }
-
     if (!response.ok) {
-      throw new ApiError(response.status, `HTTP error! status: ${response.status}`);
+      // Parse error response from backend
+      const errorData = await response.json().catch(() => ({}));
+      
+      // Handle 401 responses by clearing invalid tokens
+      if (response.status === 401) {
+        if (errorData.error?.code === 'INVALID_TOKEN' || errorData.error?.code === 'MISSING_TOKEN') {
+          console.warn('Received 401 with invalid token, clearing from localStorage');
+          localStorage.removeItem('token');
+        }
+      }
+      
+      // Throw error with backend message
+      const errorMessage = errorData.error?.message || `HTTP error! status: ${response.status}`;
+      throw new ApiError(response.status, errorMessage);
     }
 
     return await response.json();

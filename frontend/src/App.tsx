@@ -14,7 +14,7 @@ import { FavoritesPage } from '@/features/buyer/pages/FavoritesPage'
 import { SavedSearchesPage } from '@/features/buyer/pages/SavedSearchesPage'
 // import { CalculatorsPage } from '@/features/calculators'
 import { AdminPanelPage } from '@/features/admin'
-import { AddPropertyPage, MyPropertiesPage } from '@/features/property/pages'
+import { AddPropertyPage, MyPropertiesPage, EditPropertyPage } from '@/features/property/pages'
 import { AgentPropertyDashboard } from '@/features/agent/components'
 import { PropertySearchPage } from '@/features/property/pages/PropertySearchPage'
 import { ProjectDetailsPage as PublicProjectDetailsPage } from './pages/ProjectDetailsPage'
@@ -24,6 +24,7 @@ import { BulkUploadPage } from '@/pages/agent/BulkUploadPage'
 // Builder Pages
 import { ProjectsPage } from '@/features/builder/pages/ProjectsPage'
 import { NewProjectPage } from '@/features/builder/pages/NewProjectPage'
+import { EditProjectPage } from '@/features/builder/pages/EditProjectPage'
 import { ProjectDetailsPage } from '@/features/builder/pages/ProjectDetailsPage'
 import { ProjectUnitsPage } from '@/features/builder/pages/ProjectUnitsPage'
 import { BulkUnitsPage } from '@/features/builder/pages/BulkUnitsPage'
@@ -131,6 +132,14 @@ function App() {
                         }
                     />
                     <Route
+                        path="/property/:id/edit"
+                        element={
+                            <ProtectedRoute>
+                                <EditPropertyPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
                         path="/agent-dashboard"
                         element={
                             <ProtectedRoute requiredRole="agent">
@@ -169,6 +178,14 @@ function App() {
                         element={
                             <ProtectedRoute requiredRole="builder">
                                 <ProjectDetailsPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/builder/projects/:id/edit"
+                        element={
+                            <ProtectedRoute requiredRole="builder">
+                                <EditProjectPage />
                             </ProtectedRoute>
                         }
                     />

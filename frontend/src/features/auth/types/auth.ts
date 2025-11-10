@@ -65,6 +65,8 @@ export interface AuthError {
   type: AuthErrorType;
   message: string;
   field?: string;
+  code?: string;
+  details?: any;
 }
 
 export interface UseAuthReturn {

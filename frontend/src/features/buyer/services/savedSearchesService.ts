@@ -1,6 +1,7 @@
 import { api } from '@/shared/lib/api';
 import type { SavedSearch, PropertyFilters } from '../types/savedSearches';
 import type { PropertyFilters as ApiPropertyFilters } from '@/shared/lib/api';
+import { handleBuyerError } from '../utils/errorHandler';
 
 // Helper function to convert buyer PropertyFilters to API PropertyFilters
 const transformFiltersForAPI = (filters: PropertyFilters): ApiPropertyFilters => {
@@ -82,7 +83,8 @@ export const savedSearchesService = {
       return mappedSearches;
     } catch (error) {
       console.error('Error fetching saved searches:', error);
-      throw new Error(error instanceof Error ? error.message : 'Failed to fetch saved searches');
+      const buyerError = handleBuyerError(error);
+      throw buyerError;
     }
   },
 
@@ -94,6 +96,15 @@ export const savedSearchesService = {
    * @throws Error if the request fails
    */
   async createSavedSearch(name: string, filters: PropertyFilters): Promise<SavedSearch> {
+    // Input validation
+    if (!name || name.trim() === '') {
+      throw {
+        code: 'INVALID_SEARCH_NAME',
+        message: 'Please provide a search name',
+        field: 'name'
+      };
+    }
+
     try {
       const response = await api.createSavedSearch(name, transformFiltersForAPI(filters));
       return {
@@ -104,7 +115,7 @@ export const savedSearchesService = {
       };
     } catch (error) {
       console.error('Error creating saved search:', error);
-      throw new Error(error instanceof Error ? error.message : 'Failed to create saved search');
+      throw handleBuyerError(error);
     }
   },
 
@@ -114,11 +125,19 @@ export const savedSearchesService = {
    * @throws Error if the request fails
    */
   async deleteSavedSearch(searchId: number): Promise<void> {
+    // Input validation
+    if (!searchId || searchId <= 0) {
+      throw {
+        code: 'VALIDATION_ERROR',
+        message: 'Invalid search ID'
+      };
+    }
+
     try {
       await api.deleteSavedSearch(searchId);
     } catch (error) {
       console.error('Error deleting saved search:', error);
-      throw new Error(error instanceof Error ? error.message : 'Failed to delete saved search');
+      throw handleBuyerError(error);
     }
   },
 
@@ -131,6 +150,22 @@ export const savedSearchesService = {
    * @throws Error if the request fails
    */
   async updateSavedSearch(searchId: number, name: string, filters: PropertyFilters): Promise<SavedSearch> {
+    // Input validation
+    if (!searchId || searchId <= 0) {
+      throw {
+        code: 'VALIDATION_ERROR',
+        message: 'Invalid search ID'
+      };
+    }
+
+    if (!name || name.trim() === '') {
+      throw {
+        code: 'INVALID_SEARCH_NAME',
+        message: 'Please provide a valid search name',
+        field: 'name'
+      };
+    }
+
     try {
       // For now, we'll delete and recreate since update endpoint doesn't exist
       await api.deleteSavedSearch(searchId);
@@ -143,7 +178,7 @@ export const savedSearchesService = {
       };
     } catch (error) {
       console.error('Error updating saved search:', error);
-      throw new Error(error instanceof Error ? error.message : 'Failed to update saved search');
+      throw handleBuyerError(error);
     }
   },
 

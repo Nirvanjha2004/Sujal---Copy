@@ -443,6 +443,29 @@ class ProjectController {
         hasTerrace,
       } = req.body;
 
+      // Check if unit number already exists for this project
+      const existingUnit = await ProjectUnit.findOne({
+        where: {
+          project_id: projectId,
+          unit_number: unitNumber,
+        },
+      });
+
+      if (existingUnit) {
+        res.status(409).json({
+          success: false,
+          error: {
+            code: 'DUPLICATE_UNIT_NUMBER',
+            message: `Unit number "${unitNumber}" already exists in this project. Please use a different unit number.`,
+            details: {
+              unitNumber,
+              existingUnitId: existingUnit.id,
+            },
+          },
+        });
+        return;
+      }
+
       const unit = await ProjectUnit.create({
         project_id: projectId,
         unit_number: unitNumber,
@@ -474,13 +497,47 @@ class ProjectController {
         data: { unit },
         message: 'Unit created successfully',
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Create unit error:', error);
+      
+      // Handle database unique constraint violation
+      if (error.name === 'SequelizeUniqueConstraintError') {
+        res.status(409).json({
+          success: false,
+          error: {
+            code: 'DUPLICATE_UNIT_NUMBER',
+            message: `Unit number "${req.body.unitNumber}" already exists in this project. Please use a different unit number.`,
+            details: {
+              unitNumber: req.body.unitNumber,
+              constraint: error.parent?.constraint || 'unique_project_unit',
+            },
+          },
+        });
+        return;
+      }
+
+      // Handle other database errors
+      if (error.name === 'SequelizeValidationError') {
+        res.status(400).json({
+          success: false,
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'Invalid unit data',
+            details: error.errors?.map((e: any) => ({
+              field: e.path,
+              message: e.message,
+            })),
+          },
+        });
+        return;
+      }
+
+      // Generic error
       res.status(500).json({
         success: false,
         error: {
           code: 'INTERNAL_ERROR',
-          message: 'Failed to create unit',
+          message: 'Failed to create unit. Please try again.',
         },
       });
     }

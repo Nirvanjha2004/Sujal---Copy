@@ -91,6 +91,7 @@ class PropertyService {
   async getPropertyById(id: number): Promise<Property> {
     try {
       const response = await api.getProperty(id);
+      console.log('API response:', response);
       return this.transformApiPropertyToProperty(response);
     } catch (error: any) {
       if (error.status === 404) {
@@ -413,6 +414,8 @@ class PropertyService {
       images: apiProperty.images?.map((img: any) => ({
         id: img.id,
         property_id: img.property_id,
+        medium_url: img.medium_url,
+        large_url: img.large_url,
         image_url: img.image_url,
         alt_text: img.alt_text || 'Property image',
         display_order: img.display_order || 0,

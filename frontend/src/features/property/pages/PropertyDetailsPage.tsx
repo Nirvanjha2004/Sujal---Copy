@@ -40,6 +40,8 @@ export function PropertyDetailsPage() {
         }
     };
 
+    console.log("The property is: in PropertyDetailsPage", property);
+
     // Show contact card modal instead of redirecting to conversations
     const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
@@ -343,24 +345,31 @@ export function PropertyDetailsPage() {
                                 <Icon icon="solar:user-bold" className="size-8 text-primary" />
                             </div>
                             <div>
-                                <h3 className="font-semibold text-lg">Property Owner</h3>
-                                <p className="text-sm text-muted-foreground">Listed by owner</p>
+                                <h3 className="font-semibold text-lg">Property {property.owner.role}</h3>
+                                <p className="text-sm text-muted-foreground">Listed by {property.owner.first_name} {property.owner.last_name}</p>
                             </div>
                         </div>
                         <Separator />
                         <div className="space-y-3">
                             <div className="flex items-center gap-3">
                                 <Icon icon="solar:phone-bold" className="size-5 text-primary" />
-                                <div>
-                                    <p className="text-sm text-muted-foreground">Phone</p>
-                                    <p className="font-medium">+91 98765 43210</p>
-                                </div>
+                                {property.owner.phone ? (
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">Phone</p>
+                                        <p className="font-medium">{property.owner.phone}</p>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">Phone</p>
+                                        <p className="font-medium">Not available</p>
+                                    </div>
+                                )}
                             </div>
                             <div className="flex items-center gap-3">
                                 <Icon icon="solar:letter-bold" className="size-5 text-primary" />
                                 <div>
                                     <p className="text-sm text-muted-foreground">Email</p>
-                                    <p className="font-medium">owner@example.com</p>
+                                    <p className="font-medium">{property.owner.email}</p>
                                 </div>
                             </div>
                         </div>
@@ -376,10 +385,10 @@ export function PropertyDetailsPage() {
                         <Button variant="outline" onClick={() => setIsContactModalOpen(false)}>
                             Close
                         </Button>
-                        <Button className="bg-primary">
+                        {/* <Button className="bg-primary">
                             <Icon icon="solar:phone-bold" className="mr-2 h-4 w-4" />
                             Call Now
-                        </Button>
+                        </Button> */}
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

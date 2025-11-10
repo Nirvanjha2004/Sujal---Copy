@@ -1,4 +1,5 @@
 import { api } from '@/shared/lib/api';
+import { handlePropertyError } from '../utils/errorHandler';
 import type { 
   PropertyAnalytics,
   PropertyStats,
@@ -19,6 +20,14 @@ class PropertyAnalyticsService {
    * Get comprehensive property analytics
    */
   async getPropertyAnalytics(propertyId: number): Promise<PropertyAnalytics> {
+    // Input validation
+    if (!propertyId || propertyId <= 0) {
+      throw {
+        code: 'INVALID_PROPERTY_ID',
+        message: 'Please provide a valid property ID'
+      };
+    }
+
     try {
       const response = await api.getPropertyAnalytics(propertyId);
       
@@ -36,8 +45,8 @@ class PropertyAnalyticsService {
         conversionRate: response.data?.conversionRate || 0
       };
     } catch (error: any) {
-      // Return default analytics if API fails
-      return this.getDefaultAnalytics(propertyId);
+      console.error('Error fetching property analytics:', error);
+      throw handlePropertyError(error);
     }
   }
 
@@ -45,6 +54,14 @@ class PropertyAnalyticsService {
    * Get property statistics
    */
   async getPropertyStats(propertyId: number): Promise<PropertyStats> {
+    // Input validation
+    if (!propertyId || propertyId <= 0) {
+      throw {
+        code: 'INVALID_PROPERTY_ID',
+        message: 'Please provide a valid property ID'
+      };
+    }
+
     try {
       const response = await api.getPropertyAnalytics(propertyId);
       
@@ -57,13 +74,8 @@ class PropertyAnalyticsService {
         averageViewDuration: response.data?.averageViewDuration || 0
       };
     } catch (error: any) {
-      // Return default stats if API fails
-      return {
-        views: 0,
-        favorites: 0,
-        inquiries: 0,
-        shares: 0
-      };
+      console.error('Error fetching property stats:', error);
+      throw handlePropertyError(error);
     }
   }
 

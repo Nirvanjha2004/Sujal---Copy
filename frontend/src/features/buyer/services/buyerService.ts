@@ -1,7 +1,7 @@
-import { api } from '@/shared/lib/api';
 import type { BuyerStats, BuyerActivity } from '../types/buyer';
 import { favoritesService } from './favoritesService';
 import { savedSearchesService } from './savedSearchesService';
+import { handleBuyerError } from '../utils/errorHandler';
 
 /**
  * Service for managing buyer-specific data and operations
@@ -31,7 +31,7 @@ export const buyerService = {
       };
     } catch (error) {
       console.error('Error fetching buyer stats:', error);
-      throw new Error(error instanceof Error ? error.message : 'Failed to fetch buyer statistics');
+      throw handleBuyerError(error);
     }
   },
 
@@ -53,9 +53,9 @@ export const buyerService = {
       const activities: BuyerActivity[] = [];
 
       // Add favorite activities
-      favorites.slice(0, Math.floor(limit / 2)).forEach((favorite, index) => {
+      favorites.slice(0, Math.floor(limit / 2)).forEach((favorite) => {
         activities.push({
-          id: `fav_${favorite.id}`,
+          id: favorite.id,
           type: 'favorite_added',
           title: 'Property Added to Favorites',
           description: `Added ${favorite.property?.title || 'property'} to favorites`,
@@ -65,9 +65,9 @@ export const buyerService = {
       });
 
       // Add saved search activities
-      savedSearches.slice(0, Math.floor(limit / 2)).forEach((search, index) => {
+      savedSearches.slice(0, Math.floor(limit / 2)).forEach((search) => {
         activities.push({
-          id: `search_${search.id}`,
+          id: search.id,
           type: 'search_saved',
           title: 'Search Criteria Saved',
           description: `Saved search: ${search.name}`,
@@ -82,7 +82,7 @@ export const buyerService = {
         .slice(0, limit);
     } catch (error) {
       console.error('Error fetching buyer activity:', error);
-      throw new Error(error instanceof Error ? error.message : 'Failed to fetch buyer activity');
+      throw handleBuyerError(error);
     }
   },
 

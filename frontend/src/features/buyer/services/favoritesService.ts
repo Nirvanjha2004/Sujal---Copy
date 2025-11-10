@@ -1,5 +1,6 @@
 import { api } from '@/shared/lib/api';
 import type { Favorite } from '../types/favorites';
+import { handleBuyerError } from '../utils/errorHandler';
 
 export interface FavoritesResponse {
   data: {
@@ -29,7 +30,7 @@ export const favoritesService = {
       return Array.isArray(favoritesData) ? favoritesData : [];
     } catch (error) {
       console.error('Error fetching favorites:', error);
-      throw new Error(error instanceof Error ? error.message : 'Failed to fetch favorites');
+      throw handleBuyerError(error);
     }
   },
 
@@ -39,11 +40,19 @@ export const favoritesService = {
    * @throws Error if the request fails
    */
   async addToFavorites(propertyId: number): Promise<void> {
+    // Input validation
+    if (!propertyId || propertyId <= 0) {
+      throw {
+        code: 'INVALID_PROPERTY_ID',
+        message: 'Please provide a valid property ID'
+      };
+    }
+
     try {
       await api.addToFavorites(propertyId);
     } catch (error) {
       console.error('Error adding to favorites:', error);
-      throw new Error(error instanceof Error ? error.message : 'Failed to add to favorites');
+      throw handleBuyerError(error);
     }
   },
 
@@ -53,11 +62,19 @@ export const favoritesService = {
    * @throws Error if the request fails
    */
   async removeFromFavorites(propertyId: number): Promise<void> {
+    // Input validation
+    if (!propertyId || propertyId <= 0) {
+      throw {
+        code: 'INVALID_PROPERTY_ID',
+        message: 'Please provide a valid property ID'
+      };
+    }
+
     try {
       await api.removeFromFavorites(propertyId);
     } catch (error) {
       console.error('Error removing from favorites:', error);
-      throw new Error(error instanceof Error ? error.message : 'Failed to remove from favorites');
+      throw handleBuyerError(error);
     }
   },
 
@@ -81,12 +98,20 @@ export const favoritesService = {
    * @throws Error if any request fails
    */
   async bulkRemoveFromFavorites(propertyIds: number[]): Promise<void> {
+    // Input validation
+    if (!Array.isArray(propertyIds) || propertyIds.length === 0) {
+      throw {
+        code: 'VALIDATION_ERROR',
+        message: 'Please provide valid property IDs'
+      };
+    }
+
     try {
       const removePromises = propertyIds.map(id => this.removeFromFavorites(id));
       await Promise.all(removePromises);
     } catch (error) {
       console.error('Error bulk removing from favorites:', error);
-      throw new Error(error instanceof Error ? error.message : 'Failed to remove properties from favorites');
+      throw handleBuyerError(error);
     }
   }
 };

@@ -515,14 +515,14 @@ export function RealEstateLandingPage() {
                 }}
               >
                 {PROPERTY_TYPES.map((propertyType) => {
-                  // Define images for each property type
+                  // Define images for each property type using local images
                   const propertyImages = {
-                    apartment: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/3.webp",
-                    house: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/2.webp",
-                    villa: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/1.webp",
-                    plot: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/4.webp",
-                    commercial: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/5.webp",
-                    land: "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/square/4.webp"
+                    apartment: "/landingpage/images/1.png",
+                    house: "/landingpage/images/2.png",
+                    villa: "/landingpage/images/3.png",
+                    plot: "/landingpage/images/4.png",
+                    commercial: "/landingpage/images/1.png",
+                    land: "/landingpage/images/4.png"
                   };
 
                   // Define property counts (you can make this dynamic by fetching from API later)
@@ -543,11 +543,13 @@ export function RealEstateLandingPage() {
                       onClick={() => navigate(`/search?property_type=${propertyType.value}`)}
                     >
                       <CardContent className="p-0">
-                        <img
-                          alt={propertyType.label}
-                          src={propertyImages[propertyType.value] || "https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/placeholder/square.png"}
-                          className="w-full h-48 object-cover rounded-t-xl"
-                        />
+                        <div className="relative w-full aspect-square overflow-hidden rounded-t-xl">
+                          <img
+                            alt={propertyType.label}
+                            src={propertyImages[propertyType.value] || "/landingpage/images/1.png"}
+                            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                          />
+                        </div>
                         <div className="p-4">
                           <h3 className="font-semibold text-lg mb-1">{propertyType.label}</h3>
                           <p className="text-sm text-muted-foreground">{propertyCounts[propertyType.value]} properties</p>
@@ -560,7 +562,19 @@ export function RealEstateLandingPage() {
             </div>
           </div>
         </section>
-        <section className="py-16 bg-gradient-to-br from-primary to-accent full-width-element">
+
+        {/* Red Banner Section */}
+        <section className="py-0 full-width-element">
+          <div className="w-full">
+            <img
+              src="/landingpage/images/redBanner.png"
+              alt="Featured Banner"
+              className="w-full h-auto object-cover"
+            />
+          </div>
+        </section>
+
+        {/* <section className="py-16 bg-gradient-to-br from-primary to-accent full-width-element">
           <div className="container mx-auto px-4">
             <Card className="overflow-hidden border-0 shadow-2xl">
               <CardContent className="p-0">
@@ -595,7 +609,7 @@ export function RealEstateLandingPage() {
               </CardContent>
             </Card>
           </div>
-        </section>
+        </section> */}
         <section className="py-16">
           <div className="container mx-auto px-4">
             <div className="mb-8">
@@ -1197,6 +1211,131 @@ export function RealEstateLandingPage() {
           </div>
         </div>
       </section> */}
+
+      {/* Insights & Tools Section */}
+      <section className="py-12 bg-gradient-to-br from-blue-50 to-blue-100 full-width-element">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <div className="bg-blue-600 p-2 rounded-lg">
+                <Icon icon="solar:lightbulb-bolt-bold" className="size-6 text-white" />
+              </div>
+              <div>
+                <h2 className="font-heading text-2xl md:text-3xl font-bold tracking-tight">
+                  Insights & Tools
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Go from browsing to buying
+                </p>
+              </div>
+            </div>
+            <Button variant="outline" className="text-primary border-primary hover:bg-primary hover:text-white">
+              View all Insights
+            </Button>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-4 text-center">
+                <div className="bg-blue-100 p-3 rounded-lg inline-block mb-3">
+                  <img 
+                    src="/landingpage/icons/overview.png" 
+                    alt="Overview" 
+                    className="size-8 object-contain"
+                  />
+                </div>
+                <h3 className="font-semibold text-sm mb-1">Bangalore Overview</h3>
+                <p className="text-xs text-muted-foreground">Know what's great & upcoming developments</p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-4 text-center">
+                <div className="bg-blue-100 p-3 rounded-lg inline-block mb-3">
+                  <img 
+                    src="/landingpage/icons/propertyrates.png" 
+                    alt="Property Rates" 
+                    className="size-8 object-contain"
+                  />
+                </div>
+                <h3 className="font-semibold text-sm mb-1">Property Rates in Bangalore</h3>
+                <p className="text-xs text-muted-foreground">Check property rates and prices</p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-4 text-center">
+                <div className="bg-blue-100 p-3 rounded-lg inline-block mb-3">
+                  <img 
+                    src="/landingpage/icons/genuineReviews.png" 
+                    alt="Genuine Reviews" 
+                    className="size-8 object-contain"
+                  />
+                </div>
+                <h3 className="font-semibold text-sm mb-1">Genuine reviews of Bangalore</h3>
+                <p className="text-xs text-muted-foreground">Know what residents are saying</p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-4 text-center">
+                <div className="bg-blue-100 p-3 rounded-lg inline-block mb-3">
+                  <img 
+                    src="/landingpage/icons/aboutmyproperty.png" 
+                    alt="About My Property" 
+                    className="size-8 object-contain"
+                  />
+                </div>
+                <h3 className="font-semibold text-sm mb-1">About My Property</h3>
+                <p className="text-xs text-muted-foreground">Track prices & analyse market demands</p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-4 text-center">
+                <div className="bg-blue-100 p-3 rounded-lg inline-block mb-3">
+                  <img 
+                    src="/landingpage/icons/readLatestNews.png" 
+                    alt="Read Latest News" 
+                    className="size-8 object-contain"
+                  />
+                </div>
+                <h3 className="font-semibold text-sm mb-1">Read Latest News</h3>
+                <p className="text-xs text-muted-foreground">Around real estate and allied industries</p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-4 text-center">
+                <div className="bg-blue-100 p-3 rounded-lg inline-block mb-3">
+                  <img 
+                    src="/landingpage/icons/checkArticles.png" 
+                    alt="Check Articles" 
+                    className="size-8 object-contain"
+                  />
+                </div>
+                <h3 className="font-semibold text-sm mb-1">Check Articles</h3>
+                <p className="text-xs text-muted-foreground">On trending topics and policy updates</p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-4 text-center">
+                <div className="bg-blue-100 p-3 rounded-lg inline-block mb-3">
+                  <img 
+                    src="/landingpage/icons/userGuide.png" 
+                    alt="User Guide" 
+                    className="size-8 object-contain"
+                  />
+                </div>
+                <h3 className="font-semibold text-sm mb-1">User Guide</h3>
+                <p className="text-xs text-muted-foreground">To help home buyer tenants and sellers</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 bg-gradient-to-br from-pink-50 to-pink-100 full-width-element">
         <div className="container mx-auto px-4">
           <Card className="overflow-hidden border-0 shadow-2xl">
@@ -1256,8 +1395,8 @@ export function RealEstateLandingPage() {
                 </div>
                 <div className="relative h-full min-h-[25rem]">
                   <img
-                    alt="Happy Couple"
-                    src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/portrait/2.webp"
+                    alt="Sell or Rent Your Property"
+                    src="/landingpage/images/sellorrent.png"
                     className="absolute inset-0 w-full h-full object-cover"
                   />
                 </div>

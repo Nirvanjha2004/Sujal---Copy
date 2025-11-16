@@ -88,7 +88,7 @@ export function Header({ variant = 'default' }: HeaderProps) {
                   <span className="text-sm hidden lg:block">
                     Welcome, {authState.user?.first_name || authState.user?.email}
                   </span>
-                  
+
                   {/* User Profile Dropdown */}
                   <div className="relative" ref={dropdownRef}>
                     <Button
@@ -102,15 +102,15 @@ export function Header({ variant = 'default' }: HeaderProps) {
                       <span className="hidden md:block text-sm font-medium">
                         {authState.user?.first_name || 'User'}
                       </span>
-                      <Icon 
-                        icon="solar:alt-arrow-down-bold" 
+                      <Icon
+                        icon="solar:alt-arrow-down-bold"
                         className={cn(
                           "size-3 hidden md:block transition-transform duration-200",
                           isDropdownOpen && "rotate-180"
-                        )} 
+                        )}
                       />
                     </Button>
-                    
+
                     {/* Dropdown Menu */}
                     <div className={cn(
                       "absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 transition-all duration-200 z-50",
@@ -164,8 +164,8 @@ export function Header({ variant = 'default' }: HeaderProps) {
                 </>
               ) : (
                 <>
-                  <Button 
-                    size="sm" 
+                  <Button
+                    size="sm"
                     className="bg-white text-foreground hover:bg-white/90 hidden md:flex"
                     onClick={() => navigate('/login')}
                   >
@@ -181,10 +181,10 @@ export function Header({ variant = 'default' }: HeaderProps) {
                   </Button>
                 </>
               )}
-              
-              <Button 
-                size="icon" 
-                variant="ghost" 
+
+              <Button
+                size="icon"
+                variant="ghost"
                 className="size-9 hover:bg-white/20 md:hidden"
                 onClick={() => setIsMobileNavOpen(true)}
               >
@@ -193,9 +193,9 @@ export function Header({ variant = 'default' }: HeaderProps) {
             </div>
           </div>
         </div>
-        <MobileNav 
-          isOpen={isMobileNavOpen} 
-          onToggle={() => setIsMobileNavOpen(!isMobileNavOpen)} 
+        <MobileNav
+          isOpen={isMobileNavOpen}
+          onToggle={() => setIsMobileNavOpen(!isMobileNavOpen)}
         />
       </header>
     );
@@ -203,14 +203,14 @@ export function Header({ variant = 'default' }: HeaderProps) {
 
   return (
     <>
-      <MobileNav 
-        isOpen={isMobileNavOpen} 
-        onToggle={() => setIsMobileNavOpen(!isMobileNavOpen)} 
+      <MobileNav
+        isOpen={isMobileNavOpen}
+        onToggle={() => setIsMobileNavOpen(!isMobileNavOpen)}
       />
       <header className="bg-primary text-primary-foreground py-3 px-4 flex items-center justify-between sticky top-0 z-50 shadow-md full-width-element">
         <div className="flex items-center gap-8">
-          <div 
-            className="flex items-center gap-2 cursor-pointer" 
+          <div
+            className="flex items-center gap-2 cursor-pointer"
             onClick={() => navigate('/')}
           >
             <div className="bg-white p-2 rounded">
@@ -221,14 +221,14 @@ export function Header({ variant = 'default' }: HeaderProps) {
             </h1>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-3">
           {authState.isAuthenticated ? (
             <>
               <span className="text-sm hidden lg:block">
                 Welcome, {authState.user?.first_name || authState.user?.email}
               </span>
-              
+
               {/* User Profile Dropdown */}
               <div className="relative" ref={dropdownRef}>
                 <Button
@@ -242,15 +242,15 @@ export function Header({ variant = 'default' }: HeaderProps) {
                   <span className="hidden md:block text-sm font-medium">
                     {authState.user?.first_name || 'User'}
                   </span>
-                  <Icon 
-                    icon="solar:alt-arrow-down-bold" 
+                  <Icon
+                    icon="solar:alt-arrow-down-bold"
                     className={cn(
                       "size-3 hidden md:block transition-transform duration-200",
                       isDropdownOpen && "rotate-180"
-                    )} 
+                    )}
                   />
                 </Button>
-                
+
                 {/* Dropdown Menu */}
                 <div className={cn(
                   "absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 transition-all duration-200 z-50",
@@ -304,8 +304,8 @@ export function Header({ variant = 'default' }: HeaderProps) {
             </>
           ) : (
             <>
-              <Button 
-                size="sm" 
+              <Button
+                size="sm"
                 className="bg-white text-foreground hover:bg-white/90 hidden md:flex"
                 onClick={() => navigate('/login')}
               >
@@ -321,10 +321,10 @@ export function Header({ variant = 'default' }: HeaderProps) {
               </Button>
             </>
           )}
-          
-          <Button 
-            size="icon" 
-            variant="ghost" 
+
+          <Button
+            size="icon"
+            variant="ghost"
             className="size-9 hover:bg-white/20 md:hidden"
             onClick={() => setIsMobileNavOpen(true)}
           >

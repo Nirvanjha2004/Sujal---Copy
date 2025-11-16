@@ -184,65 +184,6 @@ export function RealEstateLandingPage() {
                 <p className="text-lg md:text-xl text-white/95 mb-10 drop-shadow-md">
                   Discover the perfect property from thousands of listings across India
                 </p>
-                <Card className="shadow-2xl bg-white/95 backdrop-blur-sm">
-                  <CardContent className="p-0">
-
-                    <div className="p-4 md:p-6">
-                      <div className="flex flex-col md:flex-row gap-3">
-                        <Select value={listingType} onValueChange={setListingType}>
-                          <SelectTrigger className="md:w-32">
-                            <SelectValue placeholder="Buy" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="buy">Buy</SelectItem>
-                            <SelectItem value="rent">Rent</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <Select value={propertyType} onValueChange={setPropertyType}>
-                          <SelectTrigger className="md:w-48">
-                            <SelectValue placeholder="All Residential" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All Residential</SelectItem>
-                            <SelectItem value="apartment">Apartment</SelectItem>
-                            <SelectItem value="villa">Villa</SelectItem>
-                            <SelectItem value="plot">Plot</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <div className="flex-1 relative">
-                          <Icon
-                            icon="solar:magnifer-bold"
-                            className="size-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                          />
-                          <Input
-                            className="pl-10 pr-12 h-11"
-                            placeholder="Search 'Form Houses in 1 cr'"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            onKeyPress={(e) => {
-                              if (e.key === 'Enter') {
-                                handleSearch();
-                              }
-                            }}
-                          />
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
-                          >
-                            <Icon icon="solar:map-point-bold" className="size-5 text-primary" />
-                          </Button>
-                        </div>
-                        <Button
-                          className="gradient-button h-11 px-8 font-semibold"
-                          onClick={handleSearch}
-                        >
-                          Search
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
               </div>
 
               {/* Engaging Text Section */}
@@ -297,6 +238,71 @@ export function RealEstateLandingPage() {
             </div>
           </div>
         </section>
+
+        {/* Search Bar Section - Positioned Below Hero */}
+        <section className="bg-white border-b">
+          <div className="container mx-auto px-4 md:px-6 lg:px-8">
+            <div className="max-w-5xl mx-auto">
+              <Card className="shadow-lg -mt-8 relative z-20 bg-white">
+                <CardContent className="p-4 md:p-6">
+                  <div className="flex flex-col md:flex-row gap-3">
+                    <Select value={listingType} onValueChange={setListingType}>
+                      <SelectTrigger className="md:w-32">
+                        <SelectValue placeholder="Buy" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="buy">Buy</SelectItem>
+                        <SelectItem value="rent">Rent</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={propertyType} onValueChange={setPropertyType}>
+                      <SelectTrigger className="md:w-48">
+                        <SelectValue placeholder="All Residential" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Residential</SelectItem>
+                        <SelectItem value="apartment">Apartment</SelectItem>
+                        <SelectItem value="villa">Villa</SelectItem>
+                        <SelectItem value="plot">Plot</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <div className="flex-1 relative">
+                      <Icon
+                        icon="solar:magnifer-bold"
+                        className="size-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                      />
+                      <Input
+                        className="pl-10 pr-12 h-11"
+                        placeholder="Search 'Form Houses in 1 cr'"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            handleSearch();
+                          }
+                        }}
+                      />
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+                      >
+                        <Icon icon="solar:map-point-bold" className="size-5 text-primary" />
+                      </Button>
+                    </div>
+                    <Button
+                      className="gradient-button h-11 px-8 font-semibold"
+                      onClick={handleSearch}
+                    >
+                      Search
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
         <section className="py-12 md:py-16 bg-background">
           <div className="container mx-auto px-4 md:px-6 lg:px-8">
             <div className="mb-8 flex items-center justify-between">

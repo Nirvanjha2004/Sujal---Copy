@@ -18,6 +18,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { PROPERTY_TYPES } from "@/features/property/constants";
 import { Header } from "@/shared/components/layout/Header";
+import { Footer } from "@/shared/components/layout/Footer";
 
 
 export function RealEstateLandingPage() {
@@ -1233,14 +1234,14 @@ export function RealEstateLandingPage() {
               View all Insights
             </Button>
           </div>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
             <Card className="hover:shadow-lg transition-shadow cursor-pointer">
               <CardContent className="p-4 text-center">
                 <div className="bg-blue-100 p-3 rounded-lg inline-block mb-3">
-                  <img 
-                    src="/landingpage/icons/overview.png" 
-                    alt="Overview" 
+                  <img
+                    src="/landingpage/icons/overview.png"
+                    alt="Overview"
                     className="size-8 object-contain"
                   />
                 </div>
@@ -1252,9 +1253,9 @@ export function RealEstateLandingPage() {
             <Card className="hover:shadow-lg transition-shadow cursor-pointer">
               <CardContent className="p-4 text-center">
                 <div className="bg-blue-100 p-3 rounded-lg inline-block mb-3">
-                  <img 
-                    src="/landingpage/icons/propertyrates.png" 
-                    alt="Property Rates" 
+                  <img
+                    src="/landingpage/icons/propertyrates.png"
+                    alt="Property Rates"
                     className="size-8 object-contain"
                   />
                 </div>
@@ -1266,9 +1267,9 @@ export function RealEstateLandingPage() {
             <Card className="hover:shadow-lg transition-shadow cursor-pointer">
               <CardContent className="p-4 text-center">
                 <div className="bg-blue-100 p-3 rounded-lg inline-block mb-3">
-                  <img 
-                    src="/landingpage/icons/genuineReviews.png" 
-                    alt="Genuine Reviews" 
+                  <img
+                    src="/landingpage/icons/genuineReviews.png"
+                    alt="Genuine Reviews"
                     className="size-8 object-contain"
                   />
                 </div>
@@ -1280,9 +1281,9 @@ export function RealEstateLandingPage() {
             <Card className="hover:shadow-lg transition-shadow cursor-pointer">
               <CardContent className="p-4 text-center">
                 <div className="bg-blue-100 p-3 rounded-lg inline-block mb-3">
-                  <img 
-                    src="/landingpage/icons/aboutmyproperty.png" 
-                    alt="About My Property" 
+                  <img
+                    src="/landingpage/icons/aboutmyproperty.png"
+                    alt="About My Property"
                     className="size-8 object-contain"
                   />
                 </div>
@@ -1294,9 +1295,9 @@ export function RealEstateLandingPage() {
             <Card className="hover:shadow-lg transition-shadow cursor-pointer">
               <CardContent className="p-4 text-center">
                 <div className="bg-blue-100 p-3 rounded-lg inline-block mb-3">
-                  <img 
-                    src="/landingpage/icons/readLatestNews.png" 
-                    alt="Read Latest News" 
+                  <img
+                    src="/landingpage/icons/readLatestNews.png"
+                    alt="Read Latest News"
                     className="size-8 object-contain"
                   />
                 </div>
@@ -1308,9 +1309,9 @@ export function RealEstateLandingPage() {
             <Card className="hover:shadow-lg transition-shadow cursor-pointer">
               <CardContent className="p-4 text-center">
                 <div className="bg-blue-100 p-3 rounded-lg inline-block mb-3">
-                  <img 
-                    src="/landingpage/icons/checkArticles.png" 
-                    alt="Check Articles" 
+                  <img
+                    src="/landingpage/icons/checkArticles.png"
+                    alt="Check Articles"
                     className="size-8 object-contain"
                   />
                 </div>
@@ -1322,14 +1323,173 @@ export function RealEstateLandingPage() {
             <Card className="hover:shadow-lg transition-shadow cursor-pointer">
               <CardContent className="p-4 text-center">
                 <div className="bg-blue-100 p-3 rounded-lg inline-block mb-3">
-                  <img 
-                    src="/landingpage/icons/userGuide.png" 
-                    alt="User Guide" 
+                  <img
+                    src="/landingpage/icons/userGuide.png"
+                    alt="User Guide"
                     className="size-8 object-contain"
                   />
                 </div>
                 <h3 className="font-semibold text-sm mb-1">User Guide</h3>
                 <p className="text-xs text-muted-foreground">To help home buyer tenants and sellers</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Offers for you Section */}
+      <section className="py-12 bg-white full-width-element">
+        <div className="container mx-auto px-4">
+          <div className="mb-6">
+            <h2 className="font-heading text-2xl md:text-3xl font-bold tracking-tight mb-2">
+              Offers for you
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Projects with ongoing offers in Bangalore East
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="size-20 rounded-full overflow-hidden flex-shrink-0 bg-gray-100">
+                    <img
+                      src="/landingpage/images/1.png"
+                      alt="Isha HiLife"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg mb-1">Isha HiLife</h3>
+                    <p className="text-sm text-muted-foreground mb-1">Whitefield</p>
+                    <p className="text-sm text-muted-foreground mb-2">3 BHK Apartment</p>
+                    <p className="font-semibold text-primary">₹ 1.14 - 1.25 Cr</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 pt-4 border-t">
+                  <Icon icon="solar:gift-bold" className="size-5 text-blue-600" />
+                  <span className="text-sm font-medium">No Pre-EMI Possession</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="size-20 rounded-full overflow-hidden flex-shrink-0 bg-gray-100">
+                    <img
+                      src="/landingpage/images/2.png"
+                      alt="Isha HiLife"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg mb-1">Isha HiLife</h3>
+                    <p className="text-sm text-muted-foreground mb-1">Whitefield</p>
+                    <p className="text-sm text-muted-foreground mb-2">3 BHK Apartment</p>
+                    <p className="font-semibold text-primary">₹ 1.14 - 1.25 Cr</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 pt-4 border-t">
+                  <Icon icon="solar:gift-bold" className="size-5 text-blue-600" />
+                  <span className="text-sm font-medium">No Pre-EMI Possession</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="size-20 rounded-full overflow-hidden flex-shrink-0 bg-gray-100">
+                    <img
+                      src="/landingpage/images/3.png"
+                      alt="Isha HiLife"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg mb-1">Isha HiLife</h3>
+                    <p className="text-sm text-muted-foreground mb-1">Whitefield</p>
+                    <p className="text-sm text-muted-foreground mb-2">3 BHK Apartment</p>
+                    <p className="font-semibold text-primary">₹ 1.14 - 1.25 Cr</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 pt-4 border-t">
+                  <Icon icon="solar:gift-bold" className="size-5 text-blue-600" />
+                  <span className="text-sm font-medium">No Pre-EMI Possession</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* BHK Choice Section */}
+      <section className="py-12 bg-gradient-to-br from-pink-50 to-pink-100 full-width-element">
+        <div className="container mx-auto px-4">
+          <div className="flex items-start gap-4 mb-8">
+            <div className="bg-blue-100 p-3 rounded-lg">
+              <Icon icon="solar:home-2-bold" className="size-8 text-blue-600" />
+            </div>
+            <div>
+              <h2 className="font-heading text-2xl md:text-3xl font-bold tracking-tight mb-1">
+                BHK choice in mind?
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Browse by no. of bedrooms in the house
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-6 text-center">
+                <div className="bg-blue-100 p-4 rounded-full inline-block mb-3">
+                  <Icon icon="solar:home-2-bold" className="size-8 text-blue-600" />
+                </div>
+                <h3 className="font-semibold text-base mb-1">1 RK/1 BHK</h3>
+                <p className="text-xs text-muted-foreground">440+ Properties</p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-6 text-center">
+                <div className="bg-blue-100 p-4 rounded-full inline-block mb-3">
+                  <Icon icon="solar:home-2-bold" className="size-8 text-blue-600" />
+                </div>
+                <h3 className="font-semibold text-base mb-1">2 BHK</h3>
+                <p className="text-xs text-muted-foreground">3,700+ Properties</p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-6 text-center">
+                <div className="bg-blue-100 p-4 rounded-full inline-block mb-3">
+                  <Icon icon="solar:home-2-bold" className="size-8 text-blue-600" />
+                </div>
+                <h3 className="font-semibold text-base mb-1">3 BHK</h3>
+                <p className="text-xs text-muted-foreground">4200+ Properties</p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-6 text-center">
+                <div className="bg-blue-100 p-4 rounded-full inline-block mb-3">
+                  <Icon icon="solar:home-2-bold" className="size-8 text-blue-600" />
+                </div>
+                <h3 className="font-semibold text-base mb-1">4 BHK</h3>
+                <p className="text-xs text-muted-foreground">4200+ Properties</p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-6 text-center">
+                <div className="bg-blue-100 p-4 rounded-full inline-block mb-3">
+                  <Icon icon="solar:home-2-bold" className="size-8 text-blue-600" />
+                </div>
+                <h3 className="font-semibold text-base mb-1">5 BHK</h3>
+                <p className="text-xs text-muted-foreground">4200+ Properties</p>
               </CardContent>
             </Card>
           </div>
@@ -1405,6 +1565,20 @@ export function RealEstateLandingPage() {
           </Card>
         </div>
       </section>
+
+      {/* Sales Banner Section */}
+      <section className="py-8 full-width-element">
+        <div className="container mx-auto px-4">
+          <div className="relative w-full overflow-hidden rounded-xl shadow-lg">
+            <img
+              src="/landingpage/images/SaleBanner.png"
+              alt="Sales Banner"
+              className="w-full h-auto object-cover"
+            />
+          </div>
+        </div>
+      </section>
+
       <section
         className="py-16 bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 full-width-element"
       >
@@ -1513,255 +1687,7 @@ export function RealEstateLandingPage() {
           </div>
         </div>
       </section>
-      {/* <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="mb-8">
-            <h2 className="font-heading text-3xl font-semibold tracking-tight mb-2">
-              Top Localities in Bangalore
-            </h2>
-            <div className="flex gap-6 mb-6">
-              <Button
-                variant="ghost"
-                className="text-primary border-b-2 border-primary rounded-none"
-              >
-                Buy
-              </Button>
-              <Button variant="ghost" className="text-muted-foreground">
-                Rent / Lease
-              </Button>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-              <h3 className="font-semibold text-lg mb-4">
-                New Projects in Top Localities of Bangalore
-              </h3>
-              <div className="space-y-2">
-                <a
-                  href="#"
-                  className="block text-sm text-muted-foreground hover:text-primary"
-                >
-                  New Projects in Whitefield
-                </a>
-                <a
-                  href="#"
-                  className="block text-sm text-muted-foreground hover:text-primary"
-                >
-                  New Projects in Devanahalli
-                </a>
-                <a
-                  href="#"
-                  className="block text-sm text-muted-foreground hover:text-primary"
-                >
-                  New Projects in Sarjapur Road
-                </a>
-                <a
-                  href="#"
-                  className="block text-sm text-muted-foreground hover:text-primary"
-                >
-                  View 14 More
-                </a>
-              </div>
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg mb-4">
-                Flats in Top Localities of Bangalore
-              </h3>
-              <div className="space-y-2">
-                <a
-                  href="#"
-                  className="block text-sm text-muted-foreground hover:text-primary"
-                >
-                  Flats for sale in Whitefield
-                </a>
-                <a
-                  href="#"
-                  className="block text-sm text-muted-foreground hover:text-primary"
-                >
-                  Flats for sale in Sarjapur Road
-                </a>
-                <a
-                  href="#"
-                  className="block text-sm text-muted-foreground hover:text-primary"
-                >
-                  Flats for sale in Marathahalli
-                </a>
-                <a
-                  href="#"
-                  className="block text-sm text-muted-foreground hover:text-primary"
-                >
-                  View 14 More
-                </a>
-              </div>
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg mb-4">
-                House in Top Localities of Bangalore
-              </h3>
-              <div className="space-y-2">
-                <a
-                  href="#"
-                  className="block text-sm text-muted-foreground hover:text-primary"
-                >
-                  Houses for sale in Whitefield
-                </a>
-                <a
-                  href="#"
-                  className="block text-sm text-muted-foreground hover:text-primary"
-                >
-                  Houses for sale in Marathahalli
-                </a>
-                <a
-                  href="#"
-                  className="block text-sm text-muted-foreground hover:text-primary"
-                >
-                  Houses for sale in Sarjapur Road
-                </a>
-                <a
-                  href="#"
-                  className="block text-sm text-muted-foreground hover:text-primary"
-                >
-                  View 14 More
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section> */}
-      <footer className="bg-slate-900 text-white py-16 full-width-element">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-8">
-            <div>
-              <h3 className="font-semibold text-lg mb-4 text-white">PropPuzzle</h3>
-              <div className="space-y-2">
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Mobile Apps
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Our Services
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Price Trends
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Post your Property
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Real Estate Investments
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Builders in India
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Area Converter
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Articles
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Rent Receipt
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Customer Service
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Sitemap
-                </a>
-              </div>
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg mb-4 text-white">Company</h3>
-              <div className="space-y-2">
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  About us
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Contact us
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Careers with us
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Terms & Conditions
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Request Info
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Feedback
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Report a Problem
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Testimonials
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Privacy Policy
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Summons/Notices
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Grievances
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Safety Guide
-                </a>
-              </div>
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg mb-4 text-white">Our Partners</h3>
-              <div className="space-y-2">
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Naukri.com - Jobs in India
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Jeevansathi.com - Jobs in middle east
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Jeevansathi.com - Matrimonials
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Shiksha.com - Education Career Info
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Policybazaar.com - Insurance India
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  PaisaBazaar.com
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Ambitionbox.com
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Nptelhub.com - A portal for campus hiring
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Jobhai.com - Find Jobs Near You
-                </a>
-                <a href="#" className="block text-sm text-gray-300 hover:text-white">
-                  Techminis.com - Tech news on the go
-                </a>
-              </div>
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg mb-4 text-white">Contact Us</h3>
-              <div className="space-y-2">
-                <p className="text-sm text-gray-300">Toll Free - 1800 41 99099</p>
-                <p className="text-sm text-gray-300">9:30 AM to 6:30 PM (Mon-Sun)</p>
-                <p className="text-sm text-gray-300">Email - feedback@PropPuzzle.com</p>
-              </div>
-            </div>
-          </div>
-          <div className="border-t border-gray-700 mt-12 pt-8 text-center">
-            <p className="text-sm text-gray-400">
-              All trademarks are the property of their respective owners. All rights reserved - Info
-              Edge (India) Ltd. A naukri.com group venture
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </>
   );
 }

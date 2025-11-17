@@ -18,6 +18,7 @@ import { AddPropertyPage, MyPropertiesPage, EditPropertyPage } from '@/features/
 import { AgentPropertyDashboard } from '@/features/agent/components'
 import { PropertySearchPage } from '@/features/property/pages/PropertySearchPage'
 import { ProjectDetailsPage as PublicProjectDetailsPage } from './pages/ProjectDetailsPage'
+import { FeaturedProjectDetailsPage } from './pages/FeaturedProjectDetailsPage'
 
 import { BulkUploadPage } from '@/pages/agent/BulkUploadPage'
 
@@ -44,6 +45,7 @@ function App() {
                     <Route path="/search" element={<PropertySearchPage />} />
                     <Route path="/property/:id" element={<PropertyDetailsPage />} />
                     <Route path="/project/:id" element={<PublicProjectDetailsPage />} />
+                    <Route path="/featured-project/:id" element={<FeaturedProjectDetailsPage />} />
                     {/* <Route path="/calculators" element={<CalculatorsPage />} /> */}
                     {/* Authentication routes */}
                     <Route path="/login" element={<LoginPage />} />

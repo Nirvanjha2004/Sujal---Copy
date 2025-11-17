@@ -40,6 +40,160 @@ export function RealEstateLandingPage() {
   const recommendedCarouselRef = useRef<HTMLDivElement>(null);
   const projectsCarouselRef = useRef<HTMLDivElement>(null);
 
+  // Hardcoded featured projects data
+  const featuredProjects = [
+    {
+      id: 1,
+      name: "Shalimar One World",
+      developer: "Shalimar Corp Ltd.",
+      location: "Gomti Nagar Extension, Lucknow",
+      city: "Lucknow",
+      state: "Uttar Pradesh",
+      price: "₹1.25 Cr - ₹1.95 Cr",
+      bedrooms: "3 BHK + Servant",
+      area: "1521.29 sq ft & 1547.43 sq ft carpet area",
+      image: "/landingpage/images/1.png",
+      description: "4 towers, G+28 floors, 3 BHK + Servant units, only two units per floor",
+      reraNumber: "UPRERAPRJ858081/05/2024 (Project) & UPRERAPRM4092 (Promoter)",
+      status: "Under Construction"
+    },
+    {
+      id: 2,
+      name: "Casagrand Suncity",
+      developer: "Casagrand Premier Builders Limited",
+      location: "Kelambakkam-Vandalur Corridor, Chennai",
+      city: "Chennai",
+      state: "Tamil Nadu",
+      price: "₹67 L to ₹1.48 Cr",
+      bedrooms: "2, 3 & 4 BHK units",
+      area: "Unit areas vary by tower",
+      image: "/landingpage/images/2.png",
+      description: "20-acre Roman-themed township with 1402 apartments (Phase 1), 2/3/4 BHK, 2B+G+36 floors, 130+ amenities",
+      reraNumber: "TN/35/Building/0053/2024 (Tamil Nadu RERA)",
+      status: "Under Construction"
+    },
+    {
+      id: 3,
+      name: "Casagrand Mercury",
+      developer: "Casagrand Premier Builders Limited",
+      location: "Chennai",
+      city: "Chennai",
+      state: "Tamil Nadu",
+      price: "Starts from ₹1 crore and goes up to ₹3.43 crore",
+      bedrooms: "Interior / Home Interiors",
+      area: "Not specified",
+      image: "/landingpage/images/2.png",
+      description: "One-stop interior solution for woodwork, electrical fittings, washroom accessories, and home accessories",
+      reraNumber: "TN/29/Building/055/2024",
+      status: "Active Service"
+    },
+    {
+      id: 4,
+      name: "Casagrand Casamia",
+      developer: "Casagrand Premier Builders Limited",
+      location: "Pallavaram, Chennai",
+      city: "Chennai",
+      state: "Tamil Nadu",
+      price: "Between ₹63 lakh and ₹1.25 crore",
+      bedrooms: "2, 3 & 4 BHK apartments",
+      area: "Areas not listed in sq ft table; only shown",
+      image: "/landingpage/images/2.png",
+      description: "22-acre Spanish-themed residential community, 1314 apartments, 2B+G+18 floors, 2/3/4 BHK, 60+ amenities, lush landscape, clubhouse, pools, courtyards",
+      reraNumber: "TN/35/Building/0097/2025",
+      status: "Under Construction"
+    },
+    {
+      id: 5,
+      name: "The Arena - Hiranandani Fortune City, Panvel",
+      developer: "Hiranandani Communities",
+      location: "Panvel, Navi Mumbai",
+      city: "Mumbai",
+      state: "Maharashtra",
+      price: "Luxurious 2, 3 & BHK & Office Space Starts from ₹1.74 All Inc",
+      bedrooms: "2-3 BHK",
+      area: "3 BHK: 870 sq. ft. and 1040 sq. ft. | 2 BHK: 723 sq. ft. (based on carpet area)",
+      image: "/landingpage/images/3.png",
+      description: "Premium residential project inside Hiranandani Fortune City township at Panvel; features clubhouse, recreational amenities, landscaped zones, and modern lifestyle offerings (as shown in brochure visuals & text)",
+      reraNumber: "P52000080098 (Greenfield), P52000080195 (Arcadia), P52000080155 (Citadel)",
+      status: "Under Construction"
+    },
+    {
+      id: 6,
+      name: "Golden Willows - Hiranandani Fortune City",
+      developer: "Hiranandani Communities",
+      location: "Panvel, Navi Mumbai",
+      city: "Mumbai",
+      state: "Maharashtra",
+      price: "Approximately what are shown from ₹73.9 Lk, ₹1 up to 900 and ₹1.52 Crore",
+      bedrooms: "2-BHK",
+      area: "2 BHK apartments in this project range from 723.9 sq. ft. up to 900 sq. ft.",
+      image: "/landingpage/images/3.png",
+      description: "Residential project within Hiranandani Fortune City, Panvel, offering 2 BHK apartments, landscaped spaces, and lifestyle offerings (as shown in brochure visuals and content)",
+      reraNumber: "Multiple blocks: e.g. P52000054615 (Lavender), P52000055578 (Jasmine), P52000055661 (Zenia), P52000055196 (Acacia), P52000055662 (Aster)",
+      status: "Under Construction"
+    },
+    {
+      id: 7,
+      name: "Empress Hill - Hiranandani Gardens, Powai",
+      developer: "Hiranandani Group",
+      location: "Powai, Mumbai",
+      city: "Mumbai",
+      state: "Maharashtra",
+      price: "Luxurious 3 & 4 BHK Starts at ₹5.60 Cr All Inc",
+      bedrooms: "3 & 4 BHK residences",
+      area: "10se sq Sq Ft (Carpet Area)",
+      image: "/landingpage/images/3.png",
+      description: "Luxury 3 & 4 BHK residences in Powai's landmark township with 3.5+ acres of landscaped zones, 35+ amenities (rooftop lifestyle, gyms, swimming pool, themed gardens, and wellness areas)",
+      reraNumber: "P51800052633 (Wings A, B, C, D)",
+      status: "Under Construction (BMIC approved till 20 Dec 2024; final OC pending approval)"
+    },
+    {
+      id: 8,
+      name: "DSR Valar",
+      developer: "DSR Infrastructure Pvt. Ltd.",
+      location: "Kokapet, Hyderabad",
+      city: "Hyderabad",
+      state: "Telangana",
+      price: "Over ₹4 Crore",
+      bedrooms: "3 & 4 BHK units (as shown in brochures)",
+      area: "The project is in 'Launch' phase, and the super built-up area for the 4 BHK flats starts from 4,400 square feet",
+      image: "/landingpage/images/3.png",
+      description: "Premium residential apartment project offering 3 & 4 BHK homes with luxury amenities, landscaped spaces, clubhouse, swimming pool, and modern facilities",
+      reraNumber: "TS RERA: P02500067402",
+      status: "Under Construction"
+    },
+    {
+      id: 9,
+      name: "Gateway Towers II",
+      developer: "Amanora Park Town / City Corp",
+      location: "Amanora Park Town, Pune",
+      city: "Pune",
+      state: "Maharashtra",
+      price: "Starts from ₹2.18 Cr",
+      bedrooms: "2, 2.5, 3, 3.5, 4.5 BHK & Duplex options",
+      area: "2 BHK: 883 sq ft carpet + 150 sq ft balcony | 2.5 BHK: 1086 sq ft + 157 sq ft | 3 BHK-A: 1086 sq ft + 184 sq ft | 3 BHK-B: 1175 sq ft + 184 sq ft | 3.5 BHK: 1250 sq ft + 162 sq ft | 4.5 BHK: 2250 sq ft + 211 sq ft | 4.5 BHK: 1745 sq ft + 211 sq ft | 4.5 Duplex: 1810 sq ft + 280 sq ft | 4.5 Duplex: 2315 sq ft + 233 sq ft | 4.5 Duplex: 2315 sq ft",
+      image: "/landingpage/images/4.png",
+      description: "Ultra-luxury high-rise residential towers offering 2, 2.5, 3, 3.5, 4.5 BHK & duplex units with premium finishes, digital locks, modular kitchens, AC bedrooms, branded fittings, and a full amenity zone including pools, courts, gardens, and clubhouse. A premium residential tower featuring modern amenities, lifestyle facilities, and resort-style living (as shown in brochure visuals, images, and text visuals)",
+      reraNumber: "P52100079477, PR12610125006749",
+      status: "Under Construction"
+    },
+    {
+      id: 10,
+      name: "Shalimar One World",
+      developer: "Shalimar Corp Ltd.",
+      location: "Titanium, Shalimar Corporate Park, Vibhuti Khand, Gomti Nagar, Lucknow",
+      city: "Lucknow",
+      state: "Uttar Pradesh",
+      price: "4 2BHK apartment starts at ₹4.25 Cr, and a 3BHK apartment starts at ₹6.49 Cr. For the Shalimar One World Pinnacle, prices start at ₹8.49 Cr onwards. Shalimar One World Titanium: 3 BHK units are listed from ₹6.49 Cr onwards",
+      bedrooms: "3 BHK + Servant",
+      area: "1521.29 sq ft & 1547.43 sq ft carpet area options",
+      image: "/landingpage/images/1.png",
+      description: "4 towers, G+28 floors, 3 BHK + Servant units, only two units per floor. Inside Shalimar OneWorld township",
+      reraNumber: "UPRERAPRJ858081/05/2024 (Project) & UPRERAPRM4092 (Promoter)",
+      status: "Under Construction"
+    }
+  ];
+
   // Data fetching is now handled by useLandingPageData hook - no manual API calls needed!
 
   // Handle window resize for responsive carousel
@@ -613,56 +767,92 @@ export function RealEstateLandingPage() {
         </section> */}
         <section className="py-16">
           <div className="container mx-auto px-4">
-            <div className="mb-8">
-              <h2 className="font-heading text-3xl font-semibold tracking-tight mb-2">
-                Upcoming Projects
-              </h2>
-              <p className="text-muted-foreground">
-                Visit these projects and get early bird benefits
-              </p>
+            <div className="mb-8 flex items-center justify-between">
+              <div>
+                <h2 className="font-heading text-3xl font-semibold tracking-tight mb-2">
+                  Upcoming Projects
+                </h2>
+                <p className="text-muted-foreground">
+                  Visit these projects and get early bird benefits
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    const container = document.getElementById('featured-projects-container');
+                    if (container) {
+                      container.scrollBy({ left: -400, behavior: 'smooth' });
+                    }
+                  }}
+                  className="rounded-full"
+                >
+                  <Icon icon="solar:arrow-left-bold" className="size-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    const container = document.getElementById('featured-projects-container');
+                    if (container) {
+                      container.scrollBy({ left: 400, behavior: 'smooth' });
+                    }
+                  }}
+                  className="rounded-full"
+                >
+                  <Icon icon="solar:arrow-right-bold" className="size-4" />
+                </Button>
+              </div>
             </div>
-            <Card className="overflow-hidden border-0 shadow-2xl bg-gradient-to-br from-blue-600 to-blue-800 text-white">
-              <CardContent className="p-0">
-                <div className="grid md:grid-cols-2 gap-0">
-                  <div className="p-8 flex flex-col justify-between">
-                    <div>
-                      <h3 className="text-2xl font-bold mb-2">Raaga by 3A, ISWAR GANGULY STREET</h3>
-                      <p className="text-blue-100 mb-4">3A, ISWAR GANGULY STREET</p>
-                      <div className="flex items-center gap-4 mb-6">
+            <div
+              id="featured-projects-container"
+              className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory scrollbar-hide"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {featuredProjects.map((project) => (
+                <Card
+                  key={project.id}
+                  className="flex-shrink-0 w-full md:w-[calc(50%-0.75rem)] overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer snap-start"
+                  onClick={() => navigate(`/featured-project/${project.id}`)}
+                >
+                  <CardContent className="p-0">
+                    <div className="grid md:grid-cols-2 gap-0">
+                      <div className="p-6 flex flex-col justify-between bg-gradient-to-br from-blue-600 to-blue-800 text-white">
                         <div>
-                          <p className="text-3xl font-bold">3 BHK Apartment</p>
-                          <p className="text-blue-100">₹ 80.00 Lakh</p>
+                          <h3 className="text-xl font-bold mb-2">{project.name}</h3>
+                          <p className="text-blue-100 text-sm mb-1">{project.developer}</p>
+                          <p className="text-blue-100 text-sm mb-4">{project.location}</p>
+                          <div className="mb-4">
+                            <p className="text-lg font-semibold">{project.bedrooms}</p>
+                            <p className="text-blue-100 text-sm">{project.price}</p>
+                          </div>
+                          <div className="text-xs text-blue-100 mb-2">
+                            <p>{project.area}</p>
+                          </div>
+                        </div>
+                        <div className="mt-4">
+                          <Badge variant="secondary" className="text-xs mb-2">
+                            {project.status}
+                          </Badge>
+                          <div className="flex items-center justify-between mt-3">
+                            <span className="text-xs">Click to view details</span>
+                            <Icon icon="solar:arrow-right-bold" className="size-5" />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-sm">
-                        <span>Interested in this project?</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          className="bg-red-500 hover:bg-red-600 text-white"
-                          onClick={() => navigate('/contact')}
-                        >
-                          View Number
-                        </Button>
-                        <Icon icon="solar:arrow-right-bold" className="size-5" />
+                      <div className="relative h-full min-h-[18.75rem]">
+                        <img
+                          alt={project.name}
+                          src={project.image}
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
                       </div>
                     </div>
-                    <div className="mt-4 text-sm">
-                      <p>PROP PUZZLES</p>
-                    </div>
-                  </div>
-                  <div className="relative h-full min-h-[18.75rem]">
-                    <img
-                      alt="Raaga Project"
-                      src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/landscape/6.webp"
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
         </section>
         <section className="py-16 bg-gradient-to-br from-red-50 to-red-100 full-width-element">
@@ -732,7 +922,7 @@ export function RealEstateLandingPage() {
                           key={project.id}
                           className="hover:shadow-lg transition-shadow bg-white cursor-pointer flex-shrink-0"
                           style={{ width: `calc(${100 / getVisibleCards()}% - ${(getVisibleCards() - 1) * 1.5}rem / ${getVisibleCards()})` }}
-                          onClick={() => navigate(`/project/${project.id}`)}
+                          onClick={() => navigate(`/featured-project/${project.id}`)}
                         >
                           <CardContent className="p-0">
                             <img

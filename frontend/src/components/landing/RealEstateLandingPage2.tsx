@@ -40,7 +40,7 @@ export function RealEstateLandingPage() {
   const recommendedCarouselRef = useRef<HTMLDivElement>(null);
   const projectsCarouselRef = useRef<HTMLDivElement>(null);
 
-  // Hardcoded featured projects data
+  // Hardcoded featured projects data - Only showing projects with images in ProjectImages folder
   const featuredProjects = [
     {
       id: 1,
@@ -52,7 +52,7 @@ export function RealEstateLandingPage() {
       price: "₹1.25 Cr - ₹1.95 Cr",
       bedrooms: "3 BHK + Servant",
       area: "1521.29 sq ft & 1547.43 sq ft carpet area",
-      image: "/landingpage/images/1.png",
+      image: "/landingpage/ProjectImages/shalimar/C4 (3).jpg",
       description: "4 towers, G+28 floors, 3 BHK + Servant units, only two units per floor",
       reraNumber: "UPRERAPRJ858081/05/2024 (Project) & UPRERAPRM4092 (Promoter)",
       status: "Under Construction"
@@ -67,12 +67,43 @@ export function RealEstateLandingPage() {
       price: "₹67 L to ₹1.48 Cr",
       bedrooms: "2, 3 & 4 BHK units",
       area: "Unit areas vary by tower",
-      image: "/landingpage/images/2.png",
+      image: "/landingpage/ProjectImages/Casagrand/ENTRANCE LOBBY.jpg",
       description: "20-acre Roman-themed township with 1402 apartments (Phase 1), 2/3/4 BHK, 2B+G+36 floors, 130+ amenities",
       reraNumber: "TN/35/Building/0053/2024 (Tamil Nadu RERA)",
       status: "Under Construction"
     },
     {
+      id: 8,
+      name: "DSR Valar",
+      developer: "DSR Infrastructure Pvt. Ltd.",
+      location: "Kokapet, Hyderabad",
+      city: "Hyderabad",
+      state: "Telangana",
+      price: "Over ₹4 Crore",
+      bedrooms: "3 & 4 BHK units (as shown in brochures)",
+      area: "The project is in 'Launch' phase, and the super built-up area for the 4 BHK flats starts from 4,400 square feet",
+      image: "/landingpage/ProjectImages/DSRVALAR/DSR Valar Brochure _page-0014.jpg",
+      description: "Premium residential apartment project offering 3 & 4 BHK homes with luxury amenities, landscaped spaces, clubhouse, swimming pool, and modern facilities",
+      reraNumber: "TS RERA: P02500067402",
+      status: "Under Construction"
+    },
+    {
+      id: 9,
+      name: "Gateway Towers II",
+      developer: "Amanora Park Town / City Corp",
+      location: "Amanora Park Town, Pune",
+      city: "Pune",
+      state: "Maharashtra",
+      price: "Starts from ₹2.18 Cr",
+      bedrooms: "2, 2.5, 3, 3.5, 4.5 BHK & Duplex options",
+      area: "2 BHK: 883 sq ft carpet + 150 sq ft balcony | 2.5 BHK: 1086 sq ft + 157 sq ft | 3 BHK-A: 1086 sq ft + 184 sq ft | 3 BHK-B: 1175 sq ft + 184 sq ft | 3.5 BHK: 1250 sq ft + 162 sq ft | 4.5 BHK: 2250 sq ft + 211 sq ft | 4.5 BHK: 1745 sq ft + 211 sq ft | 4.5 Duplex: 1810 sq ft + 280 sq ft | 4.5 Duplex: 2315 sq ft + 233 sq ft | 4.5 Duplex: 2315 sq ft",
+      image: "/landingpage/ProjectImages/Amanora/Gateway II Main Brochure Final_page-0017.jpg",
+      description: "Ultra-luxury high-rise residential towers offering 2, 2.5, 3, 3.5, 4.5 BHK & duplex units with premium finishes, digital locks, modular kitchens, AC bedrooms, branded fittings, and a full amenity zone including pools, courts, gardens, and clubhouse. A premium residential tower featuring modern amenities, lifestyle facilities, and resort-style living (as shown in brochure visuals, images, and text visuals)",
+      reraNumber: "P52100079477, PR12610125006749",
+      status: "Under Construction"
+    }
+    /* COMMENTED OUT - Projects without image folders
+    ,{
       id: 3,
       name: "Casagrand Mercury",
       developer: "Casagrand Premier Builders Limited",
@@ -148,36 +179,6 @@ export function RealEstateLandingPage() {
       status: "Under Construction (BMIC approved till 20 Dec 2024; final OC pending approval)"
     },
     {
-      id: 8,
-      name: "DSR Valar",
-      developer: "DSR Infrastructure Pvt. Ltd.",
-      location: "Kokapet, Hyderabad",
-      city: "Hyderabad",
-      state: "Telangana",
-      price: "Over ₹4 Crore",
-      bedrooms: "3 & 4 BHK units (as shown in brochures)",
-      area: "The project is in 'Launch' phase, and the super built-up area for the 4 BHK flats starts from 4,400 square feet",
-      image: "/landingpage/images/3.png",
-      description: "Premium residential apartment project offering 3 & 4 BHK homes with luxury amenities, landscaped spaces, clubhouse, swimming pool, and modern facilities",
-      reraNumber: "TS RERA: P02500067402",
-      status: "Under Construction"
-    },
-    {
-      id: 9,
-      name: "Gateway Towers II",
-      developer: "Amanora Park Town / City Corp",
-      location: "Amanora Park Town, Pune",
-      city: "Pune",
-      state: "Maharashtra",
-      price: "Starts from ₹2.18 Cr",
-      bedrooms: "2, 2.5, 3, 3.5, 4.5 BHK & Duplex options",
-      area: "2 BHK: 883 sq ft carpet + 150 sq ft balcony | 2.5 BHK: 1086 sq ft + 157 sq ft | 3 BHK-A: 1086 sq ft + 184 sq ft | 3 BHK-B: 1175 sq ft + 184 sq ft | 3.5 BHK: 1250 sq ft + 162 sq ft | 4.5 BHK: 2250 sq ft + 211 sq ft | 4.5 BHK: 1745 sq ft + 211 sq ft | 4.5 Duplex: 1810 sq ft + 280 sq ft | 4.5 Duplex: 2315 sq ft + 233 sq ft | 4.5 Duplex: 2315 sq ft",
-      image: "/landingpage/images/4.png",
-      description: "Ultra-luxury high-rise residential towers offering 2, 2.5, 3, 3.5, 4.5 BHK & duplex units with premium finishes, digital locks, modular kitchens, AC bedrooms, branded fittings, and a full amenity zone including pools, courts, gardens, and clubhouse. A premium residential tower featuring modern amenities, lifestyle facilities, and resort-style living (as shown in brochure visuals, images, and text visuals)",
-      reraNumber: "P52100079477, PR12610125006749",
-      status: "Under Construction"
-    },
-    {
       id: 10,
       name: "Shalimar One World",
       developer: "Shalimar Corp Ltd.",
@@ -192,6 +193,7 @@ export function RealEstateLandingPage() {
       reraNumber: "UPRERAPRJ858081/05/2024 (Project) & UPRERAPRM4092 (Promoter)",
       status: "Under Construction"
     }
+    */
   ];
 
   // Data fetching is now handled by useLandingPageData hook - no manual API calls needed!
@@ -394,6 +396,8 @@ export function RealEstateLandingPage() {
           </div>
         </section>
 
+        
+
         {/* Search Bar Section - Positioned Below Hero */}
         <section className="bg-white border-b">
           <div className="container mx-auto px-4 md:px-6 lg:px-8">
@@ -457,7 +461,232 @@ export function RealEstateLandingPage() {
             </div>
           </div>
         </section>
+        
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="mb-8 flex items-center justify-between">
+              <div>
+                <h2 className="font-heading text-3xl font-semibold tracking-tight mb-2">
+                  Upcoming Projects
+                </h2>
+                <p className="text-muted-foreground">
+                  Visit these projects and get early bird benefits
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    const container = document.getElementById('featured-projects-container');
+                    if (container) {
+                      container.scrollBy({ left: -400, behavior: 'smooth' });
+                    }
+                  }}
+                  className="rounded-full"
+                >
+                  <Icon icon="solar:arrow-left-bold" className="size-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    const container = document.getElementById('featured-projects-container');
+                    if (container) {
+                      container.scrollBy({ left: 400, behavior: 'smooth' });
+                    }
+                  }}
+                  className="rounded-full"
+                >
+                  <Icon icon="solar:arrow-right-bold" className="size-4" />
+                </Button>
+              </div>
+            </div>
+            <div
+              id="featured-projects-container"
+              className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory scrollbar-hide"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {featuredProjects.map((project) => (
+                <Card
+                  key={project.id}
+                  className="flex-shrink-0 w-full md:w-[calc(50%-0.75rem)] overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer snap-start"
+                  onClick={() => navigate(`/featured-project/${project.id}`)}
+                >
+                  <CardContent className="p-0">
+                    <div className="grid md:grid-cols-2 gap-0">
+                      <div className="p-6 flex flex-col justify-between bg-gradient-to-br from-blue-600 to-blue-800 text-white">
+                        <div>
+                          <h3 className="text-xl font-bold mb-2">{project.name}</h3>
+                          <p className="text-blue-100 text-sm mb-1">{project.developer}</p>
+                          <p className="text-blue-100 text-sm mb-4">{project.location}</p>
+                          <div className="mb-4">
+                            <p className="text-lg font-semibold">{project.bedrooms}</p>
+                            <p className="text-blue-100 text-sm">{project.price}</p>
+                          </div>
+                          <div className="text-xs text-blue-100 mb-2">
+                            <p>{project.area}</p>
+                          </div>
+                        </div>
+                        <div className="mt-4">
+                          <Badge variant="secondary" className="text-xs mb-2">
+                            {project.status}
+                          </Badge>
+                          <div className="flex items-center justify-between mt-3">
+                            <span className="text-xs">Click to view details</span>
+                            <Icon icon="solar:arrow-right-bold" className="size-5" />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="relative h-full min-h-[18.75rem]">
+                        <img
+                          alt={project.name}
+                          src={project.image}
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
 
+        <section className="py-12 md:py-16 bg-gray-50">
+          <div className="container mx-auto px-4 md:px-6 lg:px-8">
+            <div className="mb-8 flex items-center justify-between">
+              <div>
+                <h2 className="font-heading text-2xl md:text-3xl font-bold tracking-tight mb-1">
+                  Apartments, Villas and more
+                </h2>
+                <p className="text-sm md:text-base text-muted-foreground">in South Kolkata</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={prevSlide}
+                  disabled={!canGoPrev()}
+                  className="rounded-full"
+                >
+                  <Icon icon="solar:arrow-left-bold" className="size-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={nextSlide}
+                  disabled={!canGoNext()}
+                  className="rounded-full"
+                >
+                  <Icon icon="solar:arrow-right-bold" className="size-4" />
+                </Button>
+              </div>
+            </div>
+            <div className="relative overflow-hidden">
+              <div
+                ref={carouselRef}
+                className="flex transition-transform duration-300 ease-in-out gap-6"
+                style={{
+                  transform: `translateX(-${currentSlide * (100 / getVisibleCards())}%)`
+                }}
+              >
+                {PROPERTY_TYPES.map((propertyType) => {
+                  // Define images for each property type using local images
+                  const propertyImages = {
+                    apartment: "/landingpage/images/1.png",
+                    house: "/landingpage/images/2.png",
+                    villa: "/landingpage/images/3.png",
+                    plot: "/landingpage/images/4.png",
+                    commercial: "/landingpage/images/1.png",
+                    land: "/landingpage/images/4.png"
+                  };
+
+                  // Define property counts (you can make this dynamic by fetching from API later)
+                  const propertyCounts = {
+                    apartment: "8400+",
+                    house: "1400+",
+                    villa: "1200+",
+                    plot: "1700+",
+                    commercial: "800+",
+                    land: "900+"
+                  };
+
+                  return (
+                    <Card
+                      key={propertyType.value}
+                      className="hover:shadow-lg transition-shadow cursor-pointer flex-shrink-0"
+                      style={{ width: `calc(${100 / getVisibleCards()}% - ${(getVisibleCards() - 1) * 1.5}rem / ${getVisibleCards()})` }}
+                      onClick={() => navigate(`/search?property_type=${propertyType.value}`)}
+                    >
+                      <CardContent className="p-0">
+                        <div className="relative w-full aspect-square overflow-hidden rounded-t-xl">
+                          <img
+                            alt={propertyType.label}
+                            src={propertyImages[propertyType.value] || "/landingpage/images/1.png"}
+                            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                          />
+                        </div>
+                        <div className="p-4">
+                          <h3 className="font-semibold text-lg mb-1">{propertyType.label}</h3>
+                          <p className="text-sm text-muted-foreground">{propertyCounts[propertyType.value]} properties</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Red Banner Section */}
+        <section className="py-0 full-width-element">
+          <div className="w-full">
+            <img
+              src="/landingpage/images/redBanner.png"
+              alt="Featured Banner"
+              className="w-full h-auto object-cover"
+            />
+          </div>
+        </section>
+
+        {/* <section className="py-16 bg-gradient-to-br from-primary to-accent full-width-element">
+          <div className="container mx-auto px-4">
+            <Card className="overflow-hidden border-0 shadow-2xl">
+              <CardContent className="p-0">
+                <div className="grid md:grid-cols-2 gap-0">
+                  <div className="p-12 flex flex-col justify-center bg-gradient-to-br from-primary/5 to-accent/5">
+                    <div className="mb-6">
+                      <Icon icon="solar:home-smile-bold" className="size-16 text-primary" />
+                    </div>
+                    <h2 className="font-heading text-3xl font-bold tracking-tight mb-4">
+                      Ready to Find Your Perfect Home?
+                    </h2>
+                    <p className="text-muted-foreground mb-6">
+                      Join thousands of happy homeowners who found their dream property with us
+                    </p>
+                    <Button
+                      size="lg"
+                      className="w-fit shadow-lg shadow-primary/20 bg-gradient-to-br from-primary to-primary/90"
+                      onClick={() => navigate('/contact')}
+                    >
+                      <Icon icon="solar:chat-round-bold" className="size-5" />
+                      Talk to Our Expert
+                    </Button>
+                  </div>
+                  <div className="relative h-full min-h-[25rem]">
+                    <img
+                      alt="Happy Family"
+                      src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/portrait/3.webp"
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section> */}
         <section className="py-12 md:py-16 bg-background">
           <div className="container mx-auto px-4 md:px-6 lg:px-8">
             <div className="mb-8 flex items-center justify-between">
@@ -631,230 +860,7 @@ export function RealEstateLandingPage() {
             )}
           </div>
         </section>
-        <section className="py-12 md:py-16 bg-gray-50">
-          <div className="container mx-auto px-4 md:px-6 lg:px-8">
-            <div className="mb-8 flex items-center justify-between">
-              <div>
-                <h2 className="font-heading text-2xl md:text-3xl font-bold tracking-tight mb-1">
-                  Apartments, Villas and more
-                </h2>
-                <p className="text-sm md:text-base text-muted-foreground">in South Kolkata</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={prevSlide}
-                  disabled={!canGoPrev()}
-                  className="rounded-full"
-                >
-                  <Icon icon="solar:arrow-left-bold" className="size-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={nextSlide}
-                  disabled={!canGoNext()}
-                  className="rounded-full"
-                >
-                  <Icon icon="solar:arrow-right-bold" className="size-4" />
-                </Button>
-              </div>
-            </div>
-            <div className="relative overflow-hidden">
-              <div
-                ref={carouselRef}
-                className="flex transition-transform duration-300 ease-in-out gap-6"
-                style={{
-                  transform: `translateX(-${currentSlide * (100 / getVisibleCards())}%)`
-                }}
-              >
-                {PROPERTY_TYPES.map((propertyType) => {
-                  // Define images for each property type using local images
-                  const propertyImages = {
-                    apartment: "/landingpage/images/1.png",
-                    house: "/landingpage/images/2.png",
-                    villa: "/landingpage/images/3.png",
-                    plot: "/landingpage/images/4.png",
-                    commercial: "/landingpage/images/1.png",
-                    land: "/landingpage/images/4.png"
-                  };
-
-                  // Define property counts (you can make this dynamic by fetching from API later)
-                  const propertyCounts = {
-                    apartment: "8400+",
-                    house: "1400+",
-                    villa: "1200+",
-                    plot: "1700+",
-                    commercial: "800+",
-                    land: "900+"
-                  };
-
-                  return (
-                    <Card
-                      key={propertyType.value}
-                      className="hover:shadow-lg transition-shadow cursor-pointer flex-shrink-0"
-                      style={{ width: `calc(${100 / getVisibleCards()}% - ${(getVisibleCards() - 1) * 1.5}rem / ${getVisibleCards()})` }}
-                      onClick={() => navigate(`/search?property_type=${propertyType.value}`)}
-                    >
-                      <CardContent className="p-0">
-                        <div className="relative w-full aspect-square overflow-hidden rounded-t-xl">
-                          <img
-                            alt={propertyType.label}
-                            src={propertyImages[propertyType.value] || "/landingpage/images/1.png"}
-                            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                          />
-                        </div>
-                        <div className="p-4">
-                          <h3 className="font-semibold text-lg mb-1">{propertyType.label}</h3>
-                          <p className="text-sm text-muted-foreground">{propertyCounts[propertyType.value]} properties</p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Red Banner Section */}
-        <section className="py-0 full-width-element">
-          <div className="w-full">
-            <img
-              src="/landingpage/images/redBanner.png"
-              alt="Featured Banner"
-              className="w-full h-auto object-cover"
-            />
-          </div>
-        </section>
-
-        {/* <section className="py-16 bg-gradient-to-br from-primary to-accent full-width-element">
-          <div className="container mx-auto px-4">
-            <Card className="overflow-hidden border-0 shadow-2xl">
-              <CardContent className="p-0">
-                <div className="grid md:grid-cols-2 gap-0">
-                  <div className="p-12 flex flex-col justify-center bg-gradient-to-br from-primary/5 to-accent/5">
-                    <div className="mb-6">
-                      <Icon icon="solar:home-smile-bold" className="size-16 text-primary" />
-                    </div>
-                    <h2 className="font-heading text-3xl font-bold tracking-tight mb-4">
-                      Ready to Find Your Perfect Home?
-                    </h2>
-                    <p className="text-muted-foreground mb-6">
-                      Join thousands of happy homeowners who found their dream property with us
-                    </p>
-                    <Button
-                      size="lg"
-                      className="w-fit shadow-lg shadow-primary/20 bg-gradient-to-br from-primary to-primary/90"
-                      onClick={() => navigate('/contact')}
-                    >
-                      <Icon icon="solar:chat-round-bold" className="size-5" />
-                      Talk to Our Expert
-                    </Button>
-                  </div>
-                  <div className="relative h-full min-h-[25rem]">
-                    <img
-                      alt="Happy Family"
-                      src="https://wqnmyfkavrotpmupbtou.supabase.co/storage/v1/object/public/generation-assets/photos/residential-listings/portrait/3.webp"
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </section> */}
-        <section className="py-16">
-          <div className="container mx-auto px-4">
-            <div className="mb-8 flex items-center justify-between">
-              <div>
-                <h2 className="font-heading text-3xl font-semibold tracking-tight mb-2">
-                  Upcoming Projects
-                </h2>
-                <p className="text-muted-foreground">
-                  Visit these projects and get early bird benefits
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => {
-                    const container = document.getElementById('featured-projects-container');
-                    if (container) {
-                      container.scrollBy({ left: -400, behavior: 'smooth' });
-                    }
-                  }}
-                  className="rounded-full"
-                >
-                  <Icon icon="solar:arrow-left-bold" className="size-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => {
-                    const container = document.getElementById('featured-projects-container');
-                    if (container) {
-                      container.scrollBy({ left: 400, behavior: 'smooth' });
-                    }
-                  }}
-                  className="rounded-full"
-                >
-                  <Icon icon="solar:arrow-right-bold" className="size-4" />
-                </Button>
-              </div>
-            </div>
-            <div
-              id="featured-projects-container"
-              className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory scrollbar-hide"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            >
-              {featuredProjects.map((project) => (
-                <Card
-                  key={project.id}
-                  className="flex-shrink-0 w-full md:w-[calc(50%-0.75rem)] overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer snap-start"
-                  onClick={() => navigate(`/featured-project/${project.id}`)}
-                >
-                  <CardContent className="p-0">
-                    <div className="grid md:grid-cols-2 gap-0">
-                      <div className="p-6 flex flex-col justify-between bg-gradient-to-br from-blue-600 to-blue-800 text-white">
-                        <div>
-                          <h3 className="text-xl font-bold mb-2">{project.name}</h3>
-                          <p className="text-blue-100 text-sm mb-1">{project.developer}</p>
-                          <p className="text-blue-100 text-sm mb-4">{project.location}</p>
-                          <div className="mb-4">
-                            <p className="text-lg font-semibold">{project.bedrooms}</p>
-                            <p className="text-blue-100 text-sm">{project.price}</p>
-                          </div>
-                          <div className="text-xs text-blue-100 mb-2">
-                            <p>{project.area}</p>
-                          </div>
-                        </div>
-                        <div className="mt-4">
-                          <Badge variant="secondary" className="text-xs mb-2">
-                            {project.status}
-                          </Badge>
-                          <div className="flex items-center justify-between mt-3">
-                            <span className="text-xs">Click to view details</span>
-                            <Icon icon="solar:arrow-right-bold" className="size-5" />
-                          </div>
-                        </div>
-                      </div>
-                      <div className="relative h-full min-h-[18.75rem]">
-                        <img
-                          alt={project.name}
-                          src={project.image}
-                          className="absolute inset-0 w-full h-full object-cover"
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
+        
         <section className="py-16 bg-gradient-to-br from-red-50 to-red-100 full-width-element">
           <div className="container mx-auto px-4">
             <div className="mb-8 flex items-center justify-between">

@@ -1,7 +1,7 @@
 import { Icon } from "@iconify/react";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
-import topbanner from './topbanner.png';
+import { getS3ImageUrl } from "@/shared/utils/s3ImageUtils";
 import {
   Select,
   SelectTrigger,
@@ -39,7 +39,7 @@ export function RealEstateLandingPage() {
   const carouselRef = useRef<HTMLDivElement>(null);
   const recommendedCarouselRef = useRef<HTMLDivElement>(null);
   const projectsCarouselRef = useRef<HTMLDivElement>(null);
-
+  
   // Hardcoded featured projects data - Only showing projects with images in ProjectImages folder
   const featuredProjects = [
     {
@@ -52,7 +52,7 @@ export function RealEstateLandingPage() {
       price: "₹1.25 Cr - ₹1.95 Cr",
       bedrooms: "3 BHK + Servant",
       area: "1521.29 sq ft & 1547.43 sq ft carpet area",
-      image: "/landingpage/ProjectImages/shalimar/C4 (3).jpg",
+      image: getS3ImageUrl("projects/shalimar/C4 (3).jpg"),
       description: "4 towers, G+28 floors, 3 BHK + Servant units, only two units per floor",
       reraNumber: "UPRERAPRJ858081/05/2024 (Project) & UPRERAPRM4092 (Promoter)",
       status: "Under Construction"
@@ -67,7 +67,7 @@ export function RealEstateLandingPage() {
       price: "₹67 L to ₹1.48 Cr",
       bedrooms: "2, 3 & 4 BHK units",
       area: "Unit areas vary by tower",
-      image: "/landingpage/ProjectImages/Casagrand/ENTRANCE LOBBY.jpg",
+      image: getS3ImageUrl("projects/Casagrand/ENTRANCE LOBBY.jpg"),
       description: "20-acre Roman-themed township with 1402 apartments (Phase 1), 2/3/4 BHK, 2B+G+36 floors, 130+ amenities",
       reraNumber: "TN/35/Building/0053/2024 (Tamil Nadu RERA)",
       status: "Under Construction"
@@ -82,7 +82,7 @@ export function RealEstateLandingPage() {
       price: "Over ₹4 Crore",
       bedrooms: "3 & 4 BHK units (as shown in brochures)",
       area: "The project is in 'Launch' phase, and the super built-up area for the 4 BHK flats starts from 4,400 square feet",
-      image: "/landingpage/ProjectImages/DSRVALAR/DSR Valar Brochure _page-0014.jpg",
+      image: getS3ImageUrl("projects/DSRVALAR/DSR Valar Brochure _page-0014.jpg"),
       description: "Premium residential apartment project offering 3 & 4 BHK homes with luxury amenities, landscaped spaces, clubhouse, swimming pool, and modern facilities",
       reraNumber: "TS RERA: P02500067402",
       status: "Under Construction"
@@ -97,7 +97,7 @@ export function RealEstateLandingPage() {
       price: "Starts from ₹2.18 Cr",
       bedrooms: "2, 2.5, 3, 3.5, 4.5 BHK & Duplex options",
       area: "2 BHK: 883 sq ft carpet + 150 sq ft balcony | 2.5 BHK: 1086 sq ft + 157 sq ft | 3 BHK-A: 1086 sq ft + 184 sq ft | 3 BHK-B: 1175 sq ft + 184 sq ft | 3.5 BHK: 1250 sq ft + 162 sq ft | 4.5 BHK: 2250 sq ft + 211 sq ft | 4.5 BHK: 1745 sq ft + 211 sq ft | 4.5 Duplex: 1810 sq ft + 280 sq ft | 4.5 Duplex: 2315 sq ft + 233 sq ft | 4.5 Duplex: 2315 sq ft",
-      image: "/landingpage/ProjectImages/Amanora/Gateway II Main Brochure Final_page-0017.jpg",
+      image: getS3ImageUrl("projects/Amanora/Gateway II Main Brochure Final_page-0017.jpg"),
       description: "Ultra-luxury high-rise residential towers offering 2, 2.5, 3, 3.5, 4.5 BHK & duplex units with premium finishes, digital locks, modular kitchens, AC bedrooms, branded fittings, and a full amenity zone including pools, courts, gardens, and clubhouse. A premium residential tower featuring modern amenities, lifestyle facilities, and resort-style living (as shown in brochure visuals, images, and text visuals)",
       reraNumber: "P52100079477, PR12610125006749",
       status: "Under Construction"
@@ -324,7 +324,7 @@ export function RealEstateLandingPage() {
         <section
           className="relative py-20 overflow-hidden bg-cover bg-center bg-no-repeat full-width-element"
           style={{
-            backgroundImage: `url(${topbanner})`,
+            backgroundImage: `url(${getS3ImageUrl("images/topbanner.png")})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }}
@@ -592,14 +592,14 @@ export function RealEstateLandingPage() {
                 }}
               >
                 {PROPERTY_TYPES.map((propertyType) => {
-                  // Define images for each property type using local images
+                  // Define images for each property type using S3 URLs
                   const propertyImages = {
-                    apartment: "/landingpage/images/1.png",
-                    house: "/landingpage/images/2.png",
-                    villa: "/landingpage/images/3.png",
-                    plot: "/landingpage/images/4.png",
-                    commercial: "/landingpage/images/1.png",
-                    land: "/landingpage/images/4.png"
+                    apartment: getS3ImageUrl("images/1.png"),
+                    house: getS3ImageUrl("images/2.png"),
+                    villa: getS3ImageUrl("images/3.png"),
+                    plot: getS3ImageUrl("images/4.png"),
+                    commercial: getS3ImageUrl("images/1.png"),
+                    land: getS3ImageUrl("images/4.png")
                   };
 
                   // Define property counts (you can make this dynamic by fetching from API later)
@@ -623,7 +623,7 @@ export function RealEstateLandingPage() {
                         <div className="relative w-full aspect-square overflow-hidden rounded-t-xl">
                           <img
                             alt={propertyType.label}
-                            src={propertyImages[propertyType.value] || "/landingpage/images/1.png"}
+                            src={propertyImages[propertyType.value] || getS3ImageUrl("images/1.png")}
                             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                           />
                         </div>
@@ -644,7 +644,7 @@ export function RealEstateLandingPage() {
         <section className="py-0 full-width-element">
           <div className="w-full">
             <img
-              src="/landingpage/images/redBanner.png"
+              src={getS3ImageUrl("images/redBanner.png")}
               alt="Featured Banner"
               className="w-full h-auto object-cover"
             />
@@ -1436,7 +1436,7 @@ export function RealEstateLandingPage() {
               <CardContent className="p-4 text-center">
                 <div className="bg-blue-100 p-3 rounded-lg inline-block mb-3">
                   <img
-                    src="/landingpage/icons/overview.png"
+                    src={getS3ImageUrl("icons/overview.png")}
                     alt="Overview"
                     className="size-8 object-contain"
                   />
@@ -1450,7 +1450,7 @@ export function RealEstateLandingPage() {
               <CardContent className="p-4 text-center">
                 <div className="bg-blue-100 p-3 rounded-lg inline-block mb-3">
                   <img
-                    src="/landingpage/icons/propertyrates.png"
+                    src={getS3ImageUrl("icons/propertyrates.png")}
                     alt="Property Rates"
                     className="size-8 object-contain"
                   />
@@ -1464,7 +1464,7 @@ export function RealEstateLandingPage() {
               <CardContent className="p-4 text-center">
                 <div className="bg-blue-100 p-3 rounded-lg inline-block mb-3">
                   <img
-                    src="/landingpage/icons/genuineReviews.png"
+                    src={getS3ImageUrl("icons/genuineReviews.png")}
                     alt="Genuine Reviews"
                     className="size-8 object-contain"
                   />
@@ -1478,7 +1478,7 @@ export function RealEstateLandingPage() {
               <CardContent className="p-4 text-center">
                 <div className="bg-blue-100 p-3 rounded-lg inline-block mb-3">
                   <img
-                    src="/landingpage/icons/aboutmyproperty.png"
+                    src={getS3ImageUrl("icons/aboutmyproperty.png")}
                     alt="About My Property"
                     className="size-8 object-contain"
                   />
@@ -1492,7 +1492,7 @@ export function RealEstateLandingPage() {
               <CardContent className="p-4 text-center">
                 <div className="bg-blue-100 p-3 rounded-lg inline-block mb-3">
                   <img
-                    src="/landingpage/icons/readLatestNews.png"
+                    src={getS3ImageUrl("icons/readLatestNews.png")}
                     alt="Read Latest News"
                     className="size-8 object-contain"
                   />
@@ -1506,7 +1506,7 @@ export function RealEstateLandingPage() {
               <CardContent className="p-4 text-center">
                 <div className="bg-blue-100 p-3 rounded-lg inline-block mb-3">
                   <img
-                    src="/landingpage/icons/checkArticles.png"
+                    src={getS3ImageUrl("icons/checkArticles.png")}
                     alt="Check Articles"
                     className="size-8 object-contain"
                   />
@@ -1520,7 +1520,7 @@ export function RealEstateLandingPage() {
               <CardContent className="p-4 text-center">
                 <div className="bg-blue-100 p-3 rounded-lg inline-block mb-3">
                   <img
-                    src="/landingpage/icons/userGuide.png"
+                    src={getS3ImageUrl("icons/userGuide.png")}
                     alt="User Guide"
                     className="size-8 object-contain"
                   />
@@ -1551,7 +1551,7 @@ export function RealEstateLandingPage() {
                 <div className="flex items-start gap-4 mb-4">
                   <div className="size-20 rounded-full overflow-hidden flex-shrink-0 bg-gray-100">
                     <img
-                      src="/landingpage/images/1.png"
+                      src={getS3ImageUrl("images/1.png")}
                       alt="Isha HiLife"
                       className="w-full h-full object-cover"
                     />
@@ -1575,7 +1575,7 @@ export function RealEstateLandingPage() {
                 <div className="flex items-start gap-4 mb-4">
                   <div className="size-20 rounded-full overflow-hidden flex-shrink-0 bg-gray-100">
                     <img
-                      src="/landingpage/images/2.png"
+                      src={getS3ImageUrl("images/2.png")}
                       alt="Isha HiLife"
                       className="w-full h-full object-cover"
                     />
@@ -1599,7 +1599,7 @@ export function RealEstateLandingPage() {
                 <div className="flex items-start gap-4 mb-4">
                   <div className="size-20 rounded-full overflow-hidden flex-shrink-0 bg-gray-100">
                     <img
-                      src="/landingpage/images/3.png"
+                      src={getS3ImageUrl("images/3.png")}
                       alt="Isha HiLife"
                       className="w-full h-full object-cover"
                     />
@@ -1752,7 +1752,7 @@ export function RealEstateLandingPage() {
                 <div className="relative h-full min-h-[25rem]">
                   <img
                     alt="Sell or Rent Your Property"
-                    src="/landingpage/images/sellorrent.png"
+                    src={getS3ImageUrl("images/sellorrent.png")}
                     className="absolute inset-0 w-full h-full object-cover"
                   />
                 </div>
@@ -1767,7 +1767,7 @@ export function RealEstateLandingPage() {
         <div className="container mx-auto px-4">
           <div className="relative w-full overflow-hidden rounded-xl shadow-lg">
             <img
-              src="/landingpage/images/SaleBanner.png"
+              src={getS3ImageUrl("images/SaleBanner.png")}
               alt="Sales Banner"
               className="w-full h-auto object-cover"
             />

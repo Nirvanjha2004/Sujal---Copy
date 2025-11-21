@@ -110,6 +110,15 @@ dist/
 uploads/
 public/uploads/
 
+# Landing page images (stored in S3)
+frontend/public/landingpage/images/
+frontend/public/landingpage/ProjectImages/
+frontend/public/landingpage/icons/
+# Keep README.md files for documentation
+!frontend/public/landingpage/images/README.md
+!frontend/public/landingpage/ProjectImages/README.md
+!frontend/public/landingpage/icons/README.md
+
 # IDE files
 .vscode/
 .idea/

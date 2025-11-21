@@ -6,3 +6,4 @@ export * from './accessibilityTesting';
 export * from './lazyImports';
 export * from './performance';
 export * from './tokenUtils';
+export * from './s3ImageUtils';

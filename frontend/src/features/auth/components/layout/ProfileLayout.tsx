@@ -74,12 +74,12 @@ export function ProfileLayout({
           <aside 
             className={cn(
               "w-64 flex-shrink-0 transition-all duration-300 ease-in-out",
-              "lg:block", // Always visible on desktop
-              sidebarCollapsed ? "hidden" : "block", // Toggle on mobile
+              "lg:block lg:relative", // Always visible on desktop, relative positioning
+              sidebarCollapsed ? "hidden" : "fixed inset-y-0 left-0 z-50 bg-background shadow-lg", // Fixed position on mobile when open
               "lg:w-64" // Fixed width on desktop
             )}
           >
-            <div className="sticky top-6">
+            <div className="sticky top-6 p-4 lg:p-0">
               {sidebar}
             </div>
           </aside>
@@ -96,7 +96,7 @@ export function ProfileLayout({
       {/* Mobile sidebar overlay */}
       {!sidebarCollapsed && (
         <div 
-          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={toggleSidebar}
         />
       )}

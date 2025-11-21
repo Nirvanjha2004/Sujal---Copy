@@ -337,7 +337,6 @@ class PropertyController {
       }
 
 
-      console.log(`[${requestId}] Reached the search function`, (req.query))
 
       const filters: PropertySearchFilters = {
         propertyType: req.query.property_type as PropertyType,

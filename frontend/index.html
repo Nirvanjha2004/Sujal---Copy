@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Real Estate Portal</title>
+    
+    <!-- Connection Optimization: DNS Prefetch -->
+    <!-- Resolve DNS early for critical domains to reduce latency -->
+    <link rel="dns-prefetch" href="//real-estate-portal-images-dev.s3.ap-south-1.amazonaws.com" />
+    <link rel="dns-prefetch" href="//s3.ap-south-1.amazonaws.com" />
+    
+    <!-- Connection Optimization: Preconnect -->
+    <!-- Establish early connections (DNS + TCP + TLS) for critical resources -->
+    <!-- CloudFront CDN - Primary image delivery (when configured) -->
+    <link rel="preconnect" href="https://real-estate-portal-images-dev.s3.ap-south-1.amazonaws.com" crossorigin />
+    
+    <!-- S3 Direct - Fallback image delivery -->
+    <link rel="preconnect" href="https://s3.ap-south-1.amazonaws.com" crossorigin />
+    
+    <!-- API Backend - Critical for data fetching -->
+    <link rel="preconnect" href="http://localhost:3000" crossorigin />
+    
+    <!-- Performance Optimization Notes:
+         - dns-prefetch: Resolves DNS only (~20-120ms saved)
+         - preconnect: DNS + TCP handshake + TLS negotiation (~100-500ms saved)
+         - crossorigin: Required for CORS resources (images, fonts, API)
+         - HTTP/2: Enabled by default on CloudFront and modern servers
+         - Connection reuse: Browser automatically reuses connections
+    -->
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

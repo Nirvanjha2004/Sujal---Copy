@@ -7,7 +7,7 @@ import { Alert, AlertDescription } from '@/shared/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 
 import { useProfile } from '../../hooks/useProfile';
-import { ProfileFormData, User } from '../../types';
+import { ProfileFormData, User, ProfileUpdateData } from '../../types';
 
 interface ProfileFormProps {
   user: User;
@@ -32,25 +32,46 @@ export function ProfileForm({ user, onSuccess, onError, className }: ProfileForm
   // Initialize form data with user data
   useEffect(() => {
     if (user) {
+      // Clean phone number - remove country code prefix if present
+      let cleanPhone = user.phone || '';
+      if (cleanPhone) {
+        // Remove +91, +91-, or any non-digit characters except the 10 digits
+        cleanPhone = cleanPhone.replace(/^\+91-?/, '').replace(/\D/g, '');
+      }
+      
       setFormData({
-        firstName: user.first_name || user.firstName || '',
-        lastName: user.last_name || user.lastName || '',
-        phone: user.phone || '',
-        avatar: user.avatar || '',
+        firstName: user.first_name || '',
+        lastName: user.last_name || '',
+        phone: cleanPhone,
+        avatar: user.profile_image || '',
       });
     }
   }, [user]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    
+    let processedValue = value;
+    
+    // Special handling for phone number - only allow digits
+    if (name === 'phone') {
+      // Remove all non-digit characters
+      processedValue = value.replace(/\D/g, '');
+      // Limit to 10 digits
+      if (processedValue.length > 10) {
+        processedValue = processedValue.slice(0, 10);
+      }
+    }
+    
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: processedValue
     }));
 
     // Clear field error when user starts typing
-    if (fieldErrors[name as keyof ProfileFormData]) {
-      clearFieldError(name as keyof ProfileFormData);
+    const fieldKey = name === 'avatar' ? 'profile_image' : name;
+    if (fieldErrors[fieldKey as keyof ProfileUpdateData]) {
+      clearFieldError(fieldKey as keyof ProfileUpdateData);
     }
     
     // Clear messages
@@ -64,7 +85,8 @@ export function ProfileForm({ user, onSuccess, onError, className }: ProfileForm
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    validateField(name as keyof ProfileFormData, value);
+    const fieldKey = name === 'avatar' ? 'profile_image' : name;
+    validateField(fieldKey as keyof ProfileUpdateData, value);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -171,7 +193,7 @@ export function ProfileForm({ user, onSuccess, onError, className }: ProfileForm
             {/* Phone Field */}
             <FormField
               label="Phone Number"
-              description="Your phone number for contact purposes"
+              description="Enter 10-digit Indian mobile number (e.g., 9876543212)"
               error={fieldErrors.phone}
             >
               <div className="relative">
@@ -183,13 +205,20 @@ export function ProfileForm({ user, onSuccess, onError, className }: ProfileForm
                   id="phone"
                   name="phone"
                   type="tel"
-                  placeholder="+1 (555) 123-4567"
+                  placeholder="9876543212"
                   value={formData.phone}
                   onChange={handleInputChange}
                   onBlur={handleBlur}
                   disabled={isSubmitting}
+                  maxLength={10}
                   className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
                 />
+                {formData.phone && formData.phone.length === 10 && (
+                  <Icon 
+                    icon="solar:check-circle-bold" 
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 size-4 text-success" 
+                  />
+                )}
               </div>
             </FormField>
 

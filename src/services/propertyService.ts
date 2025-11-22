@@ -372,7 +372,7 @@ class PropertyService {
                         },
                     ],
                 };
-                
+
                 // Combine all conditions
                 whereConditions = {
                     [Op.and]: [
@@ -407,7 +407,7 @@ class PropertyService {
                 console.log(`[${requestId}] === KEYWORD SEARCH LOGIC ===`);
                 console.log(`[${requestId}] Keywords:`, filters.keywords);
                 console.log(`[${requestId}] WHERE CONDITIONS BEFORE:`, JSON.stringify(whereConditions, null, 2));
-                
+
                 // Create keyword OR conditions
                 const keywordConditions = {
                     [Op.or]: [
@@ -438,7 +438,7 @@ class PropertyService {
                         },
                     ],
                 };
-                
+
                 // Combine existing conditions with keyword conditions using AND
                 // Check if whereConditions already has an Op.and structure
                 if ((whereConditions as any)[Op.and]) {
@@ -453,7 +453,7 @@ class PropertyService {
                     // No existing conditions, just use keyword conditions
                     whereConditions = keywordConditions;
                 }
-                
+
                 console.log(`[${requestId}] WHERE CONDITIONS AFTER:`, JSON.stringify(whereConditions, null, 2));
                 console.log(`[${requestId}] ===========================`);
             }
@@ -466,7 +466,7 @@ class PropertyService {
                     condition[`amenities.${amenity}`] = true;
                     return condition;
                 });
-                
+
                 // Add amenities conditions to existing structure
                 if ((whereConditions as any)[Op.and]) {
                     // If we already have an AND structure, add to it
@@ -522,7 +522,7 @@ class PropertyService {
             console.log(`[${requestId}] === EXECUTING DATABASE QUERY ===`);
             console.log(`[${requestId}] WHERE CONDITIONS:`, JSON.stringify(whereConditions, null, 2));
             console.log(`[${requestId}] ===============================`);
-            
+
             const { count, rows } = await Property.findAndCountAll({
                 where: whereConditions,
                 include: [
@@ -559,7 +559,7 @@ class PropertyService {
                     keywords: filters.keywords,
                 };
                 await searchHistoryService.addToSearchHistory(filters.userId, searchCriteria, count);
-                
+
                 // Track search terms for popularity
                 if (filters.keywords) {
                     await searchHistoryService.trackSearchTerm(filters.keywords);
@@ -585,8 +585,8 @@ class PropertyService {
             if (!filters.userId) {
                 const searchCriteria = {
                     ...filters,
-                    sortOrder: filters.sortOrder === 'asc' ? 'ASC' as const : 
-                              filters.sortOrder === 'desc' ? 'DESC' as const : undefined,
+                    sortOrder: filters.sortOrder === 'asc' ? 'ASC' as const :
+                        filters.sortOrder === 'desc' ? 'DESC' as const : undefined,
                 };
                 await this.cacheService.cacheSearchResults(
                     searchCriteria,
@@ -1295,7 +1295,7 @@ class PropertyService {
 
         const featuredCount = activeProperties.filter(p => p.is_featured).length;
         const totalActive = activeProperties.length;
-        
+
         if (featuredCount < Math.min(3, Math.ceil(totalActive * 0.2))) {
             recommendations.push('Consider featuring more properties to increase visibility and views.');
         }

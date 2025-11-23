@@ -31,6 +31,7 @@ export const useProperty = (options: UsePropertyOptions = {}): UsePropertyReturn
     
     try {
       const fetchedProperty = await propertyService.getPropertyById(propertyId);
+      console.log("Use PropertyHook Called",fetchedProperty);
       setProperty(fetchedProperty);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch property';

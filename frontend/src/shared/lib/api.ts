@@ -238,7 +238,9 @@ export const api = {
   },
 
   getProperty: async (id: number): Promise<Property> => {
-    const response = await apiRequest(`/properties/${id}`) as any;
+    // Add cache-busting parameter to ensure fresh data
+    const timestamp = Date.now();
+    const response = await apiRequest(`/properties/${id}?_t=${timestamp}`) as any;
     return response.data;
   },
 

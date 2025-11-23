@@ -114,9 +114,31 @@ class PropertyService {
             // Clear related caches
             await this.clearPropertyCaches();
             await this.cacheService.invalidateSearchCache();
+            
+            // Also clear the specific property cache to ensure fresh data
+            await this.cacheService.invalidatePropertyRelatedCache(property.id);
 
-            // Cache the new property
-            await this.cacheService.cachePropertyDetails(property.id, property.toJSON());
+            // Fetch the property with all relationships before caching
+            const propertyWithRelations = await Property.findOne({
+                where: { id: property.id },
+                include: [
+                    {
+                        model: User,
+                        as: 'owner',
+                        attributes: ['id', 'first_name', 'last_name', 'email', 'phone', 'role'],
+                    },
+                    {
+                        model: PropertyImage,
+                        as: 'images',
+                        order: [['display_order', 'ASC']],
+                    },
+                ],
+            });
+
+            // Cache the property with all relationships
+            if (propertyWithRelations) {
+                await this.cacheService.cachePropertyDetails(property.id, propertyWithRelations.toJSON());
+            }
 
             // Check for saved search matches and send notifications
             // Import savedSearchService at the top of the file to avoid circular dependency

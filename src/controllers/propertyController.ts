@@ -226,8 +226,28 @@ class PropertyController {
       }
 
       console.log("The data coming from the frontend is :", req.body)
+      console.log("Authentication state:", {
+        hasUser: !!req.user,
+        userId: req.user?.userId,
+        userEmail: req.user?.email,
+        userRole: req.user?.role
+      });
 
       const userId = req.user!.userId;
+      
+      // Validate that we have a valid user ID
+      if (!userId || userId === 0) {
+        res.status(401).json({
+          success: false,
+          error: {
+            code: 'INVALID_USER',
+            message: 'Invalid user authentication. Please log in again.',
+          },
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+      
       const body = req.body as any;
       const propertyData: PropertyCreateData = {
         title: body.title,

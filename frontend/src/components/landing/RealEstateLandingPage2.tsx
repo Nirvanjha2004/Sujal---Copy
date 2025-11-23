@@ -492,14 +492,14 @@ export function RealEstateLandingPage() {
           </div>
         </section>
         
-        <section className="py-16">
-          <div className="container mx-auto px-4">
+        <section className="py-12 md:py-16 bg-background">
+          <div className="container mx-auto px-4 md:px-6 lg:px-8">
             <div className="mb-8 flex items-center justify-between">
               <div>
-                <h2 className="font-heading text-3xl font-semibold tracking-tight mb-2">
+                <h2 className="font-heading text-2xl md:text-3xl font-bold tracking-tight mb-1">
                   Upcoming Projects
                 </h2>
-                <p className="text-muted-foreground">
+                <p className="text-sm md:text-base text-muted-foreground">
                   Visit these projects and get early bird benefits
                 </p>
               </div>
@@ -507,12 +507,8 @@ export function RealEstateLandingPage() {
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => {
-                    const container = document.getElementById('featured-projects-container');
-                    if (container) {
-                      container.scrollBy({ left: -400, behavior: 'smooth' });
-                    }
-                  }}
+                  onClick={prevProjectsSlide}
+                  disabled={!canGoPrevProjects()}
                   className="rounded-full"
                 >
                   <Icon icon="solar:arrow-left-bold" className="size-4" />
@@ -520,72 +516,95 @@ export function RealEstateLandingPage() {
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => {
-                    const container = document.getElementById('featured-projects-container');
-                    if (container) {
-                      container.scrollBy({ left: 400, behavior: 'smooth' });
-                    }
-                  }}
+                  onClick={nextProjectsSlide}
+                  disabled={!canGoNextProjects()}
                   className="rounded-full"
                 >
                   <Icon icon="solar:arrow-right-bold" className="size-4" />
                 </Button>
               </div>
             </div>
-            <div
-              id="featured-projects-container"
-              className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory scrollbar-hide"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            >
-              {featuredProjects.map((project, index) => (
-                <Card
-                  key={project.id}
-                  className="flex-shrink-0 w-full md:w-[calc(50%-0.75rem)] overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer snap-start"
-                  onClick={() => navigate(`/featured-project/${project.id}`)}
-                  onMouseEnter={() => handleProjectHover(project.image)}
-                >
-                  <CardContent className="p-0">
-                    <div className="grid md:grid-cols-2 gap-0">
-                      <div className="p-6 flex flex-col justify-between bg-gradient-to-br from-blue-600 to-blue-800 text-white">
-                        <div>
-                          <h3 className="text-xl font-bold mb-2">{project.name}</h3>
-                          <p className="text-blue-100 text-sm mb-1">{project.developer}</p>
-                          <p className="text-blue-100 text-sm mb-4">{project.location}</p>
-                          <div className="mb-4">
-                            <p className="text-lg font-semibold">{project.bedrooms}</p>
-                            <p className="text-blue-100 text-sm">{project.price}</p>
+            <div className="relative overflow-hidden">
+              <div
+                ref={projectsCarouselRef}
+                className="flex transition-transform duration-300 ease-in-out gap-6"
+                style={{
+                  transform: `translateX(-${projectsSlide * (100 / getVisibleCards())}%)`
+                }}
+              >
+                {featuredProjects.map((project, index) => (
+                  <Card
+                    key={project.id}
+                    className="hover:shadow-lg transition-all duration-300 cursor-pointer flex-shrink-0 group border-0 shadow-md hover:shadow-xl"
+                    style={{ width: `calc(${100 / getVisibleCards()}% - ${(getVisibleCards() - 1) * 1.5}rem / ${getVisibleCards()})` }}
+                    onClick={() => navigate(`/featured-project/${project.id}`)}
+                    onMouseEnter={() => handleProjectHover(project.image)}
+                  >
+                    <CardContent className="p-0 h-full">
+                      <div className="flex flex-col h-full">
+                        {/* Image Section - Fixed Height */}
+                        <div className="relative w-full h-48 overflow-hidden rounded-t-xl">
+                          <OptimizedImage
+                            images={{
+                              image_url: project.image,
+                              large_url: project.image,
+                            }}
+                            alt={project.name}
+                            context="grid"
+                            priority={index < 4}
+                            className="w-full h-full transition-transform duration-300 group-hover:scale-105"
+                            showBlurPlaceholder={true}
+                          />
+                          <div className="absolute top-3 left-3">
+                            <Badge className="bg-gradient-to-r from-blue-600 to-blue-700 text-white text-xs font-medium">
+                              {project.status}
+                            </Badge>
                           </div>
-                          <div className="text-xs text-blue-100 mb-2">
-                            <p>{project.area}</p>
+                          <div className="absolute top-3 right-3">
+                            <Badge variant="secondary" className="bg-white/90 text-gray-800 text-xs font-medium">
+                              {project.city}
+                            </Badge>
                           </div>
                         </div>
-                        <div className="mt-4">
-                          <Badge variant="secondary" className="text-xs mb-2">
-                            {project.status}
-                          </Badge>
-                          <div className="flex items-center justify-between mt-3">
-                            <span className="text-xs">Click to view details</span>
-                            <Icon icon="solar:arrow-right-bold" className="size-5" />
+                        
+                        {/* Content Section - Flexible Height */}
+                        <div className="p-4 flex-1 flex flex-col justify-between">
+                          <div className="space-y-2">
+                            <h3 className="font-bold text-lg leading-tight line-clamp-2 group-hover:text-primary transition-colors">
+                              {project.name}
+                            </h3>
+                            <p className="text-sm text-muted-foreground line-clamp-1">
+                              {project.developer}
+                            </p>
+                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                              <Icon icon="solar:map-point-bold" className="size-4 text-primary" />
+                              <span className="line-clamp-1">{project.location}</span>
+                            </div>
+                          </div>
+                          
+                          <div className="mt-3 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium text-gray-600">Configuration</span>
+                              <span className="text-sm font-semibold">{project.bedrooms}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium text-gray-600">Price Range</span>
+                              <span className="text-sm font-bold text-primary">{project.price}</span>
+                            </div>
+                          </div>
+                          
+                          <div className="mt-4 pt-3 border-t border-gray-100">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-muted-foreground">Click to view details</span>
+                              <Icon icon="solar:arrow-right-bold" className="size-4 text-primary group-hover:translate-x-1 transition-transform" />
+                            </div>
                           </div>
                         </div>
                       </div>
-                      <div className="relative h-full min-h-[18.75rem]">
-                        <OptimizedImage
-                          images={{
-                            image_url: project.image,
-                            large_url: project.image,
-                          }}
-                          alt={project.name}
-                          context="detail"
-                          priority={index < 4}
-                          className="absolute inset-0"
-                          showBlurPlaceholder={true}
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </div>
           </div>
         </section>
